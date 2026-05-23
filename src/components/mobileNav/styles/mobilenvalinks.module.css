@@ -1,0 +1,26 @@
+.link {
+  font-family: var(--font-sans);
+  font-size: 32px;
+  font-weight: 600;
+  font-style: normal;
+  line-height: 1;
+  color: var(--fg1);
+}
+
+.navLink {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  width: fit-content;
+  transition: color var(--dur-fast) var(--ease-out);
+}
+
+.navLink:hover {
+  color: var(--ds-blue);
+}
+
+@media (max-width: 31.25em) {
+  .link {
+    font-size: 26px;
+  }
+}

@@ -1,0 +1,50 @@
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--font-sans);
+  font-weight: 600;
+  font-size: 12px;
+  line-height: 1;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  padding: 16px 26px;
+  border-radius: var(--radius-pill);
+  border: 1px solid transparent;
+  cursor: pointer;
+  text-decoration: none;
+  transition:
+    transform var(--dur-fast) var(--ease-out),
+    background var(--dur-fast) var(--ease-out),
+    color var(--dur-fast) var(--ease-out);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .btn:hover { transform: translateY(-1px); }
+  .btn:active { transform: scale(0.98); }
+}
+
+.primary {
+  background: var(--ds-espresso);
+  color: var(--ds-bone);
+}
+.primary:hover { background: #000; color: var(--ds-bone); }
+
+.mustard {
+  background: var(--ds-mustard);
+  color: var(--ds-espresso);
+}
+.mustard:hover { background: var(--ds-mustard-deep); color: var(--ds-espresso); }
+
+.ghost {
+  background: transparent;
+  color: var(--fg1);
+  border-color: var(--ds-espresso);
+}
+.ghost:hover { background: var(--ds-espresso); color: var(--ds-bone); }
+
+.inverse {
+  background: var(--ds-bone);
+  color: var(--ds-espresso);
+}
+.inverse:hover { background: white; color: var(--ds-espresso); }

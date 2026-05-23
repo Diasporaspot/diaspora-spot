@@ -1,0 +1,45 @@
+.nav {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  gap: 56px;
+  height: 100%;
+  padding: 92px 40px 44px;
+}
+
+.mainNavLinks {
+  display: grid;
+  row-gap: 34px;
+  width: 400px;
+  perspective: 120px;
+  perspective-origin: bottom center;
+}
+
+.authButtons {
+  display: flex;
+  align-items: center;
+  width: 400px;
+  perspective: 120px;
+  perspective-origin: bottom center;
+}
+
+.ctaButton {
+  width: 100%;
+  justify-content: center;
+  min-height: 48px;
+}
+
+@media (max-width: 33.75em) {
+  .mainNavLinks,
+  .authButtons {
+    width: 350px;
+    padding-right: 32px;
+  }
+}
+
+@media (max-width: 30.1875em) {
+  .mainNavLinks,
+  .authButtons {
+    width: 250px;
+  }
+}

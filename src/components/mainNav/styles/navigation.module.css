@@ -1,0 +1,134 @@
+.navContainer {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 1000;
+  isolation: isolate;
+  color: var(--nav-fg, var(--ds-bone));
+  background: transparent;
+  border-bottom: 1px solid transparent;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  transition:
+    background var(--dur-slow) var(--ease-out),
+    border-color var(--dur-slow) var(--ease-out),
+    box-shadow var(--dur-slow) var(--ease-out),
+    color var(--dur-slow) var(--ease-out);
+}
+
+.navContainer::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: rgba(247, 247, 247, 0.88);
+  -webkit-backdrop-filter: blur(6px) saturate(1.22) contrast(1.04);
+  backdrop-filter: blur(6px) saturate(1.22) contrast(1.04);
+  opacity: 0;
+  transform: translateZ(0);
+  will-change: opacity, backdrop-filter;
+  transition: opacity var(--dur-slow) var(--ease-out);
+}
+
+.navContainer::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -1px;
+  z-index: 1;
+  height: 1px;
+  pointer-events: none;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(247, 247, 247, 0.72) 50%,
+    transparent 100%
+  );
+  transition: opacity var(--dur-slow) var(--ease-out);
+}
+
+.heroTone {
+  --nav-fg: var(--ds-bone);
+  --nav-link-hover-bg: rgba(247, 247, 247, 0.12);
+  --nav-link-hover-color: var(--ds-bone);
+}
+
+.scrolled {
+  --nav-fg: var(--fg1);
+  --nav-link-hover-bg: var(--ds-blue-12);
+  --nav-link-hover-color: var(--ds-blue);
+  box-shadow: var(--shadow-1);
+}
+
+.scrolled::before {
+  opacity: 1;
+}
+
+.scrolled::after {
+  opacity: 0;
+}
+
+.navigation {
+  position: relative;
+  z-index: 2;
+  width: min(1240px, calc(100% - 96px));
+  min-height: 78px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 32px;
+}
+
+.logoLink {
+  display: inline-flex;
+  align-items: center;
+}
+
+.logo {
+  width: 138px;
+  height: auto;
+  display: block;
+  transition: opacity var(--dur-fast) var(--ease-out);
+}
+
+.navigationList {
+  display: grid;
+  grid-auto-flow: column;
+  align-items: center;
+  column-gap: 12px;
+  width: max-content;
+}
+
+.authButtons {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.ctaButton {
+  min-height: 38px;
+  padding: 0 18px;
+  white-space: nowrap;
+}
+
+.heroTone .ctaButton {
+  color: var(--ds-bone);
+  background: rgba(247, 247, 247, 0.1);
+  border-color: rgba(247, 247, 247, 0.38);
+  backdrop-filter: blur(10px);
+}
+
+.heroTone .ctaButton:hover {
+  color: var(--ds-espresso);
+  background: var(--ds-bone);
+}
+
+@media (max-width: 75em) {
+  .navContainer {
+    display: none;
+  }
+}

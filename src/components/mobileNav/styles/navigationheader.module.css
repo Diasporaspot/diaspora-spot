@@ -1,0 +1,38 @@
+.header {
+  position: fixed;
+  right: 50px;
+  top: 50px;
+  display: none;
+  z-index: 1001;
+}
+
+.menu {
+  width: 480px;
+  height: 530px;
+  background-color: var(--ds-paper);
+  box-shadow: var(--shadow-3);
+  border: 1px solid var(--border-soft);
+  border-radius: 8px;
+  position: relative;
+  overflow: hidden;
+}
+
+@media (max-width: 75em) {
+  .header {
+    display: block;
+  }
+}
+
+@media (max-width: 46.25em) {
+  .header {
+    right: 30px;
+    top: 30px;
+  }
+}
+
+@media (max-width: 23.5em) {
+  .header {
+    right: 18px;
+    top: 18px;
+  }
+}
