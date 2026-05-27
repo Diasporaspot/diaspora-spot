@@ -6,6 +6,27 @@
   z-index: 1001;
 }
 
+.brand {
+  position: fixed;
+  left: 50px;
+  top: 59px;
+  display: none;
+  align-items: center;
+  z-index: 1002;
+  transition: opacity var(--dur-fast) var(--ease-out);
+}
+
+.brandHidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.logo {
+  width: 138px;
+  height: auto;
+  display: block;
+}
+
 .menu {
   width: 480px;
   height: 530px;
@@ -21,6 +42,10 @@
   .header {
     display: block;
   }
+
+  .brand {
+    display: inline-flex;
+  }
 }
 
 @media (max-width: 46.25em) {
@@ -28,11 +53,27 @@
     right: 30px;
     top: 30px;
   }
+
+  .brand {
+    left: 30px;
+    top: 38px;
+    width: min(132px, calc(100vw - 174px));
+  }
+
+  .logo {
+    width: 100%;
+  }
 }
 
 @media (max-width: 23.5em) {
   .header {
     right: 18px;
     top: 18px;
+  }
+
+  .brand {
+    left: 18px;
+    top: 26px;
+    width: min(126px, calc(100vw - 142px));
   }
 }

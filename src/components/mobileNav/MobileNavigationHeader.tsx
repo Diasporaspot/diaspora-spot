@@ -1,7 +1,9 @@
 'use client';
 
 import { AnimatePresence, motion } from 'framer-motion';
-import { useState } from 'react';
+import Image from 'next/image';
+import Link from 'next/link';
+import { useEffect, useState } from 'react';
 
 import { useOutsideClick } from '@/hooks/useOutsideClick';
 import MobileNavigation from './MobileNavigation';
@@ -10,8 +12,20 @@ import styles from './styles/navigationheader.module.css';
 
 function MobileNavigationHeader() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
   const closeMenu = () => setIsMenuOpen(false);
   const ref = useOutsideClick<HTMLDivElement>(closeMenu);
+
+  useEffect(() => {
+    function handleScroll() {
+      setIsScrolled(window.scrollY > 24);
+    }
+
+    handleScroll();
+    window.addEventListener('scroll', handleScroll, { passive: true });
+
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   const menu = {
     open: {
@@ -41,6 +55,20 @@ function MobileNavigationHeader() {
 
   return (
     <div className={styles.header} ref={ref}>
+      <Link
+        href="/"
+        className={`${styles.brand} ${isMenuOpen || isScrolled ? styles.brandHidden : ''}`}
+        aria-label="DiasporaSpot home"
+      >
+        <Image
+          width={783}
+          height={143}
+          src="/assets/logo-primary-white.png"
+          alt="DiasporaSpot"
+          className={styles.logo}
+          preload
+        />
+      </Link>
       <motion.div
         className={styles.menu}
         variants={menu}
