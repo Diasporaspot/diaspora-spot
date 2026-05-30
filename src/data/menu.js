@@ -1,14 +1,14 @@
 export const navLinks = [
+  { path: '#workshops', href: '#workshops', label: 'Events & Workshops', dropdown: null },
   { path: '#solution', href: '#solution', label: 'Guides', dropdown: null },
-  { path: '#workshops', href: '#workshops', label: 'Workshops', dropdown: null },
   { path: '#articles', href: '#articles', label: 'Articles', dropdown: null },
   { path: '#community', href: '#community', label: 'Community', dropdown: null },
 ];
 
 export const footerLinks = {
   Spot: [
+    { label: 'Events & Workshops', href: '#workshops' },
     { label: 'Guides',     href: '#solution' },
-    { label: 'Workshops',  href: '#workshops' },
     { label: 'Articles',   href: '#articles' },
     { label: 'Community',  href: '#community' },
   ],
