@@ -18,7 +18,7 @@ const signals = [
   },
   {
     icon: MessageSquareText,
-    label: 'Guides, workshops, community',
+    label: 'Articles, workshops, community',
   },
   {
     icon: CalendarDays,
@@ -67,7 +67,7 @@ function FinalCta() {
                 variants={fadeUp}
                 transition={{ duration: 0.55, ease: [0.22, 0.61, 0.36, 1] }}
               >
-                Get the guides, live sessions, and community support built for the in-between parts
+                Get the articles, live sessions, and community support built for the in-between parts
                 of moving, settling, and growing abroad.
               </motion.p>
 

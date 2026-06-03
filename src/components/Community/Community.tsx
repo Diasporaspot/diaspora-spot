@@ -1,7 +1,7 @@
 'use client';
 
 import { motion, useInView } from 'framer-motion';
-import { useEffect, useRef, useState } from 'react';
+import { useRef } from 'react';
 import {
   ArrowRight,
   BriefcaseBusiness,
@@ -11,6 +11,7 @@ import {
   Sparkles,
   Users,
 } from 'lucide-react';
+import TypewriterText from '@/components/TypewriterText/TypewriterText';
 import styles from './community.module.css';
 
 const communityPillars = [
@@ -46,23 +47,6 @@ const eyebrowText = 'Community · Coming Soon';
 function Community() {
   const ref = useRef(null);
   const inView = useInView(ref, { once: true, margin: '-80px' });
-  const [typedEyebrow, setTypedEyebrow] = useState('');
-
-  useEffect(() => {
-    if (!inView) return;
-
-    let index = 0;
-    const intervalId = window.setInterval(() => {
-      index += 1;
-      setTypedEyebrow(eyebrowText.slice(0, index));
-
-      if (index === eyebrowText.length) {
-        window.clearInterval(intervalId);
-      }
-    }, 42);
-
-    return () => window.clearInterval(intervalId);
-  }, [inView]);
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -82,10 +66,12 @@ function Community() {
             variants={fadeUp}
             transition={{ duration: 0.5, ease: [0.22, 0.61, 0.36, 1] }}
           >
-            <span className={styles.eyebrowText}>
-              {typedEyebrow}
-              <span className={styles.typeCursor} aria-hidden="true" />
-            </span>
+            <TypewriterText
+              text={eyebrowText}
+              active={inView}
+              speed={42}
+              className={styles.eyebrowText}
+            />
           </motion.span>
 
           <motion.h2

@@ -2,9 +2,10 @@
 
 import Image from 'next/image';
 import { motion, useInView } from 'framer-motion';
-import { useEffect, useRef, useState } from 'react';
+import { useRef } from 'react';
 import { ArrowRight, BriefcaseBusiness, Compass, Home } from 'lucide-react';
 import Button from '@/components/Button/Button';
+import TypewriterText from '@/components/TypewriterText/TypewriterText';
 import styles from './problem.module.css';
 
 const fadeUp = {
@@ -35,23 +36,6 @@ const realityText = 'The Reality';
 function Problem() {
   const ref = useRef(null);
   const inView = useInView(ref, { once: true, margin: '-80px' });
-  const [typedReality, setTypedReality] = useState('');
-
-  useEffect(() => {
-    if (!inView) return;
-
-    let index = 0;
-    const intervalId = window.setInterval(() => {
-      index += 1;
-      setTypedReality(realityText.slice(0, index));
-
-      if (index === realityText.length) {
-        window.clearInterval(intervalId);
-      }
-    }, 44);
-
-    return () => window.clearInterval(intervalId);
-  }, [inView]);
 
   return (
     <section className={styles.problem}>
@@ -63,10 +47,12 @@ function Problem() {
             animate={inView ? { opacity: 1 } : { opacity: 0 }}
             transition={{ duration: 0.25, ease: [0.22, 0.61, 0.36, 1] }}
           >
-            <span className={styles.eyebrowText}>
-              {typedReality}
-              <span className={styles.typeCursor} aria-hidden="true" />
-            </span>
+            <TypewriterText
+              text={realityText}
+              active={inView}
+              speed={44}
+              className={styles.eyebrowText}
+            />
           </motion.span>
 
           <motion.h2

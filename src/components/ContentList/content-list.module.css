@@ -1,0 +1,152 @@
+.controls {
+  align-items: center;
+  display: grid;
+  gap: 14px;
+  grid-template-columns: minmax(260px, 0.72fr) minmax(0, 1fr);
+  margin-bottom: 32px;
+}
+
+.actions {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  justify-content: flex-end;
+  min-width: 0;
+}
+
+.searchField,
+.selectField {
+  align-items: center;
+  background: rgba(43, 38, 34, 0.055);
+  border: 1px solid rgba(200, 189, 180, 0.74);
+  border-radius: 999px;
+  color: var(--fg3);
+  display: flex;
+  gap: 12px;
+  min-height: 50px;
+  padding: 0 18px;
+  transition:
+    background var(--dur-base) var(--ease-out),
+    border-color var(--dur-base) var(--ease-out),
+    box-shadow var(--dur-base) var(--ease-out);
+}
+
+.searchField:focus-within,
+.selectField:focus-within {
+  background: rgba(255, 255, 255, 0.92);
+  border-color: rgba(43, 38, 34, 0.36);
+  box-shadow: 0 0 0 4px rgba(247, 203, 77, 0.14);
+}
+
+.searchField {
+  max-width: 520px;
+  width: 100%;
+}
+
+.searchField input,
+.selectField select {
+  appearance: none;
+  background: transparent;
+  border: 0;
+  color: var(--fg1);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  min-width: 0;
+  outline: none;
+  width: 100%;
+}
+
+.searchField input::placeholder {
+  color: var(--fg3);
+  font-weight: 700;
+}
+
+.selectField {
+  min-width: 188px;
+}
+
+.selectField select {
+  cursor: pointer;
+}
+
+.selectField select option {
+  color: var(--fg1);
+}
+
+.resetButton,
+.pagination button {
+  align-items: center;
+  background: transparent;
+  border: 1px solid rgba(43, 38, 34, 0.22);
+  border-radius: 999px;
+  color: var(--fg2);
+  cursor: pointer;
+  display: inline-flex;
+  font-family: var(--font-sans);
+  font-size: 11px;
+  font-weight: 800;
+  gap: 8px;
+  letter-spacing: 0.08em;
+  line-height: 1;
+  min-height: 50px;
+  padding: 0 14px;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.pagination {
+  align-items: center;
+  border-top: 1px solid rgba(200, 189, 180, 0.72);
+  display: flex;
+  gap: 14px;
+  justify-content: center;
+  margin-top: 34px;
+  padding-top: 26px;
+}
+
+.pagination span {
+  color: var(--fg3);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.pagination button:disabled {
+  cursor: not-allowed;
+  opacity: 0.42;
+}
+
+.empty {
+  color: var(--fg2);
+  font-size: 16px;
+  line-height: 1.6;
+  padding: 24px 0 0;
+}
+
+@media (max-width: 860px) {
+  .controls {
+    grid-template-columns: 1fr;
+  }
+
+  .actions {
+    justify-content: flex-start;
+  }
+}
+
+@media (max-width: 620px) {
+  .actions,
+  .pagination {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .selectField,
+  .resetButton,
+  .pagination button {
+    justify-content: center;
+    width: 100%;
+  }
+}

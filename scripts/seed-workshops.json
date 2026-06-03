@@ -1,0 +1,77 @@
+[
+  {
+    "_id": "workshop-cv-review-live",
+    "_type": "workshop",
+    "status": "published",
+    "title": "CV Reviews",
+    "slug": {
+      "_type": "slug",
+      "current": "cv-reviews"
+    },
+    "oneLiner": "Get noticed by recruiters.",
+    "description": "Bring your current CV and leave with clearer positioning, sharper bullets, and practical edits you can use immediately.",
+    "date": "2026-06-06",
+    "time": "11:00",
+    "timezone": "WAT",
+    "duration": "60 min",
+    "format": "Live online",
+    "host": "Career Desk",
+    "spotsLabel": "18 spots",
+    "bookingStatus": "booking-open",
+    "icon": "document",
+    "iconTone": "warm",
+    "ctaLabel": "Book CV Review",
+    "bookingUrl": "#",
+    "featured": true
+  },
+  {
+    "_id": "workshop-interview-prep-live",
+    "_type": "workshop",
+    "status": "published",
+    "title": "Interview Preparation",
+    "slug": {
+      "_type": "slug",
+      "current": "interview-preparation"
+    },
+    "oneLiner": "Walk in ready. Walk out confident.",
+    "description": "Practice stronger answers, structure your stories, and learn how to speak with calm authority in global interviews.",
+    "date": "2026-06-13",
+    "time": "14:00",
+    "timezone": "WAT",
+    "duration": "90 min",
+    "format": "Live online",
+    "host": "Hiring Circle",
+    "spotsLabel": "9 spots left",
+    "bookingStatus": "few-spots",
+    "icon": "conversation",
+    "iconTone": "gold",
+    "ctaLabel": "Reserve Seat",
+    "bookingUrl": "#",
+    "featured": false
+  },
+  {
+    "_id": "workshop-portfolio-tips-live",
+    "_type": "workshop",
+    "status": "published",
+    "title": "Portfolio Tips",
+    "slug": {
+      "_type": "slug",
+      "current": "portfolio-tips"
+    },
+    "oneLiner": "Let your work speak for itself.",
+    "description": "Turn scattered projects into a focused proof-of-work page that makes your value easier to understand.",
+    "date": "2026-06-20",
+    "time": "12:00",
+    "timezone": "WAT",
+    "duration": "60 min",
+    "format": "Workshop lab",
+    "host": "Design Review",
+    "spotsLabel": "Waitlist open",
+    "bookingStatus": "waitlist",
+    "icon": "briefcase",
+    "iconTone": "dark",
+    "ctaLabel": "Join Waitlist",
+    "bookingUrl": "#",
+    "featured": false
+  }
+]

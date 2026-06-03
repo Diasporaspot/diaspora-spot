@@ -1,9 +1,10 @@
 'use client';
 
 import { motion, useInView } from 'framer-motion';
-import { useEffect, useRef, useState } from 'react';
+import { useRef } from 'react';
 import { BookOpen, Users, ArrowRight } from 'lucide-react';
 import Button from '@/components/Button/Button';
+import TypewriterText from '@/components/TypewriterText/TypewriterText';
 import styles from './solution.module.css';
 
 const fadeUp = {
@@ -22,23 +23,6 @@ const eyebrowText = "What's inside";
 function Solution() {
   const ref = useRef(null);
   const inView = useInView(ref, { once: true, margin: '-80px' });
-  const [typedEyebrow, setTypedEyebrow] = useState('');
-
-  useEffect(() => {
-    if (!inView) return;
-
-    let index = 0;
-    const intervalId = window.setInterval(() => {
-      index += 1;
-      setTypedEyebrow(eyebrowText.slice(0, index));
-
-      if (index === eyebrowText.length) {
-        window.clearInterval(intervalId);
-      }
-    }, 42);
-
-    return () => window.clearInterval(intervalId);
-  }, [inView]);
 
   return (
     <section className={styles.solution} id="solution" ref={ref}>
@@ -51,13 +35,15 @@ function Solution() {
           transition={transition(0)}
         >
           <span className={styles.eyebrow}>
-            <span className={styles.eyebrowText}>
-              {typedEyebrow}
-              <span className={styles.typeCursor} aria-hidden="true" />
-            </span>
+            <TypewriterText
+              text={eyebrowText}
+              active={inView}
+              speed={42}
+              className={styles.eyebrowText}
+            />
           </span>
           <h2 className={styles.title}>
-            Career and Life Guides.
+            Career Articles and Workshops.
             <span className={styles.subline}>All in one spot.</span>
           </h2>
         </motion.div>
@@ -89,11 +75,11 @@ function Solution() {
             <span className={styles.label}>01 · Learn</span>
             <h3 className={styles.cardTitle}>Learn at your own pace.</h3>
             <p className={styles.cardBody}>
-              Access practical guides for life abroad — from finding work and housing, to building your career wherever you are.
+              Read practical articles for life abroad — from finding work and housing, to building your career wherever you are.
             </p>
             <div className={styles.cardCta}>
               <Button variant="ghost" href="#articles">
-                Explore Guides <ArrowRight size={14} strokeWidth={2} />
+                Read Articles <ArrowRight size={14} strokeWidth={2} />
               </Button>
             </div>
           </motion.article>
@@ -112,7 +98,7 @@ function Solution() {
             <span className={styles.label}>02 · Connect &amp; Grow</span>
             <h3 className={styles.cardTitle}>Find your people, grow your skills.</h3>
             <p className={styles.cardBody}>
-              Join workshops, events, and talks designed to sharpen your skills and connect you with people on the same path.
+              Join workshops designed to sharpen your skills and connect you with people on the same path.
             </p>
             <div className={styles.cardCta}>
               <Button variant="primary" href="#workshops">

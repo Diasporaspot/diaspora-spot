@@ -1,41 +1,13 @@
 'use client';
 
 import { motion, useInView } from 'framer-motion';
-import { useEffect, useRef, useState } from 'react';
+import { useRef } from 'react';
+import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
 import Button from '@/components/Button/Button';
+import TypewriterText from '@/components/TypewriterText/TypewriterText';
+import type { Article } from '@/content/types';
 import styles from './articles.module.css';
-
-const cards = [
-  {
-    id: 'a',
-    mediaClass: styles.mediaA,
-    cat: 'Career',
-    title: 'Writing a CV that crosses borders',
-    meta: '6 min read · Coming soon',
-  },
-  {
-    id: 'b',
-    mediaClass: styles.mediaB,
-    cat: 'Money',
-    title: 'Sending money home, the smart way',
-    meta: '8 min read · Coming soon',
-  },
-  {
-    id: 'c',
-    mediaClass: styles.mediaC,
-    cat: 'Housing',
-    title: 'Renting a flat without getting scammed',
-    meta: '7 min read · Coming soon',
-  },
-  {
-    id: 'd',
-    mediaClass: styles.mediaD,
-    cat: 'Visas',
-    title: 'The skilled worker visa, in plain English',
-    meta: '11 min read · Coming soon',
-  },
-];
 
 const fadeUp = {
   initial: { opacity: 0, y: 24 },
@@ -45,10 +17,16 @@ const fadeUp = {
 const eyebrowText = 'Featured Content';
 
 function ArticleCard({
-  card,
+  article,
 }: {
-  card: (typeof cards)[0];
+  article: Article;
 }) {
+  const mediaStyle = article.coverImage.url
+    ? {
+        backgroundImage: `linear-gradient(180deg, rgba(43,38,34,0) 50%, rgba(43,38,34,0.35) 100%), url(${article.coverImage.url})`,
+      }
+    : undefined;
+
   return (
     <motion.article
       className={styles.card}
@@ -58,37 +36,73 @@ function ArticleCard({
       }}
       transition={{ duration: 0.62, ease: [0.16, 1, 0.3, 1] }}
     >
-      <div className={`${styles.media} ${card.mediaClass}`}>
-        <span className={styles.cat}>{card.cat}</span>
-      </div>
-      <div className={styles.body}>
-        <h3 className={styles.cardTitle}>{card.title}</h3>
-        <span className={styles.meta}>{card.meta}</span>
-      </div>
+      <Link href={`/articles/${article.slug}`} className={styles.cardLink}>
+        <div className={styles.media} style={mediaStyle}>
+          <span className={styles.cat}>{article.category}</span>
+        </div>
+        <div className={styles.body}>
+          <h3 className={styles.cardTitle}>{article.title}</h3>
+          <p className={styles.excerpt}>{article.excerpt}</p>
+          <span className={styles.meta}>
+            {[article.readTime, formatArticleDate(article.publishedAt)].filter(Boolean).join(' · ')}
+          </span>
+        </div>
+      </Link>
     </motion.article>
   );
 }
 
-function Articles() {
+function FeaturedArticleCard({ article }: { article: Article }) {
+  const mediaStyle = article.coverImage.url
+    ? {
+        backgroundImage: `linear-gradient(180deg, rgba(43,38,34,0.04), rgba(43,38,34,0.22)), url(${article.coverImage.url})`,
+      }
+    : undefined;
+
+  return (
+    <motion.article
+      className={styles.featuredCard}
+      variants={{
+        initial: { opacity: 0, y: 28, scale: 0.985 },
+        animate: { opacity: 1, y: 0, scale: 1 },
+      }}
+      transition={{ duration: 0.68, ease: [0.16, 1, 0.3, 1] }}
+    >
+      <Link href={`/articles/${article.slug}`} className={styles.featuredLink}>
+        <div className={styles.featuredMedia} style={mediaStyle}>
+          <span className={styles.cat}>{article.category}</span>
+        </div>
+        <div className={styles.featuredBody}>
+          <span className={styles.kicker}>Featured article</span>
+          <h3 className={styles.featuredTitle}>{article.title}</h3>
+          <p className={styles.featuredExcerpt}>{article.excerpt}</p>
+          <span className={styles.meta}>
+            {[article.readTime, formatArticleDate(article.publishedAt)].filter(Boolean).join(' · ')}
+          </span>
+        </div>
+      </Link>
+    </motion.article>
+  );
+}
+
+function formatArticleDate(date: string) {
+  const parsedDate = new Date(`${date}T00:00:00`);
+
+  if (Number.isNaN(parsedDate.getTime())) {
+    return null;
+  }
+
+  return new Intl.DateTimeFormat('en', {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+  }).format(parsedDate);
+}
+
+function Articles({ articles }: { articles: Article[] }) {
   const ref = useRef(null);
   const inView = useInView(ref, { once: true, margin: '-60px' });
-  const [typedEyebrow, setTypedEyebrow] = useState('');
-
-  useEffect(() => {
-    if (!inView) return;
-
-    let index = 0;
-    const intervalId = window.setInterval(() => {
-      index += 1;
-      setTypedEyebrow(eyebrowText.slice(0, index));
-
-      if (index === eyebrowText.length) {
-        window.clearInterval(intervalId);
-      }
-    }, 38);
-
-    return () => window.clearInterval(intervalId);
-  }, [inView]);
+  const [featuredArticle, ...recentArticles] = articles;
 
   return (
     <section className={styles.articles} id="articles" ref={ref}>
@@ -102,10 +116,12 @@ function Articles() {
         >
           <div>
             <span className={styles.eyebrow}>
-              <span className={styles.eyebrowText}>
-                {typedEyebrow}
-                <span className={styles.typeCursor} aria-hidden="true" />
-              </span>
+              <TypewriterText
+                text={eyebrowText}
+                active={inView}
+                speed={38}
+                className={styles.eyebrowText}
+              />
             </span>
             <h2 className={styles.title}>The Diaspora Article Hub.</h2>
             <p className={styles.sub}>
@@ -127,9 +143,12 @@ function Articles() {
             },
           }}
         >
-          {cards.map((card) => (
-            <ArticleCard key={card.id} card={card} />
+          {featuredArticle ? <FeaturedArticleCard article={featuredArticle} /> : null}
+          <div className={styles.articleStack}>
+          {recentArticles.map((article) => (
+            <ArticleCard key={article._id} article={article} />
           ))}
+          </div>
         </motion.div>
 
         <motion.div
@@ -143,7 +162,7 @@ function Articles() {
             ease: [0.22, 0.61, 0.36, 1],
           }}
         >
-          <Button variant="primary" href="#">
+          <Button variant="primary" href="/articles">
             Read Articles <ArrowRight size={14} strokeWidth={2} />
           </Button>
         </motion.div>

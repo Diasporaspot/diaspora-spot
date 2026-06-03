@@ -79,6 +79,7 @@ html, body {
   padding: 0;
   background: var(--bg);
   color: var(--fg1);
+  font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
   overflow-x: hidden;
 }

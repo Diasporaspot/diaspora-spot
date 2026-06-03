@@ -111,13 +111,6 @@
   align-items: center;
 }
 
-.typeCursor {
-  width: 1px;
-  height: 1em;
-  margin-left: 2px;
-  background: currentColor;
-  animation: blink 0.85s steps(2, start) infinite;
-}
 
 .displayMask {
   overflow: hidden;
@@ -399,17 +392,5 @@
     background: rgba(13, 10, 8, 0.68);
     -webkit-backdrop-filter: none;
     backdrop-filter: none;
-  }
-}
-
-@keyframes blink {
-  0%,
-  45% {
-    opacity: 1;
-  }
-
-  46%,
-  100% {
-    opacity: 0;
   }
 }

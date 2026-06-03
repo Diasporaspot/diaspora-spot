@@ -7,8 +7,16 @@ import Workshops from '@/components/Workshops/Workshops';
 import Community from '@/components/Community/Community';
 import FinalCta from '@/components/FinalCta/FinalCta';
 import Footer from '@/components/Footer/Footer';
+import { getHomepageArticles, getUpcomingWorkshops } from '@/content/queries';
 
-export default function Home() {
+export const dynamic = 'force-dynamic';
+
+export default async function Home() {
+  const [articles, workshops] = await Promise.all([
+    getHomepageArticles(),
+    getUpcomingWorkshops(),
+  ]);
+
   return (
     <>
       <Topbar />
@@ -16,8 +24,8 @@ export default function Home() {
         <Hero />
         <Problem />
         <Solution />
-        <Articles />
-        <Workshops />
+        <Articles articles={articles} />
+        <Workshops workshops={workshops} />
         <Community />
         <FinalCta />
       </main>

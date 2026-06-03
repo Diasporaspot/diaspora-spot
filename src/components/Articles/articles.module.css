@@ -52,13 +52,6 @@
   align-items: center;
 }
 
-.typeCursor {
-  width: 1px;
-  height: 1em;
-  margin-left: 2px;
-  background: currentColor;
-  animation: blink 0.85s steps(2, start) infinite;
-}
 
 .title {
   font-family: var(--font-sans);
@@ -112,23 +105,69 @@
 .grid {
   position: relative;
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: minmax(0, 1.08fr) minmax(380px, 0.92fr);
   gap: 20px;
+  align-items: start;
+}
+
+.featuredCard,
+.card {
+  border-radius: 8px;
+  overflow: hidden;
+  position: relative;
+}
+
+.featuredCard {
+  background:
+    linear-gradient(145deg, rgba(43, 38, 34, 0.96), rgba(43, 38, 34, 0.86)),
+    radial-gradient(circle at 88% 10%, rgba(247, 203, 77, 0.26), transparent 28%),
+    var(--ds-espresso);
+  box-shadow: var(--shadow-3);
+  color: var(--fg-inverse);
+  min-height: 0;
+}
+
+.featuredCard::before {
+  background:
+    linear-gradient(90deg, rgba(255, 255, 255, 0.055) 1px, transparent 1px),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.045) 1px, transparent 1px);
+  background-size: 54px 54px;
+  content: "";
+  inset: 0;
+  pointer-events: none;
+  position: absolute;
+}
+
+.articleStack {
+  display: grid;
+  gap: 16px;
+  align-content: start;
 }
 
 .card {
-  background: rgba(255, 255, 255, 0.96);
-  border: 1px solid rgba(200, 189, 180, 0.78);
-  border-radius: 8px;
-  overflow: hidden;
-  box-shadow: var(--shadow-1);
-  display: flex;
-  flex-direction: column;
-  min-height: 356px;
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(225, 217, 212, 0.95);
+  box-shadow: var(--shadow-2);
   transition:
     transform var(--dur-base) var(--ease-out),
     box-shadow var(--dur-base) var(--ease-out),
     border-color var(--dur-base) var(--ease-out);
+}
+
+.cardLink {
+  color: inherit;
+  display: grid;
+  grid-template-columns: minmax(150px, 0.42fr) minmax(0, 1fr);
+  min-height: 210px;
+}
+
+.featuredLink {
+  color: inherit;
+  display: grid;
+  grid-template-rows: 300px minmax(0, auto);
+  position: relative;
+  text-decoration: none;
+  z-index: 1;
 }
 
 @media (prefers-reduced-motion: no-preference) {
@@ -144,11 +183,18 @@
 }
 
 .media {
-  height: 168px;
   position: relative;
   background-color: var(--ds-sand);
   background-size: cover;
   background-position: center;
+}
+
+.featuredMedia {
+  background-color: var(--ds-sand);
+  background-position: center;
+  background-size: cover;
+  min-height: 0;
+  position: relative;
 }
 
 .media::after {
@@ -158,30 +204,6 @@
   background: var(--ds-espresso);
   opacity: 0;
   transition: opacity var(--dur-base) var(--ease-out);
-}
-
-.mediaA {
-  background-image:
-    linear-gradient(180deg, rgba(43,38,34,0) 50%, rgba(43,38,34,0.35) 100%),
-    url('https://images.unsplash.com/photo-1551836022-d5d88e9218df?w=600&q=80&auto=format&fit=crop');
-}
-
-.mediaB {
-  background-image:
-    linear-gradient(180deg, rgba(43,38,34,0) 50%, rgba(43,38,34,0.35) 100%),
-    url('https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=600&q=80&auto=format&fit=crop');
-}
-
-.mediaC {
-  background-image:
-    linear-gradient(180deg, rgba(43,38,34,0) 50%, rgba(43,38,34,0.35) 100%),
-    url('https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=600&q=80&auto=format&fit=crop');
-}
-
-.mediaD {
-  background-image:
-    linear-gradient(180deg, rgba(43,38,34,0) 50%, rgba(43,38,34,0.35) 100%),
-    url('https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=600&q=80&auto=format&fit=crop');
 }
 
 .cat {
@@ -202,20 +224,88 @@
 }
 
 .body {
-  padding: 22px 22px 24px;
   flex: 1;
   display: flex;
   flex-direction: column;
   gap: 14px;
+  padding: 22px;
 }
 
 .cardTitle {
   font-family: var(--font-sans);
   font-weight: 600;
-  font-size: 19px;
-  line-height: 1.24;
-  letter-spacing: -0.01em;
+  display: -webkit-box;
+  font-size: 23px;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  line-height: 1.18;
+  letter-spacing: 0;
   color: var(--fg1);
+  overflow: hidden;
+}
+
+.excerpt {
+  display: -webkit-box;
+  font-family: var(--font-sans);
+  font-weight: 400;
+  font-size: 14px;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  line-height: 1.55;
+  color: var(--fg2);
+  overflow: hidden;
+}
+
+.featuredBody {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 30px;
+  position: relative;
+  z-index: 1;
+}
+
+.kicker {
+  align-items: center;
+  color: rgba(247, 247, 247, 0.72);
+  display: inline-flex;
+  font-size: 11px;
+  font-weight: 700;
+  gap: 10px;
+  letter-spacing: 0.14em;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.kicker::before {
+  background: rgba(247, 203, 77, 0.8);
+  content: "";
+  height: 1px;
+  width: 26px;
+}
+
+.featuredTitle {
+  color: var(--ds-bone);
+  display: -webkit-box;
+  font-size: clamp(32px, 4vw, 52px);
+  font-weight: 700;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  line-height: 1.12;
+  max-width: 13ch;
+  overflow: hidden;
+  padding-bottom: 0.14em;
+}
+
+.featuredExcerpt {
+  color: rgba(247, 247, 247, 0.72);
+  display: -webkit-box;
+  font-size: 16px;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  line-height: 1.62;
+  max-width: 54ch;
+  overflow: hidden;
 }
 
 .meta {
@@ -236,7 +326,7 @@
 
 @supports ((backdrop-filter: blur(10px)) or (-webkit-backdrop-filter: blur(10px))) {
   .card {
-    background: rgba(255, 255, 255, 0.82);
+    background: rgba(255, 255, 255, 0.84);
     -webkit-backdrop-filter: blur(14px);
     backdrop-filter: blur(14px);
   }
@@ -249,7 +339,15 @@
 }
 
 @media (max-width: 1100px) {
-  .grid { grid-template-columns: repeat(2, 1fr); }
+  .grid { grid-template-columns: 1fr; }
+
+  .featuredCard {
+    min-height: auto;
+  }
+
+  .featuredLink {
+    grid-template-rows: 280px minmax(0, auto);
+  }
 }
 
 @media (max-width: 640px) {
@@ -260,8 +358,13 @@
   .grid { grid-template-columns: 1fr; }
   .head { flex-direction: column; align-items: flex-start; }
 
-  .card {
-    min-height: auto;
+  .cardLink {
+    grid-template-columns: 1fr;
+  }
+
+  .media,
+  .featuredMedia {
+    min-height: 220px;
   }
 }
 
@@ -276,17 +379,5 @@
     background: rgba(247, 247, 247, 0.96);
     -webkit-backdrop-filter: none;
     backdrop-filter: none;
-  }
-}
-
-@keyframes blink {
-  0%,
-  45% {
-    opacity: 1;
-  }
-
-  46%,
-  100% {
-    opacity: 0;
   }
 }

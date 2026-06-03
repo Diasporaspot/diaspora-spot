@@ -70,13 +70,6 @@
   align-items: center;
 }
 
-.typeCursor {
-  width: 1px;
-  height: 1em;
-  margin-left: 2px;
-  background: currentColor;
-  animation: blink 0.85s steps(2, start) infinite;
-}
 
 .title {
   font-family: var(--font-sans);
@@ -282,18 +275,6 @@
   .iconWrap {
     width: 40px;
     height: 40px;
-  }
-}
-
-@keyframes blink {
-  0%,
-  45% {
-    opacity: 1;
-  }
-
-  46%,
-  100% {
-    opacity: 0;
   }
 }
 

@@ -22,7 +22,7 @@ const poppins = localFont({
 
 export const metadata: Metadata = {
   title: "DiasporaSpot — Build your life abroad.",
-  description: "DiasporaSpot is a digital hub created to help you build and grow your life abroad — with career resources, guides, and events.",
+  description: "DiasporaSpot is a digital hub created to help you build and grow your life abroad — with practical articles, workshops, and community.",
 };
 
 export default function RootLayout({

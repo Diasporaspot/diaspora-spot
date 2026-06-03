@@ -7,12 +7,18 @@ import {
   Briefcase,
   CalendarDays,
   Clock3,
+  FileCheck2,
   FileText,
+  Globe2,
+  MapPin,
   MessageCircle,
+  Presentation,
+  Target,
   Users,
+  type LucideIcon,
 } from 'lucide-react';
 import Button from '@/components/Button/Button';
-import { workshops, type Workshop } from '@/data/workshops';
+import type { Workshop, WorkshopIcon, WorkshopIconTone } from '@/content/types';
 import styles from './workshops.module.css';
 
 const fadeUp = {
@@ -20,16 +26,25 @@ const fadeUp = {
   animate: { opacity: 1, y: 0 },
 };
 
-const iconMap = {
-  cv: FileText,
-  interview: MessageCircle,
-  portfolio: Briefcase,
+const iconMap: Record<WorkshopIcon, LucideIcon> = {
+  document: FileText,
+  briefcase: Briefcase,
+  conversation: MessageCircle,
+  people: Users,
+  calendar: CalendarDays,
+  globe: Globe2,
+  target: Target,
+  presentation: Presentation,
+  checklist: FileCheck2,
+  'map-pin': MapPin,
 };
 
-const iconClassMap = {
-  cv: styles.iconSand,
-  interview: styles.iconMustard,
-  portfolio: styles.iconDark,
+const iconClassMap: Record<WorkshopIconTone, string> = {
+  warm: styles.iconSand,
+  gold: styles.iconMustard,
+  dark: styles.iconDark,
+  green: styles.iconGreen,
+  blue: styles.iconBlue,
 };
 
 const statusLabel = {
@@ -68,13 +83,13 @@ function WorkshopIcon({ workshop }: { workshop: Workshop }) {
   const Icon = iconMap[workshop.icon];
 
   return (
-    <div className={`${styles.iconWrap} ${iconClassMap[workshop.icon]}`}>
+    <div className={`${styles.iconWrap} ${iconClassMap[workshop.iconTone]}`}>
       <Icon size={24} strokeWidth={1.6} />
     </div>
   );
 }
 
-function Workshops() {
+function Workshops({ workshops }: { workshops: Workshop[] }) {
   const ref = useRef(null);
   const inView = useInView(ref, { once: true, margin: '-80px' });
   const [featuredWorkshop, ...upcomingWorkshops] = workshops;
@@ -114,8 +129,8 @@ function Workshops() {
           >
             <div className={styles.featuredTop}>
               <WorkshopIcon workshop={featuredWorkshop} />
-              <span className={`${styles.status} ${styles[featuredWorkshop.status]}`}>
-                {statusLabel[featuredWorkshop.status]}
+              <span className={`${styles.status} ${styles[featuredWorkshop.bookingStatus]}`}>
+                {statusLabel[featuredWorkshop.bookingStatus]}
               </span>
             </div>
 
@@ -141,7 +156,7 @@ function Workshops() {
           <div className={styles.scheduleStack}>
             {upcomingWorkshops.map((workshop, index) => (
               <motion.article
-                key={workshop.id}
+                key={workshop._id}
                 className={styles.sessionCard}
                 variants={{
                   initial: { opacity: 0, x: 24 },
@@ -153,8 +168,8 @@ function Workshops() {
                 <div className={styles.sessionBody}>
                   <div className={styles.sessionHead}>
                     <WorkshopIcon workshop={workshop} />
-                    <span className={`${styles.status} ${styles[workshop.status]}`}>
-                      {statusLabel[workshop.status]}
+                    <span className={`${styles.status} ${styles[workshop.bookingStatus]}`}>
+                      {statusLabel[workshop.bookingStatus]}
                     </span>
                   </div>
                   <h3 className={styles.cardTitle}>{workshop.title}</h3>
@@ -181,7 +196,7 @@ function Workshops() {
           animate={inView ? 'animate' : 'initial'}
           transition={{ duration: 0.5, delay: 0.36, ease: [0.22, 0.61, 0.36, 1] }}
         >
-          <Button variant="primary" href="#">
+          <Button variant="primary" href="/workshops">
             View All Workshops <ArrowRight size={14} strokeWidth={2} />
           </Button>
         </motion.div>
