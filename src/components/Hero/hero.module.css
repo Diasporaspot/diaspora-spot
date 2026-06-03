@@ -287,10 +287,10 @@
 
 @media (max-width: 920px) {
   .grid {
-    align-content: end;
+    align-content: center;
     justify-items: start;
-    padding-top: 92px;
-    padding-bottom: 32px;
+    padding-top: 112px;
+    padding-bottom: 56px;
   }
 
   .content {
@@ -331,8 +331,8 @@
 
   .grid {
     gap: 24px;
-    padding-top: 104px;
-    padding-bottom: 22px;
+    padding-top: 118px;
+    padding-bottom: 44px;
   }
 
   .display {

@@ -13,21 +13,6 @@ const fadeUp = {
   animate: { opacity: 1, y: 0 },
 };
 
-const avatars = [
-  {
-    id: 'p1',
-    bg: 'https://images.unsplash.com/photo-1531123897727-8f129e1688ce?w=200&q=80&auto=format&fit=crop',
-  },
-  {
-    id: 'p2',
-    bg: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&q=80&auto=format&fit=crop',
-  },
-  {
-    id: 'p3',
-    bg: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200&q=80&auto=format&fit=crop',
-  },
-];
-
 const heroSlides = [
   '/images/diaspora-spot-image-1.png',
   '/images/diaspora-spot-image-2.png',
