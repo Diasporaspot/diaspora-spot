@@ -443,9 +443,7 @@ export async function getUpcomingWorkshops() {
       { cache: 'no-store' },
     );
 
-    if (sanityWorkshops.length > 0) {
-      return sanityWorkshops.map(normalizeWorkshop);
-    }
+    return sanityWorkshops.map(normalizeWorkshop);
   } catch (error) {
     console.warn('Sanity workshop fetch failed, falling back to local dummy data.', error);
   }

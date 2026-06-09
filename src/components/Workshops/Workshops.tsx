@@ -94,8 +94,6 @@ function Workshops({ workshops }: { workshops: Workshop[] }) {
   const inView = useInView(ref, { once: true, margin: '-80px' });
   const [featuredWorkshop, ...upcomingWorkshops] = workshops;
 
-  if (!featuredWorkshop) return null;
-
   return (
     <section className={styles.workshops} id="workshops" ref={ref}>
       <div className="wrap">
@@ -113,81 +111,96 @@ function Workshops({ workshops }: { workshops: Workshop[] }) {
           </p>
         </motion.div>
 
-        <motion.div
-          className={styles.workshopBoard}
-          initial="initial"
-          animate={inView ? 'animate' : 'initial'}
-          variants={{ animate: { transition: { delayChildren: 0.18, staggerChildren: 0.16 } } }}
-        >
-          <motion.article
-            className={styles.featuredCard}
-            variants={{
-              initial: { opacity: 0, y: 28, scale: 0.985 },
-              animate: { opacity: 1, y: 0, scale: 1 },
-            }}
-            transition={{ duration: 0.68, ease: [0.16, 1, 0.3, 1] }}
+        {featuredWorkshop ? (
+          <motion.div
+            className={styles.workshopBoard}
+            initial="initial"
+            animate={inView ? 'animate' : 'initial'}
+            variants={{ animate: { transition: { delayChildren: 0.18, staggerChildren: 0.16 } } }}
           >
-            <div className={styles.featuredTop}>
-              <WorkshopIcon workshop={featuredWorkshop} />
-              <span className={`${styles.status} ${styles[featuredWorkshop.bookingStatus]}`}>
-                {statusLabel[featuredWorkshop.bookingStatus]}
-              </span>
-            </div>
+            <motion.article
+              className={styles.featuredCard}
+              variants={{
+                initial: { opacity: 0, y: 28, scale: 0.985 },
+                animate: { opacity: 1, y: 0, scale: 1 },
+              }}
+              transition={{ duration: 0.68, ease: [0.16, 1, 0.3, 1] }}
+            >
+              <div className={styles.featuredTop}>
+                <WorkshopIcon workshop={featuredWorkshop} />
+                <span className={`${styles.status} ${styles[featuredWorkshop.bookingStatus]}`}>
+                  {statusLabel[featuredWorkshop.bookingStatus]}
+                </span>
+              </div>
 
-            <div className={styles.featuredContent}>
-              <span className={styles.kicker}>Next live session</span>
-              <h3 className={styles.featuredTitle}>{featuredWorkshop.title}</h3>
-              <p className={styles.oneLiner}>{featuredWorkshop.oneLiner}</p>
-              <p className={styles.description}>{featuredWorkshop.description}</p>
-            </div>
+              <div className={styles.featuredContent}>
+                <span className={styles.kicker}>Next live session</span>
+                <h3 className={styles.featuredTitle}>{featuredWorkshop.title}</h3>
+                <p className={styles.oneLiner}>{featuredWorkshop.oneLiner}</p>
+                <p className={styles.description}>{featuredWorkshop.description}</p>
+              </div>
 
-            <WorkshopMeta workshop={featuredWorkshop} />
+              <WorkshopMeta workshop={featuredWorkshop} />
 
-            <div className={styles.featuredFooter}>
-              <span>
-                {featuredWorkshop.format} · {featuredWorkshop.duration}
-              </span>
-              <Button variant="inverse" href={featuredWorkshop.href}>
-                {featuredWorkshop.ctaLabel} <ArrowRight size={14} strokeWidth={2} />
-              </Button>
-            </div>
-          </motion.article>
+              <div className={styles.featuredFooter}>
+                <span>
+                  {featuredWorkshop.format} · {featuredWorkshop.duration}
+                </span>
+                <Button variant="inverse" href={featuredWorkshop.href}>
+                  {featuredWorkshop.ctaLabel} <ArrowRight size={14} strokeWidth={2} />
+                </Button>
+              </div>
+            </motion.article>
 
-          <div className={styles.scheduleStack}>
-            {upcomingWorkshops.map((workshop, index) => (
-              <motion.article
-                key={workshop._id}
-                className={styles.sessionCard}
-                variants={{
-                  initial: { opacity: 0, x: 24 },
-                  animate: { opacity: 1, x: 0 },
-                }}
-                transition={{ duration: 0.58, ease: [0.16, 1, 0.3, 1] }}
-              >
-                <div className={styles.sessionIndex}>0{index + 2}</div>
-                <div className={styles.sessionBody}>
-                  <div className={styles.sessionHead}>
-                    <WorkshopIcon workshop={workshop} />
-                    <span className={`${styles.status} ${styles[workshop.bookingStatus]}`}>
-                      {statusLabel[workshop.bookingStatus]}
-                    </span>
+            <div className={styles.scheduleStack}>
+              {upcomingWorkshops.map((workshop, index) => (
+                <motion.article
+                  key={workshop._id}
+                  className={styles.sessionCard}
+                  variants={{
+                    initial: { opacity: 0, x: 24 },
+                    animate: { opacity: 1, x: 0 },
+                  }}
+                  transition={{ duration: 0.58, ease: [0.16, 1, 0.3, 1] }}
+                >
+                  <div className={styles.sessionIndex}>0{index + 2}</div>
+                  <div className={styles.sessionBody}>
+                    <div className={styles.sessionHead}>
+                      <WorkshopIcon workshop={workshop} />
+                      <span className={`${styles.status} ${styles[workshop.bookingStatus]}`}>
+                        {statusLabel[workshop.bookingStatus]}
+                      </span>
+                    </div>
+                    <h3 className={styles.cardTitle}>{workshop.title}</h3>
+                    <p className={styles.sessionDescription}>{workshop.description}</p>
+                    <WorkshopMeta workshop={workshop} />
+                    <div className={styles.sessionFooter}>
+                      <span>
+                        Hosted by {workshop.host} · {workshop.duration}
+                      </span>
+                      <Button variant="ghost" href={workshop.href}>
+                        {workshop.ctaLabel} <ArrowRight size={14} strokeWidth={2} />
+                      </Button>
+                    </div>
                   </div>
-                  <h3 className={styles.cardTitle}>{workshop.title}</h3>
-                  <p className={styles.sessionDescription}>{workshop.description}</p>
-                  <WorkshopMeta workshop={workshop} />
-                  <div className={styles.sessionFooter}>
-                    <span>
-                      Hosted by {workshop.host} · {workshop.duration}
-                    </span>
-                    <Button variant="ghost" href={workshop.href}>
-                      {workshop.ctaLabel} <ArrowRight size={14} strokeWidth={2} />
-                    </Button>
-                  </div>
-                </div>
-              </motion.article>
-            ))}
-          </div>
-        </motion.div>
+                </motion.article>
+              ))}
+            </div>
+          </motion.div>
+        ) : (
+          <motion.div
+            className={styles.emptyState}
+            variants={fadeUp}
+            initial="initial"
+            animate={inView ? 'animate' : 'initial'}
+            transition={{ duration: 0.5, ease: [0.22, 0.61, 0.36, 1] }}
+          >
+            <h3>No workshops available</h3>
+            <p>
+              New sessions will appear here once the DiasporaSpot team publishes them.
+            </p>
+          </motion.div>
+        )}
 
         <motion.div
           className={styles.cta}
