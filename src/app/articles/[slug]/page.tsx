@@ -6,6 +6,7 @@ import Footer from '@/components/Footer/Footer';
 import TypewriterText from '@/components/TypewriterText/TypewriterText';
 import { getArticleBySlug } from '@/content/queries';
 import type { ArticleBlock, ArticleTextSpan } from '@/content/types';
+import ArticleNewsletterSignup from './ArticleNewsletterSignup';
 import styles from './article-detail.module.css';
 
 export const dynamic = 'force-dynamic';
@@ -201,14 +202,18 @@ export default async function ArticleDetailPage({ params }: PageProps<'/articles
               {article.body.map((block, index) => (
                 <ArticleBodyBlock key={`${block._type}-${index}`} block={block} />
               ))}
+              <ArticleNewsletterSignup />
             </article>
 
             <aside className={styles.aside} aria-label="Article details">
-              <h2 className={styles.asideTitle}>Article Details</h2>
-              <p className={styles.asideText}>
-                {article.articleDetails ||
-                  'Written for diaspora professionals looking for practical guidance they can use while building life abroad.'}
-              </p>
+              <div className={styles.asideSticky}>
+                <h2 className={styles.asideTitle}>Article Details</h2>
+                <p className={styles.asideText}>
+                  {article.articleDetails ||
+                    'Written for diaspora professionals looking for practical guidance they can use while building life abroad.'}
+                </p>
+                <ArticleNewsletterSignup idPrefix="article-aside-newsletter" variant="compact" />
+              </div>
             </aside>
           </div>
         </section>

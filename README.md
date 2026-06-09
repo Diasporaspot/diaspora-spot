@@ -2,6 +2,18 @@ This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-
 
 ## Getting Started
 
+Create a local `.env` file with the public Sanity values and the server-only MailerLite values:
+
+```bash
+NEXT_PUBLIC_SANITY_PROJECT_ID=beibii8a
+NEXT_PUBLIC_SANITY_DATASET=production
+NEXT_PUBLIC_SANITY_API_VERSION=2025-06-02
+MAILERLITE_API_KEY=your_mailerlite_api_key
+MAILERLITE_GROUP_ID=optional_existing_group_id
+```
+
+`MAILERLITE_GROUP_ID` is optional. When present, early-access submissions are added to that existing MailerLite group.
+
 First, run the development server:
 
 ```bash

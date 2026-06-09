@@ -23,6 +23,15 @@ const poppins = localFont({
 export const metadata: Metadata = {
   title: "DiasporaSpot — Build your life abroad.",
   description: "DiasporaSpot is a digital hub created to help you build and grow your life abroad — with practical articles, workshops, and community.",
+  manifest: "/site.webmanifest",
+  icons: {
+    icon: [
+      { url: "/favicon.ico", sizes: "any" },
+      { url: "/favicon-32x32.png", sizes: "32x32", type: "image/png" },
+      { url: "/favicon-16x16.png", sizes: "16x16", type: "image/png" },
+    ],
+    apple: [{ url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" }],
+  },
 };
 
 export default function RootLayout({

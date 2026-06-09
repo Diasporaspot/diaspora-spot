@@ -2,7 +2,6 @@
   background: var(--ds-espresso);
   color: var(--fg1);
   min-height: 100vh;
-  overflow-x: clip;
 }
 
 .page main {
@@ -126,6 +125,7 @@
 }
 
 .articleShell {
+  align-items: stretch;
   display: grid;
   gap: 48px;
   grid-template-columns: minmax(0, 820px) minmax(220px, 1fr);
@@ -267,8 +267,379 @@
   margin-top: 0;
 }
 
+.newsletter {
+  background:
+    radial-gradient(circle at 92% 16%, rgba(247, 203, 77, 0.24), transparent 26%),
+    linear-gradient(145deg, rgba(43, 38, 34, 0.98), rgba(43, 38, 34, 0.9));
+  border-radius: 8px;
+  color: var(--ds-bone);
+  display: grid;
+  gap: 18px;
+  margin-top: 64px;
+  overflow: hidden;
+  padding: 28px;
+  position: relative;
+}
+
+.newsletter::before {
+  background:
+    linear-gradient(90deg, rgba(255, 255, 255, 0.055) 1px, transparent 1px),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+  background-size: 44px 44px;
+  content: "";
+  inset: 0;
+  opacity: 0.62;
+  pointer-events: none;
+  position: absolute;
+}
+
+.newsletter > * {
+  position: relative;
+  z-index: 1;
+}
+
+.newsletterIcon {
+  align-items: center;
+  background: var(--ds-mustard);
+  border-radius: 8px;
+  color: var(--ds-espresso);
+  display: inline-flex;
+  height: 42px;
+  justify-content: center;
+  width: 42px;
+}
+
+.newsletterEyebrow {
+  color: rgba(247, 247, 247, 0.62);
+  display: inline-flex;
+  font-family: var(--font-sans);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.newsletterCopy h2 {
+  color: var(--ds-bone);
+  font-family: var(--font-sans);
+  font-size: clamp(26px, 4vw, 38px);
+  font-weight: 750;
+  letter-spacing: 0;
+  line-height: 1.05;
+  margin: 14px 0 12px;
+}
+
+.newsletterCopy p {
+  color: rgba(247, 247, 247, 0.72);
+  font-size: 15px;
+  line-height: 1.6;
+  margin: 0;
+  max-width: 58ch;
+}
+
+.newsletterForm {
+  background: rgba(247, 247, 247, 0.1);
+  border: 1px solid rgba(247, 247, 247, 0.16);
+  border-radius: 8px;
+  display: flex;
+  gap: 8px;
+  margin-top: 4px;
+  max-width: 560px;
+  padding: 8px;
+}
+
+.newsletterForm input {
+  background: transparent;
+  border: 0;
+  color: var(--ds-bone);
+  flex: 1;
+  font-family: var(--font-sans);
+  font-size: 14px;
+  line-height: 1;
+  min-width: 0;
+  outline: none;
+  padding: 12px 14px;
+}
+
+.newsletterForm input::placeholder {
+  color: rgba(247, 247, 247, 0.5);
+}
+
+.newsletterForm button {
+  align-items: center;
+  background: var(--ds-mustard);
+  border: 0;
+  border-radius: 7px;
+  color: var(--ds-espresso);
+  cursor: pointer;
+  display: inline-flex;
+  font-family: var(--font-sans);
+  font-size: 12px;
+  font-weight: 750;
+  gap: 10px;
+  justify-content: center;
+  letter-spacing: 0.12em;
+  line-height: 1;
+  padding: 12px 18px;
+  text-transform: uppercase;
+  transition: background var(--dur-fast) var(--ease-out);
+  white-space: nowrap;
+}
+
+.newsletterForm button:hover {
+  background: var(--ds-mustard-deep);
+}
+
+.newsletterCompact {
+  gap: 14px;
+  max-height: 440px;
+  margin-top: 26px;
+  padding: 18px;
+  transition:
+    max-height var(--dur-slow) var(--ease-out),
+    margin var(--dur-slow) var(--ease-out),
+    opacity var(--dur-base) var(--ease-out),
+    padding var(--dur-slow) var(--ease-out),
+    transform var(--dur-base) var(--ease-out);
+}
+
+.newsletterCompact::before {
+  background-size: 34px 34px;
+  opacity: 0.44;
+}
+
+.newsletterCompact .newsletterEyebrow {
+  font-size: 9px;
+  letter-spacing: 0.12em;
+}
+
+.newsletterCompact .newsletterCopy h2 {
+  font-size: 19px;
+  line-height: 1.12;
+  margin: 10px 0 8px;
+}
+
+.newsletterCompact .newsletterCopy p {
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.newsletterCompact .newsletterForm {
+  display: grid;
+  gap: 8px;
+  margin-top: 0;
+  padding: 7px;
+}
+
+.newsletterCompact .newsletterForm input {
+  font-size: 12px;
+  padding: 10px 11px;
+}
+
+.newsletterCompact .newsletterForm button {
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  min-height: 40px;
+  padding: 11px 12px;
+  width: 100%;
+}
+
+.newsletterCompactHidden {
+  max-height: 0;
+  margin-top: 0;
+  opacity: 0;
+  overflow: hidden;
+  padding-bottom: 0;
+  padding-top: 0;
+  pointer-events: none;
+  transform: translateY(8px);
+}
+
+.modalOverlay {
+  -webkit-backdrop-filter: blur(4px);
+  backdrop-filter: blur(4px);
+  background: rgba(23, 20, 17, 0.72);
+  display: grid;
+  inset: 0;
+  padding: 24px;
+  place-items: center;
+  position: fixed;
+  z-index: 2000;
+}
+
+.modal {
+  background: var(--ds-paper);
+  border: 1px solid rgba(247, 247, 247, 0.18);
+  border-radius: 8px;
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.26);
+  padding: 32px;
+  position: relative;
+  width: min(100%, 520px);
+}
+
+.modalClose {
+  background: var(--ds-bone);
+  border: 1px solid var(--border-soft);
+  border-radius: 999px;
+  color: var(--fg1);
+  cursor: pointer;
+  display: grid;
+  height: 38px;
+  place-items: center;
+  position: absolute;
+  right: 18px;
+  top: 18px;
+  width: 38px;
+}
+
+.modalEyebrow {
+  color: var(--fg3);
+  display: inline-flex;
+  font-family: var(--font-sans);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.modalTitle {
+  color: var(--fg1);
+  font-family: var(--font-sans);
+  font-size: clamp(30px, 5vw, 44px);
+  font-weight: 750;
+  line-height: 1;
+  margin: 18px 48px 12px 0;
+}
+
+.modalCopy {
+  color: var(--fg2);
+  font-family: var(--font-sans);
+  font-size: 15px;
+  font-weight: 400;
+  line-height: 1.6;
+  max-width: 44ch;
+}
+
+.modalForm {
+  display: grid;
+  gap: 14px;
+  margin-top: 24px;
+}
+
+.modalField {
+  display: grid;
+  gap: 8px;
+}
+
+.modalField span {
+  color: var(--fg3);
+  font-family: var(--font-sans);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.modalField input {
+  background: var(--ds-bone-50);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--fg1);
+  font-family: var(--font-sans);
+  font-size: 14px;
+  line-height: 1.2;
+  min-height: 52px;
+  outline: none;
+  padding: 0 14px;
+  transition:
+    border-color var(--dur-base) var(--ease-out),
+    box-shadow var(--dur-base) var(--ease-out);
+  width: 100%;
+}
+
+.modalField input:focus {
+  border-color: var(--ds-blue);
+  box-shadow: var(--shadow-focus);
+}
+
+.honeypot {
+  height: 1px;
+  left: -9999px;
+  overflow: hidden;
+  position: absolute;
+  width: 1px;
+}
+
+.modalSubmit {
+  align-items: center;
+  background: var(--ds-espresso);
+  border: 0;
+  border-radius: 999px;
+  color: var(--ds-bone);
+  cursor: pointer;
+  display: inline-flex;
+  font-family: var(--font-sans);
+  font-size: 12px;
+  font-weight: 700;
+  gap: 10px;
+  justify-content: center;
+  letter-spacing: 0.14em;
+  line-height: 1;
+  min-height: 52px;
+  text-transform: uppercase;
+  transition:
+    background var(--dur-fast) var(--ease-out),
+    opacity var(--dur-fast) var(--ease-out);
+}
+
+.modalSubmit:hover:not(:disabled) {
+  background: #000;
+}
+
+.modalSubmit:disabled {
+  cursor: wait;
+  opacity: 0.72;
+}
+
+.modalMessage {
+  font-family: var(--font-sans);
+  font-size: 13px;
+  font-weight: 650;
+  line-height: 1.45;
+}
+
+.successMessage {
+  color: var(--ds-blue-deep);
+}
+
+.errorMessage {
+  color: #a5361f;
+}
+
+.spinner {
+  animation: spin 800ms linear infinite;
+}
+
+.srOnly {
+  border: 0;
+  clip: rect(0, 0, 0, 0);
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  padding: 0;
+  position: absolute;
+  white-space: nowrap;
+  width: 1px;
+}
+
 .aside {
-  align-self: start;
+  align-self: stretch;
+}
+
+.asideSticky {
   border-top: 1px solid var(--border);
   padding-top: 22px;
   position: sticky;
@@ -300,6 +671,10 @@
   }
 
   .aside {
+    position: static;
+  }
+
+  .asideSticky {
     position: static;
   }
 }
@@ -415,6 +790,23 @@
   .aside {
     display: none;
   }
+
+  .newsletter {
+    margin-top: 44px;
+    padding: 24px;
+  }
+
+  .newsletterForm {
+    flex-direction: column;
+  }
+
+  .newsletterForm button {
+    width: 100%;
+  }
+
+  .modal {
+    padding: 28px 22px 24px;
+  }
 }
 
 @media (max-width: 575px) {
@@ -473,6 +865,12 @@
 
   .tableWrap table {
     min-width: 520px;
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
   }
 }
 
