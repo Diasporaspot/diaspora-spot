@@ -24,18 +24,18 @@ export const footerLinks = {
     { label: 'Workshops', href: '/workshops' },
     // { label: 'Guides',     href: '/guides' },
     { label: 'Articles', href: '/articles' },
-    { label: 'Community', href: '/#community' },
+    // { label: 'Community', href: '/#community' },
   ],
-  About: [
-    { label: 'Our story', href: '#' },
+  Help: [
+    { label: 'Careers', href: '#' },
     // { label: 'Speakers',   href: '#' },
     // { label: 'Press', href: '#' },
     { label: 'Contact', href: '#' },
   ],
-  Help: [
-    { label: 'Get started', href: '#' },
-    { label: 'FAQ', href: '#' },
-    { label: 'Code of conduct', href: '#' },
-    { label: 'Privacy', href: '#' },
+  Legal: [
+    // { label: 'Get started', href: '#' },
+    // { label: 'FAQ', href: '#' },
+    { label: 'Privacy Policy', href: '/privacy-policy' },
+    { label: 'Terms of Use', href: '/terms-of-use' },
   ],
 };

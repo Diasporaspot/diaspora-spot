@@ -1,0 +1,246 @@
+.page {
+  background: var(--ds-espresso);
+  min-height: 100vh;
+}
+
+.page main {
+  background: var(--ds-bone);
+  padding-top: 0;
+}
+
+.hero {
+  background:
+    linear-gradient(135deg, rgba(43, 38, 34, 0.98), rgba(43, 38, 34, 0.9)),
+    radial-gradient(circle at 84% 18%, rgba(247, 203, 77, 0.2), transparent 30%),
+    var(--ds-espresso);
+  color: var(--fg-inverse);
+  overflow: hidden;
+  padding: 132px 0 72px;
+  position: relative;
+}
+
+.hero::after {
+  background:
+    linear-gradient(90deg, rgba(255, 255, 255, 0.06) 1px, transparent 1px),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+  background-size: 54px 54px;
+  content: "";
+  inset: 0;
+  opacity: 0.42;
+  pointer-events: none;
+  position: absolute;
+}
+
+.heroInner {
+  max-width: 860px;
+  position: relative;
+  z-index: 1;
+}
+
+.eyebrow {
+  color: rgba(247, 247, 247, 0.72);
+  display: inline-flex;
+  font-size: 11px;
+  font-weight: 700;
+  gap: 10px;
+  letter-spacing: 0.14em;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.eyebrow::before {
+  background: var(--ds-mustard);
+  content: "";
+  height: 1px;
+  margin-top: 5px;
+  width: 28px;
+}
+
+.title {
+  background: linear-gradient(180deg, #ffffff 0%, var(--ds-bone) 48%, #aaa49f 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  font-size: clamp(42px, 7vw, 86px);
+  font-weight: 700;
+  letter-spacing: 0;
+  line-height: 1.04;
+  margin: 18px 0;
+  max-width: 11ch;
+  padding-bottom: 0.08em;
+}
+
+.intro {
+  color: rgba(247, 247, 247, 0.74);
+  font-size: 18px;
+  line-height: 1.66;
+  max-width: 64ch;
+}
+
+.content {
+  display: grid;
+  gap: 48px;
+  grid-template-columns: minmax(0, 1fr) 280px;
+  padding: 64px 48px 112px;
+}
+
+.document {
+  background: rgba(255, 255, 255, 0.72);
+  border: 1px solid rgba(200, 189, 180, 0.72);
+  border-radius: 8px;
+  box-shadow: var(--shadow-1);
+  padding: clamp(28px, 4vw, 56px);
+}
+
+.section {
+  border-top: 1px solid rgba(200, 189, 180, 0.72);
+  padding-top: 30px;
+}
+
+.section:first-child {
+  border-top: 0;
+  padding-top: 0;
+}
+
+.section + .section {
+  margin-top: 34px;
+}
+
+.section h2 {
+  color: var(--fg1);
+  font-size: clamp(22px, 2.4vw, 32px);
+  font-weight: 700;
+  letter-spacing: 0;
+  line-height: 1.14;
+  margin-bottom: 16px;
+}
+
+.section p,
+.section li {
+  color: var(--fg2);
+  font-size: 15px;
+  line-height: 1.78;
+}
+
+.section a {
+  color: var(--fg-accent);
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.section p + p,
+.section p + ul,
+.section ul + p {
+  margin-top: 12px;
+}
+
+.section ul {
+  display: grid;
+  gap: 8px;
+  list-style: disc;
+  margin: 12px 0 0;
+  padding-left: 22px;
+}
+
+.aside {
+  align-self: start;
+  background: rgba(255, 255, 255, 0.68);
+  border: 1px solid rgba(200, 189, 180, 0.72);
+  border-radius: 8px;
+  padding: 22px;
+  position: sticky;
+  top: 88px;
+}
+
+.asideLabel {
+  color: var(--fg3);
+  display: block;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  line-height: 1;
+  margin-bottom: 16px;
+  text-transform: uppercase;
+}
+
+.aside nav {
+  display: grid;
+  gap: 8px;
+}
+
+.aside a {
+  border: 1px solid transparent;
+  border-radius: 999px;
+  color: var(--fg2);
+  display: inline-flex;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1;
+  padding: 10px 12px;
+  transition:
+    background var(--dur-fast) var(--ease-out),
+    border-color var(--dur-fast) var(--ease-out),
+    color var(--dur-fast) var(--ease-out);
+}
+
+.aside a:hover,
+.aside a.active {
+  background: var(--ds-espresso);
+  border-color: var(--ds-espresso);
+}
+
+.aside a:hover {
+  color: var(--ds-bone);
+}
+
+.aside a.active {
+  color: var(--ds-mustard);
+}
+
+.contact {
+  border-top: 1px solid rgba(200, 189, 180, 0.72);
+  color: var(--fg3);
+  font-size: 13px;
+  line-height: 1.6;
+  margin-top: 20px;
+  padding-top: 18px;
+}
+
+.contact a {
+  color: var(--fg-accent);
+  display: inline;
+  font-weight: 700;
+  padding: 0;
+}
+
+@media (max-width: 940px) {
+  .content {
+    grid-template-columns: 1fr;
+    padding: 48px 24px 88px;
+  }
+
+  .aside {
+    order: -1;
+    position: static;
+  }
+
+  .aside nav {
+    display: flex;
+    flex-wrap: wrap;
+  }
+}
+
+@media (max-width: 560px) {
+  .hero {
+    padding: 112px 0 56px;
+  }
+
+  .intro {
+    font-size: 16px;
+  }
+
+  .document {
+    padding: 24px 20px;
+  }
+}

@@ -1,3 +1,5 @@
+import Image from 'next/image';
+import Link from 'next/link';
 import { footerLinks } from '@/data/menu';
 import styles from './footer.module.css';
 
@@ -6,7 +8,7 @@ function Footer() {
     <footer className={styles.footer}>
       <div className={styles.inner}>
         <div className={styles.brand}>
-          <img src="/assets/logo-primary-white.png" alt="DiasporaSpot" />
+          <Image src="/assets/logo-primary-white.png" alt="DiasporaSpot" width={142} height={26} />
           <p className={styles.brandTag}>A digital hub to help you build and grow your life abroad.</p>
         </div>
 
@@ -17,7 +19,11 @@ function Footer() {
               <ul>
                 {items.map((item) => (
                   <li key={item.label}>
-                    <a href={item.href}>{item.label}</a>
+                    {item.href.startsWith('/') ? (
+                      <Link href={item.href}>{item.label}</Link>
+                    ) : (
+                      <a href={item.href}>{item.label}</a>
+                    )}
                   </li>
                 ))}
               </ul>
