@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
+import CookieConsent from "@/components/CookieConsent/CookieConsent";
 import "./globals.css";
 
 const poppins = localFont({
@@ -41,7 +42,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={poppins.variable}>
-      <body>{children}</body>
+      <body>
+        {children}
+        <CookieConsent />
+      </body>
     </html>
   );
 }

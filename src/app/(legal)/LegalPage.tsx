@@ -6,14 +6,21 @@ import styles from './legal-page.module.css';
 
 type LegalSection = {
   title: string;
-  paragraphs?: ReactNode[];
-  items?: string[];
+  clauses?: {
+    number: string;
+    content: ReactNode;
+    items?: {
+      number?: string;
+      content: ReactNode;
+    }[];
+  }[];
 };
 
 type LegalPageProps = {
   activePath: '/privacy-policy' | '/terms-of-use';
   eyebrow: string;
   intro: string;
+  leadParagraphs: ReactNode[];
   sections: LegalSection[];
   title: string;
 };
@@ -23,7 +30,14 @@ const legalLinks = [
   { href: '/terms-of-use', label: 'Terms of Use' },
 ];
 
-export default function LegalPage({ activePath, eyebrow, intro, sections, title }: LegalPageProps) {
+export default function LegalPage({
+  activePath,
+  eyebrow,
+  intro,
+  leadParagraphs,
+  sections,
+  title,
+}: LegalPageProps) {
   return (
     <div className={styles.page}>
       <Topbar />
@@ -40,17 +54,42 @@ export default function LegalPage({ activePath, eyebrow, intro, sections, title 
 
         <section className={`wrap ${styles.content}`} aria-label={title}>
           <article className={styles.document}>
+            <div className={styles.lead}>
+              {leadParagraphs.map((paragraph, index) => (
+                <p key={index}>{paragraph}</p>
+              ))}
+            </div>
+
             {sections.map((section) => (
               <section className={styles.section} key={section.title}>
                 <h2>{section.title}</h2>
-                {section.paragraphs?.map((paragraph, index) => <p key={index}>{paragraph}</p>)}
-                {section.items ? (
-                  <ul>
-                    {section.items.map((item) => (
-                      <li key={item}>{item}</li>
-                    ))}
-                  </ul>
-                ) : null}
+                {section.clauses?.map((clause) => (
+                  <div className={styles.clause} key={clause.number}>
+                    <span className={styles.clauseNumber}>{clause.number}</span>
+                    <div className={styles.clauseBody}>
+                      <p>{clause.content}</p>
+                      {clause.items ? (
+                        <ul className={styles.clauseList}>
+                          {clause.items.map((item) => (
+                            <li
+                              className={
+                                item.number
+                                  ? `${styles.clauseListItem} ${styles.numberedListItem}`
+                                  : styles.clauseListItem
+                              }
+                              key={item.number ?? String(item.content)}
+                            >
+                              {item.number ? (
+                                <span className={styles.clauseNumber}>{item.number}</span>
+                              ) : null}
+                              <span>{item.content}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      ) : null}
+                    </div>
+                  </div>
+                ))}
               </section>
             ))}
           </article>
