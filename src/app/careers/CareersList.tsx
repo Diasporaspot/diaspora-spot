@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { AnimatePresence, motion } from 'framer-motion';
 import Button from '@/components/Button/Button';
 import ContentList, {
   type ContentListFilter,
@@ -97,7 +98,9 @@ function JobCard({ job }: { job: Job }) {
         </div>
       </article>
 
-      {selectedJob ? <JobModal job={selectedJob} onClose={() => setSelectedJob(null)} /> : null}
+      <AnimatePresence>
+        {selectedJob ? <JobModal job={selectedJob} onClose={() => setSelectedJob(null)} /> : null}
+      </AnimatePresence>
     </>
   );
 }
@@ -123,20 +126,28 @@ function JobModal({ job, onClose }: { job: Job; onClose: () => void }) {
   }, [onClose]);
 
   return (
-    <div
+    <motion.div
+      animate={{ opacity: 1 }}
       className={styles.modalOverlay}
+      exit={{ opacity: 0 }}
+      initial={{ opacity: 0 }}
       role="presentation"
       onMouseDown={(event) => {
         if (event.target === event.currentTarget) {
           onClose();
         }
       }}
+      transition={{ duration: 0.24, ease: [0.22, 0.61, 0.36, 1] }}
     >
-      <section
+      <motion.section
+        animate={{ opacity: 1, scale: 1, y: 0 }}
         aria-labelledby="career-role-title"
         aria-modal="true"
         className={styles.modal}
+        exit={{ opacity: 0, scale: 0.94, y: 8 }}
+        initial={{ opacity: 0, scale: 0.94, y: 10 }}
         role="dialog"
+        transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }}
       >
         <div className={styles.modalHead}>
           <div>
@@ -213,8 +224,8 @@ function JobModal({ job, onClose }: { job: Job; onClose: () => void }) {
             ) : null}
           </div>
         </div>
-      </section>
-    </div>
+      </motion.section>
+    </motion.div>
   );
 }
 
