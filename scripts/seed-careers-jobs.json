@@ -1,0 +1,106 @@
+[
+  {
+    "_id": "job-community-programs-lead",
+    "_type": "job",
+    "status": "published",
+    "title": "Community Programs Lead",
+    "slug": {
+      "_type": "slug",
+      "current": "community-programs-lead"
+    },
+    "department": "Community",
+    "location": "Remote, Africa and Europe time zones",
+    "locationType": "Remote",
+    "employmentType": "Full-time",
+    "seniority": "Lead",
+    "salaryRange": "Competitive",
+    "summary": "Own the programs, member rituals, and partnerships that make DiasporaSpot feel useful and personal for people building their lives abroad.",
+    "description": "You will shape the community experience across events, workshops, partner sessions, and member touchpoints. This role is for someone who can turn community insight into practical programming and keep the standard high from planning through delivery.",
+    "responsibilities": [
+      "Plan and run community programs that support relocation, careers, housing, money, and belonging.",
+      "Build a repeatable calendar for workshops, clinics, and member conversations.",
+      "Work with contributors, partners, and speakers to create valuable sessions.",
+      "Track community feedback and turn it into sharper programming decisions."
+    ],
+    "requirements": [
+      "Experience managing communities, programs, events, partnerships, or member operations.",
+      "Strong written communication and thoughtful follow-through.",
+      "Comfort working with distributed teams and async workflows.",
+      "A practical understanding of the diaspora experience across countries and cultures."
+    ],
+    "howToApply": "Send your CV and a short note to careers@diasporaspot.com with the subject line \"Community Programs Lead\". Include one community program, event, or partnership you have helped build and what made it work.",
+    "contactEmail": "careers@diasporaspot.com",
+    "postedAt": "2026-06-16",
+    "applyBy": "2026-07-12",
+    "featured": true
+  },
+  {
+    "_id": "job-content-strategist",
+    "_type": "job",
+    "status": "published",
+    "title": "Content Strategist",
+    "slug": {
+      "_type": "slug",
+      "current": "content-strategist"
+    },
+    "department": "Content",
+    "location": "Remote",
+    "locationType": "Remote",
+    "employmentType": "Contract",
+    "seniority": "Mid level",
+    "salaryRange": "Project-based retainer",
+    "summary": "Create practical, well-researched content that helps diasporans make better decisions about careers, money, housing, and settling in.",
+    "description": "You will own editorial planning and production for articles, guides, newsletters, and resource pages. The work needs to be sharp, grounded, and easy to act on.",
+    "responsibilities": [
+      "Develop article and guide ideas from audience needs, search demand, and community questions.",
+      "Research topics carefully and turn complex information into clear editorial products.",
+      "Maintain a publishing calendar across articles, guides, and newsletter moments.",
+      "Collaborate with subject-matter contributors and edit their drafts into the DiasporaSpot voice."
+    ],
+    "requirements": [
+      "Strong editorial judgment and a portfolio of practical long-form or resource content.",
+      "Ability to fact-check, structure, and simplify dense topics.",
+      "Comfort writing for an audience navigating cross-border decisions.",
+      "Familiarity with CMS workflows; Sanity experience is useful but not required."
+    ],
+    "howToApply": "Send your CV, portfolio links, and two content ideas for DiasporaSpot to careers@diasporaspot.com with the subject line \"Content Strategist\".",
+    "contactEmail": "careers@diasporaspot.com",
+    "postedAt": "2026-06-14",
+    "applyBy": "2026-07-05",
+    "featured": false
+  },
+  {
+    "_id": "job-product-designer",
+    "_type": "job",
+    "status": "published",
+    "title": "Product Designer",
+    "slug": {
+      "_type": "slug",
+      "current": "product-designer"
+    },
+    "department": "Product",
+    "location": "Lagos or Remote",
+    "locationType": "Hybrid",
+    "employmentType": "Part-time",
+    "seniority": "Senior",
+    "salaryRange": "Flexible, based on scope",
+    "summary": "Design calm, useful product experiences for people comparing options, learning what to do next, and taking action across borders.",
+    "description": "You will work across discovery, product flows, content surfaces, and high-fidelity UI. The right person can simplify messy user journeys without making the experience feel cold or generic.",
+    "responsibilities": [
+      "Design flows for content discovery, workshops, tools, and community experiences.",
+      "Create polished responsive UI that fits the DiasporaSpot brand and product direction.",
+      "Translate user research and team context into clear product decisions.",
+      "Work closely with engineering to ship designs with strong interaction and content details."
+    ],
+    "requirements": [
+      "A portfolio showing strong product thinking and refined visual execution.",
+      "Experience designing responsive web products or content-rich platforms.",
+      "Comfort moving between strategy, wireframes, prototypes, and production details.",
+      "Taste for quiet, useful interfaces that serve repeat users."
+    ],
+    "howToApply": "Send your portfolio and a short note to careers@diasporaspot.com with the subject line \"Product Designer\". Include one product experience you think DiasporaSpot should improve or build next.",
+    "contactEmail": "careers@diasporaspot.com",
+    "postedAt": "2026-06-10",
+    "featured": false
+  }
+]
