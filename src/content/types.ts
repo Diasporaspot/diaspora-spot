@@ -115,6 +115,36 @@ export type Workshop = {
   featured: boolean;
 };
 
+export type JobEmploymentType = 'Full-time' | 'Part-time' | 'Contract' | 'Internship' | 'Volunteer';
+
+export type JobLocationType = 'Remote' | 'Hybrid' | 'On-site';
+
+export type JobSeniority = 'Entry level' | 'Mid level' | 'Senior' | 'Lead' | 'Manager';
+
+export type Job = {
+  _id: string;
+  _type: 'job';
+  createdAt?: string;
+  status: ContentStatus;
+  title: string;
+  slug: string;
+  department: string;
+  location: string;
+  locationType: JobLocationType;
+  employmentType: JobEmploymentType;
+  seniority?: JobSeniority;
+  salaryRange?: string;
+  summary: string;
+  description: string;
+  responsibilities: string[];
+  requirements: string[];
+  howToApply: string;
+  contactEmail?: string;
+  postedAt: string;
+  applyBy?: string;
+  featured: boolean;
+};
+
 export type EventStatus = 'registration-open' | 'few-spots' | 'sold-out' | 'waitlist';
 
 export type Event = {

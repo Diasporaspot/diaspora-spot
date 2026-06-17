@@ -27,7 +27,7 @@ export const footerLinks = {
     // { label: 'Community', href: '/#community' },
   ],
   Help: [
-    { label: 'Careers', href: '#' },
+    { label: 'Careers', href: '/careers' },
     // { label: 'Speakers',   href: '#' },
     // { label: 'Press', href: '#' },
     { label: 'Contact', href: '#' },

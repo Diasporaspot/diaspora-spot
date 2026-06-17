@@ -67,3 +67,29 @@ const workshopProjection = `{
 export const upcomingWorkshopsQuery = `*[_type == "workshop" && status == "published"] | order(featured desc, date asc) ${workshopProjection}`;
 
 export const featuredWorkshopsQuery = `*[_type == "workshop" && status == "published" && featured == true] | order(date asc) ${workshopProjection}`;
+
+const jobProjection = `{
+  _id,
+  _type,
+  "_createdAt": _createdAt,
+  status,
+  title,
+  "slug": slug.current,
+  department,
+  location,
+  locationType,
+  employmentType,
+  seniority,
+  salaryRange,
+  summary,
+  description,
+  responsibilities,
+  requirements,
+  howToApply,
+  contactEmail,
+  postedAt,
+  applyBy,
+  featured
+}`;
+
+export const allPublishedJobsQuery = `*[_type == "job" && status == "published"] | order(featured desc, postedAt desc, _createdAt desc) ${jobProjection}`;

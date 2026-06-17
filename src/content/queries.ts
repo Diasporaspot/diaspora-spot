@@ -4,6 +4,7 @@ import {
   articleCategoriesQuery,
   articleBySlugQuery,
   articleSlugsQuery,
+  allPublishedJobsQuery,
   featuredPublishedArticlesQuery,
   upcomingWorkshopsQuery,
 } from '@/sanity/lib/queries';
@@ -15,6 +16,10 @@ import type {
   ContentCategory,
   ContentStatus,
   Guide,
+  Job,
+  JobEmploymentType,
+  JobLocationType,
+  JobSeniority,
   Workshop,
   WorkshopIcon,
   WorkshopIconTone,
@@ -127,6 +132,30 @@ type SanityWorkshop = {
   iconTone?: WorkshopIconTone;
   ctaLabel?: string;
   href?: string;
+  featured?: boolean;
+};
+
+type SanityJob = {
+  _id: string;
+  _type: 'job';
+  _createdAt?: string;
+  status?: ContentStatus;
+  title?: string;
+  slug?: string;
+  department?: string;
+  location?: string;
+  locationType?: JobLocationType;
+  employmentType?: JobEmploymentType;
+  seniority?: JobSeniority;
+  salaryRange?: string;
+  summary?: string;
+  description?: string;
+  responsibilities?: string[];
+  requirements?: string[];
+  howToApply?: string;
+  contactEmail?: string;
+  postedAt?: string;
+  applyBy?: string;
   featured?: boolean;
 };
 
@@ -341,6 +370,32 @@ function normalizeWorkshop(workshop: SanityWorkshop): Workshop {
   };
 }
 
+function normalizeJob(job: SanityJob): Job {
+  return {
+    _id: job._id,
+    _type: 'job',
+    createdAt: job._createdAt,
+    status: job.status ?? 'published',
+    title: job.title ?? '',
+    slug: job.slug ?? '',
+    department: job.department ?? 'Team',
+    location: job.location ?? 'Remote',
+    locationType: job.locationType ?? 'Remote',
+    employmentType: job.employmentType ?? 'Full-time',
+    seniority: job.seniority,
+    salaryRange: job.salaryRange,
+    summary: job.summary ?? '',
+    description: job.description ?? '',
+    responsibilities: job.responsibilities ?? [],
+    requirements: job.requirements ?? [],
+    howToApply: job.howToApply ?? '',
+    contactEmail: job.contactEmail,
+    postedAt: job.postedAt ?? '',
+    applyBy: job.applyBy,
+    featured: job.featured ?? false,
+  };
+}
+
 async function fetchSanityArticles(query: string, params: Record<string, string> = {}) {
   try {
     const sanityArticles = await sanityClient.fetch<SanityArticle[]>(query, params, {
@@ -449,6 +504,22 @@ export async function getUpcomingWorkshops() {
   }
 
   return workshops.filter((workshop) => workshop.status === 'published').sort(byDateAsc);
+}
+
+export async function getAllJobs() {
+  try {
+    const sanityJobs = await sanityClient.fetch<SanityJob[]>(
+      allPublishedJobsQuery,
+      {},
+      { cache: 'no-store' },
+    );
+
+    return sanityJobs.map(normalizeJob);
+  } catch (error) {
+    console.warn('Sanity job fetch failed.', error);
+  }
+
+  return [];
 }
 
 export async function getUpcomingEvents() {
