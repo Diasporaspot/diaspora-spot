@@ -9,6 +9,7 @@ export const navLinks = [
   },
   // { path: '/guides', href: '/guides', label: 'Guides', dropdown: null },
   { path: '/articles', href: '/articles', label: 'Articles', dropdown: null },
+  { path: '/careers', href: '/careers', label: 'Careers', dropdown: null },
   {
     path: '/#community',
     href: '/#community',
