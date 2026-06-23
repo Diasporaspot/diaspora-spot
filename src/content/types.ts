@@ -111,7 +111,7 @@ export type Workshop = {
   icon: WorkshopIcon;
   iconTone: WorkshopIconTone;
   ctaLabel: string;
-  href: string;
+  registrationReady: boolean;
   featured: boolean;
 };
 

@@ -1,18 +1,17 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
+import Link from 'next/link';
+import { useEffect, useMemo, useState } from 'react';
 import {
   CalendarDays,
   Check,
   Clock3,
   Copy,
-  ExternalLink,
   SlidersHorizontal,
   Users,
   X,
 } from 'lucide-react';
-import Button from '@/components/Button/Button';
 import ContentList, {
   type ContentListFilter,
   type ContentListSort,
@@ -193,9 +192,22 @@ function WorkshopModal({
             </div>
 
             <div className={styles.modalActions}>
-              <Button variant="mustard" href={workshop.href}>
-                {workshop.ctaLabel} <ExternalLink size={14} />
-              </Button>
+              {workshop.registrationReady ? (
+                <Link
+                  className={styles.registrationButton}
+                  href={`/workshops/${workshop.slug}/register`}
+                >
+                  {workshop.ctaLabel}
+                </Link>
+              ) : (
+                <button
+                  className={styles.registrationButton}
+                  disabled
+                  type="button"
+                >
+                  Registration opening soon
+                </button>
+              )}
               <button className={styles.copyButton} type="button" onClick={onCopy}>
                 {copied ? <Check size={16} /> : <Copy size={16} />}
                 {copied ? 'Copied link' : 'Copy share link'}

@@ -1233,7 +1233,7 @@ export const workshops: Workshop[] = [
     icon: 'document',
     iconTone: 'warm',
     ctaLabel: 'Book CV Review',
-    href: '#',
+    registrationReady: false,
     featured: true,
   },
   {
@@ -1257,7 +1257,7 @@ export const workshops: Workshop[] = [
     icon: 'conversation',
     iconTone: 'gold',
     ctaLabel: 'Reserve Seat',
-    href: '#',
+    registrationReady: false,
     featured: false,
   },
   {
@@ -1281,7 +1281,7 @@ export const workshops: Workshop[] = [
     icon: 'briefcase',
     iconTone: 'dark',
     ctaLabel: 'Join Waitlist',
-    href: '#',
+    registrationReady: false,
     featured: false,
   },
 ];

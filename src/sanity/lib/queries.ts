@@ -60,7 +60,7 @@ const workshopProjection = `{
   icon,
   iconTone,
   ctaLabel,
-  "href": bookingUrl,
+  "registrationReady": defined(mailerLiteGroupId) && mailerLiteProvisioningStatus == "ready",
   featured
 }`;
 

@@ -59,6 +59,11 @@ const sections = [
         content:
           'We use your information to monitor and understanding our audience and usage of our website. This information will also be used for improvement and maintenance of the site.',
       },
+      {
+        number: '3.3',
+        content:
+          'When you register for a workshop, we use your name and email address to manage your registration and send confirmation, reminders and other communications about that workshop.',
+      },
     ],
   },
   {
@@ -83,6 +88,11 @@ const sections = [
         number: '4.5',
         content:
           'Our website may make use of third party payment processing services. Any payment details will be processed via the third party payment processing services and as such under their privacy policy.',
+      },
+      {
+        number: '4.6',
+        content:
+          'We use MailerLite to store workshop registration details and deliver workshop emails. MailerLite processes your name and email address on our behalf for these purposes.',
       },
     ],
   },

@@ -35,9 +35,11 @@ export const workshop = defineType({
   fields: [
     defineField({
       name: 'status',
-      title: 'Status',
+      title: 'Website visibility',
       type: 'string',
       initialValue: 'draft',
+      description:
+        'Choose Published when this workshop is ready for the website, then use Sanity’s Publish button.',
       options: {
         list: [
           { title: 'Draft', value: 'draft' },
@@ -69,6 +71,7 @@ export const workshop = defineType({
       title: 'Short headline',
       type: 'string',
       description: 'A punchy one-line benefit used on the homepage feature card.',
+      validation: (rule) => rule.required().max(140),
     }),
     defineField({
       name: 'description',
@@ -88,6 +91,14 @@ export const workshop = defineType({
       title: 'Start time',
       type: 'string',
       description: 'Example: 11:00',
+      validation: (rule) =>
+        rule.required().custom((value) => {
+          if (!value || /^([01]\d|2[0-3]):[0-5]\d$/.test(value)) {
+            return true;
+          }
+
+          return 'Use 24-hour time in HH:MM format, for example 11:00.';
+        }),
     }),
     defineField({
       name: 'timezone',
@@ -95,30 +106,35 @@ export const workshop = defineType({
       type: 'string',
       initialValue: 'WAT',
       description: 'Example: WAT, GMT, EST',
+      validation: (rule) => rule.required(),
     }),
     defineField({
       name: 'duration',
       title: 'Duration',
       type: 'string',
       description: 'Example: 60 min',
+      validation: (rule) => rule.required(),
     }),
     defineField({
       name: 'format',
       title: 'Format',
       type: 'string',
       description: 'Example: Live online, Workshop lab, Office hours',
+      validation: (rule) => rule.required(),
     }),
     defineField({
       name: 'host',
       title: 'Host name',
       type: 'string',
       description: 'The person, team, or group hosting this workshop.',
+      validation: (rule) => rule.required(),
     }),
     defineField({
       name: 'spotsLabel',
       title: 'Availability note',
       type: 'string',
       description: 'Example: 18 spots, 4 spots left, Waitlist open',
+      validation: (rule) => rule.required(),
     }),
     defineField({
       name: 'bookingStatus',
@@ -158,17 +174,45 @@ export const workshop = defineType({
       title: 'Button text',
       type: 'string',
       initialValue: 'Reserve a seat',
+      validation: (rule) => rule.required(),
     }),
     defineField({
-      name: 'bookingUrl',
-      title: 'Booking link',
-      type: 'url',
-      description: 'Paste the page where people should book, register, or join the waitlist.',
-      validation: (rule) =>
-        rule.uri({
-          allowRelative: true,
-          scheme: ['http', 'https', 'mailto', 'tel'],
-        }),
+      name: 'mailerLiteGroupId',
+      title: 'MailerLite group ID',
+      type: 'string',
+      description: 'Created automatically after this workshop is published.',
+      readOnly: true,
+      hidden: true,
+    }),
+    defineField({
+      name: 'mailerLiteGroupName',
+      title: 'MailerLite group name',
+      type: 'string',
+      description: 'Use this group when configuring the workshop automation in MailerLite.',
+      readOnly: true,
+      hidden: true,
+    }),
+    defineField({
+      name: 'mailerLiteProvisioningStatus',
+      title: 'Registration setup',
+      type: 'string',
+      initialValue: 'pending',
+      options: {
+        list: [
+          { title: 'Setting up registration...', value: 'pending' },
+          { title: 'Registration ready', value: 'ready' },
+          { title: 'Setup failed - publish again to retry', value: 'failed' },
+        ],
+      },
+      readOnly: true,
+    }),
+    defineField({
+      name: 'mailerLiteProvisioningError',
+      title: 'MailerLite setup error',
+      type: 'text',
+      rows: 3,
+      readOnly: true,
+      hidden: true,
     }),
     defineField({
       name: 'featured',

@@ -14,6 +14,14 @@ MAILERLITE_GROUP_ID=optional_existing_group_id
 
 `MAILERLITE_GROUP_ID` is optional. When present, early-access submissions are added to that existing MailerLite group.
 
+## Workshop registration workflow
+
+Published workshops automatically receive a dedicated MailerLite group through the deployed `provision-workshop-mailerlite` Sanity Function. The function stores the generated group ID on the workshop and registration becomes available when setup is complete.
+
+The function has its own server-side `MAILERLITE_API_KEY`, configured with the Sanity Functions environment-variable command. It does not require a webhook, callback URL, webhook secret, or manually managed Sanity write token.
+
+Staff can find the generated group in MailerLite using the workshop title and date. They may optionally activate a MailerLite automation using **Joins a group** for workshop communications. Keep those emails limited to registration confirmation and workshop communications unless the user has separately consented to general marketing.
+
 First, run the development server:
 
 ```bash

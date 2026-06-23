@@ -21,7 +21,6 @@
     "icon": "document",
     "iconTone": "warm",
     "ctaLabel": "Book CV Review",
-    "bookingUrl": "#",
     "featured": true
   },
   {
@@ -46,7 +45,6 @@
     "icon": "conversation",
     "iconTone": "gold",
     "ctaLabel": "Reserve Seat",
-    "bookingUrl": "#",
     "featured": false
   },
   {
@@ -71,7 +69,6 @@
     "icon": "briefcase",
     "iconTone": "dark",
     "ctaLabel": "Join Waitlist",
-    "bookingUrl": "#",
     "featured": false
   }
 ]

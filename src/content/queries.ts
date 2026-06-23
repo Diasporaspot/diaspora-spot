@@ -131,7 +131,7 @@ type SanityWorkshop = {
   icon?: WorkshopIcon;
   iconTone?: WorkshopIconTone;
   ctaLabel?: string;
-  href?: string;
+  registrationReady?: boolean;
   featured?: boolean;
 };
 
@@ -365,7 +365,7 @@ function normalizeWorkshop(workshop: SanityWorkshop): Workshop {
     icon: workshop.icon ?? 'document',
     iconTone: workshop.iconTone ?? 'warm',
     ctaLabel: workshop.ctaLabel ?? 'Reserve a seat',
-    href: workshop.href ?? '#',
+    registrationReady: workshop.registrationReady ?? false,
     featured: workshop.featured ?? false,
   };
 }

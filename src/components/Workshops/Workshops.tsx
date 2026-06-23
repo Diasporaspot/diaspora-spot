@@ -146,7 +146,7 @@ function Workshops({ workshops }: { workshops: Workshop[] }) {
                 <span>
                   {featuredWorkshop.format} · {featuredWorkshop.duration}
                 </span>
-                <Button variant="inverse" href={featuredWorkshop.href}>
+                <Button variant="inverse" href={`/workshops/${featuredWorkshop.slug}`}>
                   {featuredWorkshop.ctaLabel} <ArrowRight size={14} strokeWidth={2} />
                 </Button>
               </div>
@@ -178,7 +178,7 @@ function Workshops({ workshops }: { workshops: Workshop[] }) {
                       <span>
                         Hosted by {workshop.host} · {workshop.duration}
                       </span>
-                      <Button variant="ghost" href={workshop.href}>
+                      <Button variant="ghost" href={`/workshops/${workshop.slug}`}>
                         {workshop.ctaLabel} <ArrowRight size={14} strokeWidth={2} />
                       </Button>
                     </div>
