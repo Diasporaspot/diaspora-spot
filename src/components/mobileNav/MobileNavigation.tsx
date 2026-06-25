@@ -36,7 +36,7 @@ function MobileNavigation({ closeMenu }: { closeMenu: () => void }) {
         custom={navLinks.length}
       >
         <Button
-          href="#final"
+          href="/workshops"
           variant="primary"
           className={styles.ctaButton}
           onClick={handleCtaClick}

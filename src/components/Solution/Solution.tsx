@@ -78,7 +78,7 @@ function Solution() {
               Read practical articles for life abroad — from finding work and housing, to building your career wherever you are.
             </p>
             <div className={styles.cardCta}>
-              <Button variant="ghost" href="#articles">
+              <Button variant="ghost" href="/articles">
                 Read Articles <ArrowRight size={14} strokeWidth={2} />
               </Button>
             </div>
@@ -101,7 +101,7 @@ function Solution() {
               Join workshops designed to sharpen your skills and connect you with people on the same path.
             </p>
             <div className={styles.cardCta}>
-              <Button variant="primary" href="#workshops">
+              <Button variant="primary" href="/workshops">
                 Save My Spot <ArrowRight size={14} strokeWidth={2} />
               </Button>
             </div>

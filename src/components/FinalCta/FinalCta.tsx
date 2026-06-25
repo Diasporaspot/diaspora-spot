@@ -76,7 +76,7 @@ function FinalCta() {
                 variants={fadeUp}
                 transition={{ duration: 0.5, ease: [0.22, 0.61, 0.36, 1] }}
               >
-                <Button variant="mustard" href="#" className={styles.btnWrap}>
+                <Button variant="mustard" href="/workshops" className={styles.btnWrap}>
                   Join Us Now <ArrowRight size={14} strokeWidth={2} />
                 </Button>
                 <Button variant="inverse" href="#solution" className={styles.secondaryBtn}>

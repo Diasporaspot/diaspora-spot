@@ -73,7 +73,7 @@ function Navigation() {
 function AuthButtons() {
   return (
     <div className={styles.authButtons}>
-      <Button href="#final" variant="primary" className={styles.ctaButton}>
+      <Button href="/workshops" variant="primary" className={styles.ctaButton}>
         Join Us <ArrowRight size={14} strokeWidth={2} />
       </Button>
     </div>

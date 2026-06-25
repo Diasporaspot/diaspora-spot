@@ -124,7 +124,7 @@ function Hero() {
               ease: [0.22, 0.61, 0.36, 1],
             }}
           >
-            <Button variant="mustard" href="#final">
+            <Button variant="mustard" href="/workshops">
               Join Us <ArrowRight size={14} strokeWidth={2} />
             </Button>
             <a className={styles.arrowLink} href="#solution">

@@ -2,7 +2,8 @@
 
 import { AnimatePresence, motion } from 'framer-motion';
 import Link from 'next/link';
-import { useEffect, useMemo, useState } from 'react';
+import { usePathname, useRouter } from 'next/navigation';
+import { useMemo, useState } from 'react';
 import {
   CalendarDays,
   Check,
@@ -220,34 +221,14 @@ function WorkshopModal({
   );
 }
 
-type WorkshopExplorerProps = {
-  workshops: Workshop[];
-  activeWorkshopSlug?: string;
-};
-
-export default function WorkshopExplorer({
-  activeWorkshopSlug,
-  workshops,
-}: WorkshopExplorerProps) {
+export default function WorkshopExplorer({ workshops }: { workshops: Workshop[] }) {
+  const pathname = usePathname();
+  const router = useRouter();
   const [copied, setCopied] = useState(false);
-  const [localWorkshop, setLocalWorkshop] = useState<Workshop | undefined>();
-  const [hiddenSlug, setHiddenSlug] = useState<string | undefined>();
-  const routeWorkshop = activeWorkshopSlug
-    ? workshops.find((workshop) => workshop.slug === activeWorkshopSlug)
+  const selectedSlug = pathname.match(/^\/workshops\/([^/]+)$/)?.[1];
+  const selectedWorkshop = selectedSlug
+    ? workshops.find((workshop) => workshop.slug === decodeURIComponent(selectedSlug))
     : undefined;
-  const selectedWorkshop =
-    localWorkshop ?? (activeWorkshopSlug !== hiddenSlug ? routeWorkshop : undefined);
-
-  useEffect(() => {
-    function handlePopState() {
-      const slug = window.location.pathname.match(/^\/workshops\/([^/]+)$/)?.[1];
-      setHiddenSlug(undefined);
-      setLocalWorkshop(slug ? workshops.find((workshop) => workshop.slug === slug) : undefined);
-    }
-
-    window.addEventListener('popstate', handlePopState);
-    return () => window.removeEventListener('popstate', handlePopState);
-  }, [workshops]);
 
   const filters = useMemo<ContentListFilter<Workshop>[]>(
     () => [
@@ -289,15 +270,11 @@ export default function WorkshopExplorer({
   );
 
   function openWorkshop(workshop: Workshop) {
-    setHiddenSlug(undefined);
-    setLocalWorkshop(workshop);
-    window.history.pushState(null, '', `/workshops/${workshop.slug}`);
+    router.push(`/workshops/${workshop.slug}`, { scroll: false });
   }
 
   function closeWorkshop() {
-    setLocalWorkshop(undefined);
-    setHiddenSlug(activeWorkshopSlug);
-    window.history.pushState(null, '', '/workshops');
+    router.replace('/workshops', { scroll: false });
   }
 
   function copyWorkshopLink() {
