@@ -6,6 +6,8 @@ import { FormEvent, useEffect, useState } from 'react';
 import styles from './homeAccessPrompt.module.css';
 
 const SIGNUP_COOKIE_NAME = 'ds_early_access_signup';
+const CONSENT_COOKIE_NAME = 'ds_cookie_consent';
+const CONSENT_CHANGE_EVENT = 'ds:cookie-consent-change';
 const SIGNUP_COOKIE_MAX_AGE = 60 * 60 * 24 * 365;
 const REVEAL_DELAY = 6500;
 
@@ -17,6 +19,12 @@ function hasSignupCookie() {
     .some((item) => item.startsWith(`${SIGNUP_COOKIE_NAME}=`));
 }
 
+function hasConsentCookie() {
+  return document.cookie
+    .split('; ')
+    .some((item) => item.startsWith(`${CONSENT_COOKIE_NAME}=`));
+}
+
 function storeSignupCookie() {
   const secure = window.location.protocol === 'https:' ? '; Secure' : '';
 
@@ -26,13 +34,25 @@ function storeSignupCookie() {
 export default function HomeAccessPrompt() {
   const [isVisible, setIsVisible] = useState(false);
   const [isCommunityVisible, setIsCommunityVisible] = useState(false);
+  const [hasCookieChoice, setHasCookieChoice] = useState(false);
   const [submitState, setSubmitState] = useState<SubmitState>('idle');
   const [message, setMessage] = useState('');
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
 
   useEffect(() => {
-    if (hasSignupCookie()) {
+    function syncCookieChoice() {
+      setHasCookieChoice(hasConsentCookie());
+    }
+
+    syncCookieChoice();
+    window.addEventListener(CONSENT_CHANGE_EVENT, syncCookieChoice);
+
+    return () => window.removeEventListener(CONSENT_CHANGE_EVENT, syncCookieChoice);
+  }, []);
+
+  useEffect(() => {
+    if (!hasCookieChoice || hasSignupCookie()) {
       return;
     }
 
@@ -41,7 +61,7 @@ export default function HomeAccessPrompt() {
     }, REVEAL_DELAY);
 
     return () => window.clearTimeout(timer);
-  }, []);
+  }, [hasCookieChoice]);
 
   useEffect(() => {
     const communitySection = document.getElementById('community');

@@ -10,6 +10,8 @@ import styles from './cookieConsent.module.css';
 const COOKIE_NAME = 'ds_cookie_consent';
 const COOKIE_MAX_AGE = 60 * 60 * 24 * 365;
 const CONSENT_CHANGE_EVENT = 'ds:cookie-consent-change';
+const DEFAULT_GA_MEASUREMENT_ID = 'G-HY8H12ZFY9';
+const DEFAULT_CLARITY_PROJECT_ID = 'xgm7wbtndd';
 
 type ConsentState = {
   necessary: true;
@@ -103,7 +105,8 @@ function subscribeToMount() {
 }
 
 function CookieScripts({ consent }: { consent: ConsentState | null }) {
-  const analyticsId = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID;
+  const analyticsId = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID || DEFAULT_GA_MEASUREMENT_ID;
+  const clarityId = process.env.NEXT_PUBLIC_CLARITY_PROJECT_ID || DEFAULT_CLARITY_PROJECT_ID;
   const adsenseClientId = process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID;
 
   return (
@@ -120,6 +123,15 @@ function CookieScripts({ consent }: { consent: ConsentState | null }) {
               function gtag(){dataLayer.push(arguments);}
               gtag('js', new Date());
               gtag('config', '${analyticsId}');
+            `}
+          </Script>
+          <Script id="microsoft-clarity-consent" strategy="afterInteractive">
+            {`
+              (function(c,l,a,r,i,t,y){
+                c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+                t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+                y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+              })(window, document, "clarity", "script", "${clarityId}");
             `}
           </Script>
         </>
