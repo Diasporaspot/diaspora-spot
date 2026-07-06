@@ -1,0 +1,219 @@
+.prompt {
+  position: fixed;
+  left: 22px;
+  bottom: 22px;
+  z-index: 60;
+  width: min(410px, calc(100vw - 44px));
+  border: 1px solid rgba(247, 247, 247, 0.16);
+  border-radius: 8px;
+  background:
+    linear-gradient(145deg, rgba(43, 38, 34, 0.96), rgba(23, 20, 17, 0.98)),
+    var(--ds-espresso);
+  box-shadow: 0 18px 54px rgba(43, 38, 34, 0.2);
+  color: var(--ds-bone);
+  padding: 20px;
+}
+
+.prompt::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(247, 203, 77, 0.56), transparent);
+}
+
+.close {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  width: 34px;
+  height: 34px;
+  border: 1px solid rgba(247, 247, 247, 0.14);
+  border-radius: 999px;
+  background: rgba(247, 247, 247, 0.08);
+  color: var(--ds-sand-70);
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+}
+
+.close:hover {
+  border-color: rgba(247, 247, 247, 0.32);
+  color: var(--ds-bone);
+}
+
+.topline {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding-right: 46px;
+  font-family: var(--font-sans);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  line-height: 1;
+  text-transform: uppercase;
+  color: var(--ds-mustard);
+}
+
+.icon {
+  width: 30px;
+  height: 30px;
+  border-radius: 999px;
+  background: rgba(247, 203, 77, 0.16);
+  color: var(--ds-mustard);
+  display: grid;
+  place-items: center;
+}
+
+.title {
+  margin: 16px 38px 8px 0;
+  font-family: var(--font-sans);
+  font-size: 23px;
+  font-weight: 750;
+  line-height: 1.12;
+  color: var(--ds-bone);
+}
+
+.copy {
+  max-width: 36ch;
+  font-family: var(--font-sans);
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 1.55;
+  color: rgba(247, 247, 247, 0.72);
+}
+
+.form {
+  display: grid;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.field {
+  display: grid;
+  gap: 7px;
+}
+
+.field span {
+  font-family: var(--font-sans);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  line-height: 1;
+  text-transform: uppercase;
+  color: rgba(247, 247, 247, 0.58);
+}
+
+.field input {
+  width: 100%;
+  min-height: 44px;
+  border: 1px solid rgba(247, 247, 247, 0.16);
+  border-radius: 8px;
+  background: rgba(247, 247, 247, 0.08);
+  color: var(--ds-bone);
+  font-family: var(--font-sans);
+  font-size: 14px;
+  line-height: 1.2;
+  outline: none;
+  padding: 0 13px;
+  transition:
+    border-color var(--dur-base) var(--ease-out),
+    box-shadow var(--dur-base) var(--ease-out);
+}
+
+.field input::placeholder {
+  color: rgba(247, 247, 247, 0.42);
+}
+
+.field input:focus {
+  border-color: var(--ds-mustard);
+  box-shadow: 0 0 0 3px rgba(247, 203, 77, 0.14);
+}
+
+.honeypot {
+  position: absolute;
+  left: -9999px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+
+.submit {
+  min-height: 46px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--ds-mustard);
+  color: var(--ds-espresso);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  font-family: var(--font-sans);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  line-height: 1;
+  text-transform: uppercase;
+  transition:
+    background var(--dur-fast) var(--ease-out),
+    opacity var(--dur-fast) var(--ease-out),
+    transform var(--dur-fast) var(--ease-out);
+}
+
+.submit:hover:not(:disabled) {
+  background: var(--ds-mustard-deep);
+  transform: translateY(-1px);
+}
+
+.submit:disabled {
+  cursor: wait;
+  opacity: 0.76;
+}
+
+.message,
+.meta {
+  margin-top: 12px;
+  font-family: var(--font-sans);
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.45;
+}
+
+.meta {
+  color: rgba(247, 247, 247, 0.5);
+}
+
+.success {
+  color: var(--ds-mustard);
+}
+
+.error {
+  color: #ffb39f;
+}
+
+.spinner {
+  animation: spin 800ms linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (max-width: 560px) {
+  .prompt {
+    left: 12px;
+    bottom: 12px;
+    width: calc(100vw - 24px);
+    max-height: calc(100vh - 24px);
+    overflow: auto;
+    padding: 18px;
+  }
+
+  .title {
+    font-size: 21px;
+  }
+}

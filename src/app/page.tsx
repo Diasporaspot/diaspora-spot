@@ -7,6 +7,7 @@ import Workshops from '@/components/Workshops/Workshops';
 import Community from '@/components/Community/Community';
 import FinalCta from '@/components/FinalCta/FinalCta';
 import Footer from '@/components/Footer/Footer';
+import HomeAccessPrompt from '@/components/HomeAccessPrompt/HomeAccessPrompt';
 import { getHomepageArticles, getUpcomingWorkshops } from '@/content/queries';
 
 export const dynamic = 'force-dynamic';
@@ -30,6 +31,7 @@ export default async function Home() {
         <FinalCta />
       </main>
       <Footer />
+      <HomeAccessPrompt />
     </>
   );
 }
