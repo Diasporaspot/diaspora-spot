@@ -76,6 +76,7 @@ export type Article = {
 };
 
 export type WorkshopStatus = 'booking-open' | 'few-spots' | 'waitlist';
+export type WorkshopPaymentType = 'free' | 'paid';
 
 export type WorkshopIcon =
   | 'document'
@@ -108,6 +109,9 @@ export type Workshop = {
   host: string;
   spotsLabel: string;
   bookingStatus: WorkshopStatus;
+  paymentType: WorkshopPaymentType;
+  price: number;
+  currency: string;
   icon: WorkshopIcon;
   iconTone: WorkshopIconTone;
   ctaLabel: string;

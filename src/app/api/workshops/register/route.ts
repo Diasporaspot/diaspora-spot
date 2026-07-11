@@ -1,17 +1,17 @@
-import { isValidEmail, subscribeToMailerLite } from '@/lib/mailerlite';
-import { sanityClient } from '@/sanity/lib/client';
+import {
+  getRegistrationWorkshop,
+  getWorkshopRegistrationError,
+  isPaidWorkshop,
+  normalizeRegistrationInput,
+  registerWorkshopAttendee,
+  validateRegistrationInput,
+} from '@/lib/workshop-registration';
 
 type RegistrationBody = {
   email?: unknown;
   name?: unknown;
   slug?: unknown;
   website?: unknown;
-};
-
-type RegistrationWorkshop = {
-  bookingStatus?: string;
-  mailerLiteGroupId?: string;
-  mailerLiteProvisioningStatus?: string;
 };
 
 const RATE_LIMIT_WINDOW_MS = 10 * 60 * 1000;
@@ -41,54 +41,39 @@ export async function POST(request: Request) {
 
   try {
     const body = (await request.json()) as RegistrationBody;
-    const email = typeof body.email === 'string' ? body.email.trim().toLowerCase() : '';
-    const name = typeof body.name === 'string' ? body.name.trim() : '';
-    const slug = typeof body.slug === 'string' ? body.slug.trim() : '';
+    const input = normalizeRegistrationInput(body);
     const website = typeof body.website === 'string' ? body.website.trim() : '';
 
     if (website) {
       return Response.json({ ok: true });
     }
 
-    if (!name || name.length > 120) {
-      return Response.json({ error: 'Enter your name.' }, { status: 400 });
+    const validationError = validateRegistrationInput(input);
+    if (validationError) {
+      return Response.json({ error: validationError }, { status: 400 });
     }
 
-    if (!isValidEmail(email)) {
-      return Response.json({ error: 'Enter a valid email address.' }, { status: 400 });
-    }
+    const workshop = await getRegistrationWorkshop(input.slug);
+    const registrationError = getWorkshopRegistrationError(workshop);
 
-    if (!slug) {
-      return Response.json({ error: 'Select a workshop.' }, { status: 400 });
-    }
-
-    const workshop = await sanityClient.fetch<RegistrationWorkshop | null>(
-      `*[_type == "workshop" && status == "published" && slug.current == $slug][0]{
-        bookingStatus,
-        mailerLiteGroupId,
-        mailerLiteProvisioningStatus
-      }`,
-      { slug },
-    );
-
-    if (!workshop) {
-      return Response.json({ error: 'This workshop could not be found.' }, { status: 404 });
-    }
-
-    if (
-      !workshop.mailerLiteGroupId ||
-      workshop.mailerLiteProvisioningStatus !== 'ready'
-    ) {
+    if (!workshop || registrationError) {
       return Response.json(
-        { error: 'Registration is not available for this workshop yet.' },
-        { status: 409 },
+        { error: registrationError?.message || 'This workshop could not be found.' },
+        { status: registrationError?.status || 404 },
       );
     }
 
-    await subscribeToMailerLite({
-      email,
-      name,
-      groupIds: [workshop.mailerLiteGroupId],
+    if (isPaidWorkshop(workshop)) {
+      return Response.json(
+        { error: 'Payment is required before this workshop can be reserved.' },
+        { status: 402 },
+      );
+    }
+
+    await registerWorkshopAttendee({
+      email: input.email,
+      name: input.name,
+      workshop,
     });
 
     return Response.json({ ok: true });

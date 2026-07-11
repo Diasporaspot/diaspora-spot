@@ -12,6 +12,7 @@ const COOKIE_MAX_AGE = 60 * 60 * 24 * 365;
 const CONSENT_CHANGE_EVENT = 'ds:cookie-consent-change';
 const DEFAULT_GA_MEASUREMENT_ID = 'G-HY8H12ZFY9';
 const DEFAULT_CLARITY_PROJECT_ID = 'xgm7wbtndd';
+const DEFAULT_META_PIXEL_ID = '1028283539696763';
 
 type ConsentState = {
   necessary: true;
@@ -108,6 +109,7 @@ function CookieScripts({ consent }: { consent: ConsentState | null }) {
   const analyticsId = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID || DEFAULT_GA_MEASUREMENT_ID;
   const clarityId = process.env.NEXT_PUBLIC_CLARITY_PROJECT_ID || DEFAULT_CLARITY_PROJECT_ID;
   const adsenseClientId = process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID;
+  const metaPixelId = process.env.NEXT_PUBLIC_META_PIXEL_ID || DEFAULT_META_PIXEL_ID;
 
   return (
     <>
@@ -143,6 +145,23 @@ function CookieScripts({ consent }: { consent: ConsentState | null }) {
           strategy="afterInteractive"
           crossOrigin="anonymous"
         />
+      ) : null}
+
+      {consent?.advertising && metaPixelId ? (
+        <Script id="meta-pixel-consent" strategy="afterInteractive">
+          {`
+            !function(f,b,e,v,n,t,s)
+            {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+            n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+            if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+            n.queue=[];t=b.createElement(e);t.async=!0;
+            t.src=v;s=b.getElementsByTagName(e)[0];
+            s.parentNode.insertBefore(t,s)}(window,document,'script',
+            'https://connect.facebook.net/en_US/fbevents.js');
+            fbq('init', '${metaPixelId}');
+            fbq('track', 'PageView');
+          `}
+        </Script>
       ) : null}
     </>
   );
@@ -207,7 +226,7 @@ export default function CookieConsent() {
       {
         key: 'advertising' as const,
         title: 'Advertising cookies',
-        text: 'Allow advertising services such as Google AdSense to tailor ads if configured.',
+        text: 'Allow advertising services such as Meta Pixel and Google AdSense to measure and tailor ads if configured.',
       },
     ],
     [],

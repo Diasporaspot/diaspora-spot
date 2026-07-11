@@ -29,6 +29,21 @@ export function formatWorkshopDate(date: string, options: Intl.DateTimeFormatOpt
   }).format(parsedDate);
 }
 
+export function formatWorkshopPrice(workshop: Pick<Workshop, 'currency' | 'paymentType' | 'price'>) {
+  if (workshop.paymentType !== 'paid' || workshop.price <= 0) {
+    return 'Free';
+  }
+
+  try {
+    return new Intl.NumberFormat('en', {
+      currency: workshop.currency.toUpperCase(),
+      style: 'currency',
+    }).format(workshop.price);
+  } catch {
+    return `${workshop.currency.toUpperCase()} ${workshop.price}`;
+  }
+}
+
 const workshopIconMap: Record<WorkshopIcon, LucideIcon> = {
   document: FileText,
   briefcase: Briefcase,

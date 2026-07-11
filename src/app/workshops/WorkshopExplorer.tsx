@@ -9,6 +9,7 @@ import {
   Check,
   Clock3,
   Copy,
+  CreditCard,
   SlidersHorizontal,
   Users,
   X,
@@ -20,6 +21,7 @@ import ContentList, {
 import type { Workshop, WorkshopStatus } from '@/content/types';
 import {
   formatWorkshopDate,
+  formatWorkshopPrice,
   WorkshopIconBadge,
   workshopStatusLabel,
 } from './workshopShared';
@@ -186,9 +188,9 @@ function WorkshopModal({
                 <strong>{workshop.spotsLabel}</strong>
               </span>
               <span>
-                <SlidersHorizontal size={17} />
-                <small>Duration</small>
-                <strong>{workshop.duration}</strong>
+                <CreditCard size={17} />
+                <small>Price</small>
+                <strong>{formatWorkshopPrice(workshop)}</strong>
               </span>
             </div>
 

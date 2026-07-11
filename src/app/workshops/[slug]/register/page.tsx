@@ -1,11 +1,12 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { ArrowLeft, CalendarDays, Clock3, SlidersHorizontal, Users } from 'lucide-react';
+import { ArrowLeft, CalendarDays, Clock3, CreditCard, Users } from 'lucide-react';
 import Topbar from '@/components/Topbar/Topbar';
 import Footer from '@/components/Footer/Footer';
 import { getUpcomingWorkshops } from '@/content/queries';
 import type { Workshop } from '@/content/types';
 import {
+  formatWorkshopPrice,
   formatWorkshopDate,
   WorkshopIconBadge,
   workshopStatusLabel,
@@ -18,6 +19,9 @@ export const dynamic = 'force-dynamic';
 type WorkshopRegistrationPageProps = {
   params: Promise<{
     slug: string;
+  }>;
+  searchParams?: Promise<{
+    payment?: string;
   }>;
 };
 
@@ -54,14 +58,16 @@ function RegistrationSummary({ workshop }: { workshop: Workshop }) {
           <strong>{workshop.spotsLabel}</strong>
         </span>
         <span>
-          <SlidersHorizontal size={17} />
-          <small>Duration</small>
-          <strong>{workshop.duration}</strong>
+          <CreditCard size={17} />
+          <small>Price</small>
+          <strong>{formatWorkshopPrice(workshop)}</strong>
         </span>
       </div>
       <div className={styles.registrationHost}>
         <span>Hosted by</span>
-        <strong>{workshop.host}</strong>
+        <strong>
+          {workshop.host} · {workshop.duration}
+        </strong>
       </div>
     </aside>
   );
@@ -69,14 +75,22 @@ function RegistrationSummary({ workshop }: { workshop: Workshop }) {
 
 export default async function WorkshopRegistrationPage({
   params,
+  searchParams,
 }: WorkshopRegistrationPageProps) {
   const { slug } = await params;
+  const resolvedSearchParams = await searchParams;
   const workshops = await getUpcomingWorkshops();
   const workshop = workshops.find((item) => item.slug === slug);
 
   if (!workshop) {
     notFound();
   }
+
+  const priceLabel = formatWorkshopPrice(workshop);
+  const paymentNotice =
+    resolvedSearchParams?.payment === 'success' || resolvedSearchParams?.payment === 'cancelled'
+      ? resolvedSearchParams.payment
+      : undefined;
 
   return (
     <div className={styles.page}>
@@ -94,12 +108,18 @@ export default async function WorkshopRegistrationPage({
                 <span className={styles.eyebrow}>Workshop registration</span>
                 <h1 id="registration-title">Reserve your seat</h1>
                 <p>
-                  Enter your details below. The team will use your email to send confirmation,
-                  reminders, and workshop updates.
+                  {workshop.paymentType === 'paid'
+                    ? `Enter your details below, then complete the ${priceLabel} payment securely through Stripe.`
+                    : 'Enter your details below. The team will use your email to send confirmation, reminders, and workshop updates.'}
                 </p>
 
                 {workshop.registrationReady ? (
-                  <WorkshopRegistrationForm slug={workshop.slug} />
+                  <WorkshopRegistrationForm
+                    initialNotice={paymentNotice}
+                    isPaid={workshop.paymentType === 'paid'}
+                    priceLabel={priceLabel}
+                    slug={workshop.slug}
+                  />
                 ) : (
                   <div className={styles.registrationUnavailable} role="status">
                     <strong>Registration is opening soon.</strong>

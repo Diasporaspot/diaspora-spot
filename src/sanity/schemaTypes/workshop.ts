@@ -28,6 +28,13 @@ const iconToneOptions = [
   { title: 'Blue', value: 'blue' },
 ];
 
+const currencyOptions = [
+  { title: 'USD', value: 'usd' },
+  { title: 'GBP', value: 'gbp' },
+  { title: 'EUR', value: 'eur' },
+  { title: 'NGN', value: 'ngn' },
+];
+
 export const workshop = defineType({
   name: 'workshop',
   title: 'Workshop',
@@ -146,6 +153,57 @@ export const workshop = defineType({
         layout: 'dropdown',
       },
       validation: (rule) => rule.required(),
+    }),
+    defineField({
+      name: 'paymentType',
+      title: 'Payment type',
+      type: 'string',
+      initialValue: 'free',
+      options: {
+        list: [
+          { title: 'Free', value: 'free' },
+          { title: 'Paid', value: 'paid' },
+        ],
+        layout: 'radio',
+      },
+      validation: (rule) => rule.required(),
+    }),
+    defineField({
+      name: 'price',
+      title: 'Price',
+      type: 'number',
+      initialValue: 0,
+      description: 'Use the normal currency amount, for example 25 for $25.',
+      hidden: ({ parent }) => parent?.paymentType !== 'paid',
+      validation: (rule) =>
+        rule.custom((value, context) => {
+          if (context.parent && (context.parent as { paymentType?: string }).paymentType === 'paid') {
+            return typeof value === 'number' && value > 0
+              ? true
+              : 'Enter a price greater than 0 for paid workshops.';
+          }
+
+          return true;
+        }),
+    }),
+    defineField({
+      name: 'currency',
+      title: 'Currency',
+      type: 'string',
+      initialValue: 'usd',
+      hidden: ({ parent }) => parent?.paymentType !== 'paid',
+      options: {
+        list: currencyOptions,
+        layout: 'dropdown',
+      },
+      validation: (rule) =>
+        rule.custom((value, context) => {
+          if (context.parent && (context.parent as { paymentType?: string }).paymentType === 'paid') {
+            return value ? true : 'Choose a currency for paid workshops.';
+          }
+
+          return true;
+        }),
     }),
     defineField({
       name: 'icon',

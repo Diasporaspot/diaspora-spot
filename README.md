@@ -10,9 +10,13 @@ NEXT_PUBLIC_SANITY_DATASET=production
 NEXT_PUBLIC_SANITY_API_VERSION=2025-06-02
 MAILERLITE_API_KEY=your_mailerlite_api_key
 MAILERLITE_GROUP_ID=optional_existing_group_id
+STRIPE_SECRET_KEY=sk_test_or_live_key
+STRIPE_WEBHOOK_SECRET=whsec_webhook_signing_secret
+NEXT_PUBLIC_SITE_URL=https://your-production-domain.com
 ```
 
 `MAILERLITE_GROUP_ID` is optional. When present, early-access submissions are added to that existing MailerLite group.
+`NEXT_PUBLIC_SITE_URL` is used for Stripe Checkout success and cancel redirects in deployed environments.
 
 ## Workshop registration workflow
 
@@ -21,6 +25,8 @@ Published workshops automatically receive a dedicated MailerLite group through t
 The function has its own server-side `MAILERLITE_API_KEY`, configured with the Sanity Functions environment-variable command. It does not require a webhook, callback URL, webhook secret, or manually managed Sanity write token.
 
 Staff can find the generated group in MailerLite using the workshop title and date. They may optionally activate a MailerLite automation using **Joins a group** for workshop communications. Keep those emails limited to registration confirmation and workshop communications unless the user has separately consented to general marketing.
+
+Paid workshops use Stripe Checkout. Set the workshop payment type, price and currency in Sanity. Free workshops register immediately through MailerLite; paid workshops redirect to Stripe and are only registered after Stripe sends a signed `checkout.session.completed` webhook to `/api/stripe/webhook`.
 
 First, run the development server:
 

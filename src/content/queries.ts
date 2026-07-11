@@ -23,6 +23,7 @@ import type {
   Workshop,
   WorkshopIcon,
   WorkshopIconTone,
+  WorkshopPaymentType,
   WorkshopStatus,
 } from './types';
 
@@ -128,6 +129,9 @@ type SanityWorkshop = {
   host?: string;
   spotsLabel?: string;
   bookingStatus?: WorkshopStatus;
+  paymentType?: WorkshopPaymentType;
+  price?: number;
+  currency?: string;
   icon?: WorkshopIcon;
   iconTone?: WorkshopIconTone;
   ctaLabel?: string;
@@ -362,6 +366,9 @@ function normalizeWorkshop(workshop: SanityWorkshop): Workshop {
     host: workshop.host ?? '',
     spotsLabel: workshop.spotsLabel ?? '',
     bookingStatus: workshop.bookingStatus ?? 'booking-open',
+    paymentType: workshop.paymentType ?? 'free',
+    price: workshop.price ?? 0,
+    currency: workshop.currency ?? 'usd',
     icon: workshop.icon ?? 'document',
     iconTone: workshop.iconTone ?? 'warm',
     ctaLabel: workshop.ctaLabel ?? 'Reserve a seat',
