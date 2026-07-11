@@ -5,7 +5,7 @@ import { CheckCircle2, LoaderCircle } from 'lucide-react';
 import styles from '../../workshops-page.module.css';
 
 type WorkshopRegistrationFormProps = {
-  initialNotice?: 'cancelled' | 'success';
+  initialNotice?: 'cancelled' | 'success' | 'unconfirmed';
   isPaid: boolean;
   priceLabel: string;
   slug: string;
@@ -86,9 +86,18 @@ export default function WorkshopRegistrationForm({
       <div className={styles.registrationSuccess} role="status">
         <CheckCircle2 size={26} />
         <div>
-          <strong>Payment is being confirmed.</strong>
-          <span>If payment succeeded, we will send workshop updates by email shortly.</span>
+          <strong>Your registration is confirmed.</strong>
+          <span>We will send workshop updates by email shortly.</span>
         </div>
+      </div>
+    );
+  }
+
+  if (isPaid && initialNotice === 'unconfirmed') {
+    return (
+      <div className={styles.registrationUnavailable} role="alert">
+        <strong>We could not confirm this payment.</strong>
+        <span>Please return to Stripe Checkout or try reserving your seat again.</span>
       </div>
     );
   }

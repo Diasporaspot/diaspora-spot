@@ -89,6 +89,9 @@ export async function POST(request: Request) {
     const successUrl = new URL(`/workshops/${input.slug}/register`, baseUrl);
     successUrl.searchParams.set('payment', 'success');
     successUrl.searchParams.set('session_id', '{CHECKOUT_SESSION_ID}');
+    const successUrlString = successUrl
+      .toString()
+      .replace('%7BCHECKOUT_SESSION_ID%7D', '{CHECKOUT_SESSION_ID}');
     const cancelUrl = new URL(`/workshops/${input.slug}/register`, baseUrl);
     cancelUrl.searchParams.set('payment', 'cancelled');
 
@@ -119,7 +122,7 @@ export async function POST(request: Request) {
       payment_intent_data: {
         metadata,
       },
-      success_url: successUrl.toString(),
+      success_url: successUrlString,
       cancel_url: cancelUrl.toString(),
     });
 

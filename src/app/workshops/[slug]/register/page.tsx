@@ -5,6 +5,7 @@ import Topbar from '@/components/Topbar/Topbar';
 import Footer from '@/components/Footer/Footer';
 import { getUpcomingWorkshops } from '@/content/queries';
 import type { Workshop } from '@/content/types';
+import { getStripe } from '@/lib/stripe';
 import {
   formatWorkshopPrice,
   formatWorkshopDate,
@@ -22,8 +23,11 @@ type WorkshopRegistrationPageProps = {
   }>;
   searchParams?: Promise<{
     payment?: string;
+    session_id?: string;
   }>;
 };
+
+type PaymentNotice = 'cancelled' | 'success' | 'unconfirmed';
 
 function RegistrationSummary({ workshop }: { workshop: Workshop }) {
   return (
@@ -73,6 +77,41 @@ function RegistrationSummary({ workshop }: { workshop: Workshop }) {
   );
 }
 
+async function getPaymentNotice({
+  searchParams,
+  workshop,
+}: {
+  searchParams?: { payment?: string; session_id?: string };
+  workshop: Workshop;
+}): Promise<PaymentNotice | undefined> {
+  if (searchParams?.payment === 'cancelled') {
+    return 'cancelled';
+  }
+
+  if (searchParams?.payment !== 'success' || workshop.paymentType !== 'paid') {
+    return undefined;
+  }
+
+  const sessionId = searchParams.session_id;
+
+  if (!sessionId || sessionId === '{CHECKOUT_SESSION_ID}') {
+    return 'unconfirmed';
+  }
+
+  try {
+    const session = await getStripe().checkout.sessions.retrieve(sessionId);
+    const sessionMatchesWorkshop =
+      session.client_reference_id === workshop._id && session.metadata?.slug === workshop.slug;
+
+    return session.payment_status === 'paid' && sessionMatchesWorkshop
+      ? 'success'
+      : 'unconfirmed';
+  } catch (reason) {
+    console.error('Could not verify Stripe checkout session.', reason);
+    return 'unconfirmed';
+  }
+}
+
 export default async function WorkshopRegistrationPage({
   params,
   searchParams,
@@ -87,10 +126,10 @@ export default async function WorkshopRegistrationPage({
   }
 
   const priceLabel = formatWorkshopPrice(workshop);
-  const paymentNotice =
-    resolvedSearchParams?.payment === 'success' || resolvedSearchParams?.payment === 'cancelled'
-      ? resolvedSearchParams.payment
-      : undefined;
+  const paymentNotice = await getPaymentNotice({
+    searchParams: resolvedSearchParams,
+    workshop,
+  });
 
   return (
     <div className={styles.page}>
