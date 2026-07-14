@@ -1,6 +1,6 @@
 'use client';
 
-import { type FormEvent, useState } from 'react';
+import { type FormEvent, useEffect, useState } from 'react';
 import { CheckCircle2, LoaderCircle } from 'lucide-react';
 import styles from '../../workshops-page.module.css';
 
@@ -10,6 +10,18 @@ type WorkshopRegistrationFormProps = {
   priceLabel: string;
   slug: string;
 };
+
+type MetaPixelWindow = Window & {
+  fbq?: (action: 'track', eventName: 'CompleteRegistration') => void;
+};
+
+function trackCompleteRegistration() {
+  const fbq = (window as MetaPixelWindow).fbq;
+
+  if (typeof fbq === 'function') {
+    fbq('track', 'CompleteRegistration');
+  }
+}
 
 export default function WorkshopRegistrationForm({
   initialNotice,
@@ -21,6 +33,22 @@ export default function WorkshopRegistrationForm({
   const [error, setError] = useState(
     initialNotice === 'cancelled' ? 'Payment was cancelled. You can try again below.' : '',
   );
+
+  useEffect(() => {
+    if (!isPaid || initialNotice !== 'success') {
+      return;
+    }
+
+    const sessionId = new URLSearchParams(window.location.search).get('session_id') || slug;
+    const trackingKey = `ds_meta_complete_registration:${slug}:${sessionId}`;
+
+    if (window.sessionStorage.getItem(trackingKey)) {
+      return;
+    }
+
+    trackCompleteRegistration();
+    window.sessionStorage.setItem(trackingKey, 'true');
+  }, [initialNotice, isPaid, slug]);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -61,6 +89,7 @@ export default function WorkshopRegistrationForm({
 
       form.reset();
       setState('success');
+      trackCompleteRegistration();
     } catch (reason) {
       setError(
         reason instanceof Error ? reason.message : 'Registration failed. Please try again.',
