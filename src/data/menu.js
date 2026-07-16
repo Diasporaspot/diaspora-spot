@@ -40,3 +40,21 @@ export const footerLinks = {
     { label: 'Terms of Use', href: '/terms-of-use' },
   ],
 };
+
+export const socialLinks = [
+  {
+    label: 'Instagram',
+    handle: '@diasporaspot',
+    href: 'https://www.instagram.com/diasporaspot',
+  },
+  {
+    label: 'TikTok',
+    handle: '@diasporaspot',
+    href: 'https://www.tiktok.com/@diasporaspot',
+  },
+  {
+    label: 'LinkedIn',
+    handle: 'DiasporaSpot',
+    href: 'https://www.linkedin.com/company/diasporaspot/',
+  },
+];

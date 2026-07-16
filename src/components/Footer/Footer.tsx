@@ -1,5 +1,6 @@
 import Image from 'next/image';
 import Link from 'next/link';
+import SocialLinks from '@/components/SocialLinks/SocialLinks';
 import { footerLinks } from '@/data/menu';
 import styles from './footer.module.css';
 
@@ -10,6 +11,9 @@ function Footer() {
         <div className={styles.brand}>
           <Image src="/assets/logo-primary-white.png" alt="DiasporaSpot" width={142} height={26} />
           <p className={styles.brandTag}>A digital hub to help you build and grow your life abroad.</p>
+          <div className={styles.socialWrap}>
+            <SocialLinks />
+          </div>
         </div>
 
         <div className={styles.cols}>

@@ -28,6 +28,10 @@
   max-width: 32ch;
 }
 
+.socialWrap {
+  margin-top: 24px;
+}
+
 .cols {
   display: grid;
   grid-template-columns: repeat(3, 1fr);

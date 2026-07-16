@@ -133,6 +133,10 @@
   color: var(--fg3);
 }
 
+.socialRow {
+  margin-top: 22px;
+}
+
 .modalOverlay {
   position: fixed;
   inset: 0;

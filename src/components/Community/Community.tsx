@@ -13,6 +13,7 @@ import {
   Users,
   X,
 } from 'lucide-react';
+import SocialLinks from '@/components/SocialLinks/SocialLinks';
 import TypewriterText from '@/components/TypewriterText/TypewriterText';
 import styles from './community.module.css';
 
@@ -189,6 +190,14 @@ function Community() {
           >
             No spam. Just useful updates, early access, and a short welcome.
           </motion.p>
+
+          <motion.div
+            className={styles.socialRow}
+            variants={fadeUp}
+            transition={{ duration: 0.5, ease: [0.22, 0.61, 0.36, 1] }}
+          >
+            <SocialLinks tone="light" />
+          </motion.div>
         </motion.div>
 
         <motion.div
