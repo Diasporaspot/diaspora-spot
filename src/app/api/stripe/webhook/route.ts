@@ -1,7 +1,7 @@
 import type Stripe from 'stripe';
 import {
-  getRegistrationWorkshop,
   getWorkshopRegistrationError,
+  getWorkshopForPaidFulfillment,
   registerWorkshopAttendee,
 } from '@/lib/workshop-registration';
 import { getStripe } from '@/lib/stripe';
@@ -18,16 +18,16 @@ async function registerPaidWorkshop(session: Stripe.Checkout.Session) {
     session.customer_details?.email ||
     (typeof session.customer_email === 'string' ? session.customer_email : '');
   const name = session.metadata?.name || session.customer_details?.name || '';
-  const slug = session.metadata?.slug || '';
+  const workshopId = session.metadata?.workshopId || '';
 
-  if (!email || !name || !slug) {
+  if (!email || !name || !workshopId) {
     console.error('Paid workshop checkout is missing registration metadata.', {
       sessionId: session.id,
     });
     return;
   }
 
-  const workshop = await getRegistrationWorkshop(slug);
+  const workshop = await getWorkshopForPaidFulfillment(workshopId);
   const registrationError = getWorkshopRegistrationError(workshop);
 
   if (!workshop || registrationError) {

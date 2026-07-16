@@ -102,6 +102,22 @@ export async function getRegistrationWorkshop(slug: string) {
   );
 }
 
+export async function getWorkshopForPaidFulfillment(id: string) {
+  return sanityClient.fetch<RegistrationWorkshop | null>(
+    `*[_type == "workshop" && _id == $id][0]{
+      _id,
+      bookingStatus,
+      currency,
+      mailerLiteGroupId,
+      mailerLiteProvisioningStatus,
+      paymentType,
+      price,
+      title
+    }`,
+    { id },
+  );
+}
+
 export function getWorkshopRegistrationError(workshop: RegistrationWorkshop | null) {
   if (!workshop) {
     return { message: 'This workshop could not be found.', status: 404 };
