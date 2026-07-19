@@ -10,6 +10,7 @@ import {
   Clock3,
   Copy,
   CreditCard,
+  Layers3,
   SlidersHorizontal,
   Users,
   X,
@@ -82,7 +83,10 @@ function WorkshopCard({
         </span>
       </div>
       <div className={styles.body}>
-        <span className={styles.kicker}>{workshop.format}</span>
+        <span className={styles.kicker}>
+          {workshop.series ? `${workshop.series.title} · ` : ''}
+          {workshop.format}
+        </span>
         <h2 className={styles.cardTitle}>{workshop.title}</h2>
         <p className={styles.description}>{workshop.description}</p>
         <WorkshopMeta workshop={workshop} />
@@ -162,6 +166,17 @@ function WorkshopModal({
               <span>Hosted by</span>
               <strong>{workshop.host}</strong>
             </div>
+            {workshop.series ? (
+              <Link
+                className={styles.seriesInlineLink}
+                href={`/workshops/series/${workshop.series.slug}`}
+              >
+                <Layers3 size={17} />
+                <span>
+                  Part of <strong>{workshop.series.title}</strong>
+                </span>
+              </Link>
+            ) : null}
           </div>
 
           <aside className={styles.bookingPanel} aria-label="Booking details">
@@ -215,6 +230,14 @@ function WorkshopModal({
                 {copied ? <Check size={16} /> : <Copy size={16} />}
                 {copied ? 'Copied link' : 'Copy share link'}
               </button>
+              {workshop.series ? (
+                <Link
+                  className={styles.seriesSecondaryButton}
+                  href={`/workshops/series/${workshop.series.slug}`}
+                >
+                  View complete series
+                </Link>
+              ) : null}
             </div>
           </aside>
         </div>
@@ -223,7 +246,11 @@ function WorkshopModal({
   );
 }
 
-export default function WorkshopExplorer({ workshops }: { workshops: Workshop[] }) {
+export default function WorkshopExplorer({
+  workshops,
+}: {
+  workshops: Workshop[];
+}) {
   const pathname = usePathname();
   const router = useRouter();
   const [copied, setCopied] = useState(false);
@@ -286,16 +313,15 @@ export default function WorkshopExplorer({ workshops }: { workshops: Workshop[] 
   }
 
   return (
-    <section className={`wrap ${styles.index}`} aria-label="All workshops">
+    <section className={styles.index} aria-label="All workshops">
       <div className={styles.indexHead}>
         <div>
           <h2 className={styles.sectionTitle}>Upcoming sessions</h2>
           <p className={styles.indexIntro}>
-            Search the workshop library, filter by status, and open a shareable detail view for the
-            session you want to send around.
+            Browse upcoming live sessions and reserve the workshop that fits what you want to work
+            on next.
           </p>
         </div>
-        <span className={styles.resultsMeta}>{workshops.length} sessions</span>
       </div>
 
       <ContentList
@@ -309,6 +335,7 @@ export default function WorkshopExplorer({ workshops }: { workshops: Workshop[] 
             workshop.description,
             workshop.host,
             workshop.format,
+            workshop.series?.title,
           ].join(' ')
         }
         gridClassName={styles.grid}

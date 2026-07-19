@@ -22,11 +22,21 @@ NEXT_PUBLIC_SITE_URL=https://your-production-domain.com
 
 Published workshops automatically receive a dedicated MailerLite group through the deployed `provision-workshop-mailerlite` Sanity Function. The function stores the generated group ID on the workshop and registration becomes available when setup is complete.
 
+Published workshop series receive their own group through `provision-series-mailerlite`. A series
+registration adds the attendee to the series group and every included workshop group. Series pricing
+is independent of individual workshop pricing, so a series may be free or paid while every included
+workshop remains individually bookable.
+
 The function has its own server-side `MAILERLITE_API_KEY`, configured with the Sanity Functions environment-variable command. It does not require a webhook, callback URL, webhook secret, or manually managed Sanity write token.
 
 Staff can find the generated group in MailerLite using the workshop title and date. They may optionally activate a MailerLite automation using **Joins a group** for workshop communications. Keep those emails limited to registration confirmation and workshop communications unless the user has separately consented to general marketing.
 
 Paid workshops use Stripe Checkout. Set the workshop payment type, price and currency in Sanity. Free workshops register immediately through MailerLite; paid workshops redirect to Stripe and are only registered after Stripe sends a signed `checkout.session.completed` webhook to `/api/stripe/webhook`.
+
+Configure the Stripe webhook for `checkout.session.completed` and
+`checkout.session.async_payment_succeeded`. Stripe remains the payment record; after a successful
+payment, the webhook reads the workshop or series from Sanity and adds the attendee to its MailerLite
+groups.
 
 First, run the development server:
 

@@ -1,15 +1,16 @@
 import {
-  getRegistrationWorkshop,
-  getWorkshopRegistrationError,
-  isPaidWorkshop,
+  getProductRegistrationError,
+  getRegistrationProduct,
+  isPaidProduct,
   normalizeRegistrationInput,
-  registerWorkshopAttendee,
+  registerProductAttendee,
   validateRegistrationInput,
 } from '@/lib/workshop-registration';
 
 type RegistrationBody = {
   email?: unknown;
   name?: unknown;
+  productType?: unknown;
   slug?: unknown;
   website?: unknown;
 };
@@ -53,27 +54,27 @@ export async function POST(request: Request) {
       return Response.json({ error: validationError }, { status: 400 });
     }
 
-    const workshop = await getRegistrationWorkshop(input.slug);
-    const registrationError = getWorkshopRegistrationError(workshop);
+    const product = await getRegistrationProduct(input.productType, input.slug);
+    const registrationError = getProductRegistrationError(product);
 
-    if (!workshop || registrationError) {
+    if (!product || registrationError) {
       return Response.json(
-        { error: registrationError?.message || 'This workshop could not be found.' },
+        { error: registrationError?.message || 'This workshop or series could not be found.' },
         { status: registrationError?.status || 404 },
       );
     }
 
-    if (isPaidWorkshop(workshop)) {
+    if (isPaidProduct(product)) {
       return Response.json(
-        { error: 'Payment is required before this workshop can be reserved.' },
+        { error: 'Payment is required before this workshop or series can be reserved.' },
         { status: 402 },
       );
     }
 
-    await registerWorkshopAttendee({
+    await registerProductAttendee({
       email: input.email,
       name: input.name,
-      workshop,
+      product,
     });
 
     return Response.json({ ok: true });

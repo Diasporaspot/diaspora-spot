@@ -1,14 +1,15 @@
 import type Stripe from 'stripe';
 import {
-  getWorkshopRegistrationError,
-  getWorkshopForPaidFulfillment,
-  registerWorkshopAttendee,
+  getProductRegistrationError,
+  getRegistrationProductById,
+  registerProductAttendee,
+  type RegistrationProductType,
 } from '@/lib/workshop-registration';
 import { getStripe } from '@/lib/stripe';
 
 export const runtime = 'nodejs';
 
-async function registerPaidWorkshop(session: Stripe.Checkout.Session) {
+async function fulfillPaidPurchase(session: Stripe.Checkout.Session) {
   if (session.payment_status !== 'paid') {
     return;
   }
@@ -18,23 +19,22 @@ async function registerPaidWorkshop(session: Stripe.Checkout.Session) {
     session.customer_details?.email ||
     (typeof session.customer_email === 'string' ? session.customer_email : '');
   const name = session.metadata?.name || session.customer_details?.name || '';
-  const workshopId = session.metadata?.workshopId || '';
+  const productType: RegistrationProductType =
+    session.metadata?.productType === 'series' ? 'series' : 'workshop';
+  const productId = session.metadata?.productId || session.metadata?.workshopId || '';
 
-  if (!email || !name || !workshopId) {
-    console.error('Paid workshop checkout is missing registration metadata.', {
-      sessionId: session.id,
-    });
-    return;
+  if (!email || !name || !productId) {
+    throw new Error(`Paid ${productType} checkout is missing registration metadata.`);
   }
 
-  const workshop = await getWorkshopForPaidFulfillment(workshopId);
-  const registrationError = getWorkshopRegistrationError(workshop);
+  const product = await getRegistrationProductById(productType, productId);
+  const registrationError = getProductRegistrationError(product);
 
-  if (!workshop || registrationError) {
-    throw new Error(registrationError?.message || 'This workshop could not be found.');
+  if (!product || registrationError) {
+    throw new Error(registrationError?.message || 'This workshop or series could not be found.');
   }
 
-  await registerWorkshopAttendee({ email, name, workshop });
+  await registerProductAttendee({ email, name, product });
 }
 
 export async function POST(request: Request) {
@@ -61,8 +61,11 @@ export async function POST(request: Request) {
   }
 
   try {
-    if (event.type === 'checkout.session.completed') {
-      await registerPaidWorkshop(event.data.object);
+    if (
+      event.type === 'checkout.session.completed' ||
+      event.type === 'checkout.session.async_payment_succeeded'
+    ) {
+      await fulfillPaidPurchase(event.data.object);
     }
 
     return Response.json({ received: true });

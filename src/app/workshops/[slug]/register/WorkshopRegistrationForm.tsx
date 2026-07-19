@@ -8,6 +8,8 @@ type WorkshopRegistrationFormProps = {
   initialNotice?: 'cancelled' | 'success' | 'unconfirmed';
   isPaid: boolean;
   priceLabel: string;
+  productLabel?: string;
+  productType?: 'series' | 'workshop';
   slug: string;
 };
 
@@ -27,6 +29,8 @@ export default function WorkshopRegistrationForm({
   initialNotice,
   isPaid,
   priceLabel,
+  productLabel = 'workshop',
+  productType = 'workshop',
   slug,
 }: WorkshopRegistrationFormProps) {
   const [state, setState] = useState<'idle' | 'submitting' | 'success'>('idle');
@@ -40,7 +44,7 @@ export default function WorkshopRegistrationForm({
     }
 
     const sessionId = new URLSearchParams(window.location.search).get('session_id') || slug;
-    const trackingKey = `ds_meta_complete_registration:${slug}:${sessionId}`;
+    const trackingKey = `ds_meta_complete_registration:${productType}:${slug}:${sessionId}`;
 
     if (window.sessionStorage.getItem(trackingKey)) {
       return;
@@ -48,7 +52,7 @@ export default function WorkshopRegistrationForm({
 
     trackCompleteRegistration();
     window.sessionStorage.setItem(trackingKey, 'true');
-  }, [initialNotice, isPaid, slug]);
+  }, [initialNotice, isPaid, productType, slug]);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -67,6 +71,7 @@ export default function WorkshopRegistrationForm({
           body: JSON.stringify({
             email: formData.get('email'),
             name: formData.get('name'),
+            productType,
             slug,
             website: formData.get('website'),
           }),
@@ -103,8 +108,8 @@ export default function WorkshopRegistrationForm({
       <div className={styles.registrationSuccess} role="status">
         <CheckCircle2 size={26} />
         <div>
-          <strong>You are registered.</strong>
-          <span>Check your inbox for workshop updates from the team.</span>
+          <strong>You are registered for the {productLabel}.</strong>
+          <span>Check your inbox for confirmation and session updates from the team.</span>
         </div>
       </div>
     );
@@ -115,8 +120,8 @@ export default function WorkshopRegistrationForm({
       <div className={styles.registrationSuccess} role="status">
         <CheckCircle2 size={26} />
         <div>
-          <strong>Your registration is confirmed.</strong>
-          <span>We will send workshop updates by email shortly.</span>
+          <strong>Your {productLabel} registration is confirmed.</strong>
+          <span>We will send confirmation and session updates by email shortly.</span>
         </div>
       </div>
     );
@@ -163,7 +168,7 @@ export default function WorkshopRegistrationForm({
       <p className={styles.registrationNotice}>
         {isPaid
           ? `You will be redirected to Stripe to pay ${priceLabel}. After payment, we will send confirmation, reminders, and related updates.`
-          : 'By registering, you agree to receive emails about this workshop, including confirmation, reminders, and related updates.'}{' '}
+          : `By registering, you agree to receive emails about this ${productLabel}, including confirmation, reminders, and related updates.`}{' '}
         See our <a href="/privacy-policy">privacy policy</a>.
       </p>
       {error ? (

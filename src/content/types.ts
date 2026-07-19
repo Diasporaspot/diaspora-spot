@@ -77,6 +77,7 @@ export type Article = {
 
 export type WorkshopStatus = 'booking-open' | 'few-spots' | 'waitlist';
 export type WorkshopPaymentType = 'free' | 'paid';
+export type WorkshopSeriesStatus = WorkshopStatus | 'closed';
 
 export type WorkshopIcon =
   | 'document'
@@ -91,6 +92,12 @@ export type WorkshopIcon =
   | 'map-pin';
 
 export type WorkshopIconTone = 'warm' | 'gold' | 'dark' | 'green' | 'blue';
+
+export type WorkshopSeriesSummary = {
+  _id: string;
+  title: string;
+  slug: string;
+};
 
 export type Workshop = {
   _id: string;
@@ -115,6 +122,30 @@ export type Workshop = {
   icon: WorkshopIcon;
   iconTone: WorkshopIconTone;
   ctaLabel: string;
+  registrationReady: boolean;
+  featured: boolean;
+  series?: WorkshopSeriesSummary;
+};
+
+export type WorkshopSeries = {
+  _id: string;
+  _type: 'workshopSeries';
+  createdAt?: string;
+  status: ContentStatus;
+  title: string;
+  slug: string;
+  oneLiner: string;
+  description: string;
+  workshops: Workshop[];
+  salesStatus: WorkshopSeriesStatus;
+  allowWaitlistedWorkshops: boolean;
+  paymentType: WorkshopPaymentType;
+  price: number;
+  currency: string;
+  icon: WorkshopIcon;
+  iconTone: WorkshopIconTone;
+  ctaLabel: string;
+  pricingConflict: boolean;
   registrationReady: boolean;
   featured: boolean;
 };

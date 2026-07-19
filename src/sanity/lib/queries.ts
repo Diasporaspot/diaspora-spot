@@ -40,7 +40,7 @@ export const articleSlugsQuery = `*[_type == "article" && status == "published" 
 
 export const articleCategoriesQuery = `array::unique(*[_type == "article" && status == "published" && defined(category)].category)`;
 
-const workshopProjection = `{
+const workshopFields = `
   _id,
   _type,
   "_createdAt": _createdAt,
@@ -64,12 +64,68 @@ const workshopProjection = `{
   iconTone,
   ctaLabel,
   "registrationReady": defined(mailerLiteGroupId) && mailerLiteProvisioningStatus == "ready",
-  featured
+  featured`;
+
+const workshopProjection = `{
+  ${workshopFields},
+  "series": *[
+    _type == "workshopSeries" &&
+    status == "published" &&
+    ^._id in workshops[]._ref
+  ][0]{
+    _id,
+    title,
+    "slug": slug.current
+  }
+}`;
+
+const workshopSeriesProjection = `{
+  _id,
+  _type,
+  "_createdAt": _createdAt,
+  status,
+  title,
+  "slug": slug.current,
+  oneLiner,
+  description,
+  salesStatus,
+  allowWaitlistedWorkshops,
+  paymentType,
+  price,
+  currency,
+  icon,
+  iconTone,
+  ctaLabel,
+  "pricingConflict":
+    paymentType != "paid" &&
+    count(workshops[@->status == "published" && @->paymentType == "paid"]) > 0,
+  "registrationReady":
+    defined(mailerLiteGroupId) &&
+    mailerLiteProvisioningStatus == "ready" &&
+    count(workshops[@->status == "published"]) > 0 &&
+    count(workshops[
+      @->status == "published" &&
+      (!defined(@->mailerLiteGroupId) || @->mailerLiteProvisioningStatus != "ready")
+    ]) == 0 &&
+    (
+      allowWaitlistedWorkshops == true ||
+      count(workshops[@->status == "published" && @->bookingStatus == "waitlist"]) == 0
+    ) &&
+    (
+      paymentType == "paid" ||
+      count(workshops[@->status == "published" && @->paymentType == "paid"]) == 0
+    ),
+  featured,
+  "workshops": workshops[@->status == "published"][]->{${workshopFields}}
 }`;
 
 export const upcomingWorkshopsQuery = `*[_type == "workshop" && status == "published"] | order(featured desc, date asc) ${workshopProjection}`;
 
 export const featuredWorkshopsQuery = `*[_type == "workshop" && status == "published" && featured == true] | order(date asc) ${workshopProjection}`;
+
+export const publishedWorkshopSeriesQuery = `*[_type == "workshopSeries" && status == "published"] | order(featured desc, _createdAt desc) ${workshopSeriesProjection}`;
+
+export const workshopSeriesBySlugQuery = `*[_type == "workshopSeries" && status == "published" && slug.current == $slug][0] ${workshopSeriesProjection}`;
 
 const jobProjection = `{
   _id,

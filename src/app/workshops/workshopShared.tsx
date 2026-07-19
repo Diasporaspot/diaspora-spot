@@ -11,7 +11,15 @@ import {
   Users,
   type LucideIcon,
 } from 'lucide-react';
-import type { Workshop, WorkshopIcon, WorkshopIconTone, WorkshopStatus } from '@/content/types';
+import type {
+  Workshop,
+  WorkshopIcon,
+  WorkshopIconTone,
+  WorkshopPaymentType,
+  WorkshopSeries,
+  WorkshopSeriesStatus,
+  WorkshopStatus,
+} from '@/content/types';
 import styles from './workshops-page.module.css';
 
 export function formatWorkshopDate(date: string, options: Intl.DateTimeFormatOptions = {}) {
@@ -29,19 +37,29 @@ export function formatWorkshopDate(date: string, options: Intl.DateTimeFormatOpt
   }).format(parsedDate);
 }
 
-export function formatWorkshopPrice(workshop: Pick<Workshop, 'currency' | 'paymentType' | 'price'>) {
-  if (workshop.paymentType !== 'paid' || workshop.price <= 0) {
+export function formatWorkshopPrice(product: {
+  currency: string;
+  paymentType: WorkshopPaymentType;
+  price: number;
+}) {
+  if (product.paymentType !== 'paid' || product.price <= 0) {
     return 'Free';
   }
 
   try {
     return new Intl.NumberFormat('en', {
-      currency: workshop.currency.toUpperCase(),
+      currency: product.currency.toUpperCase(),
       style: 'currency',
-    }).format(workshop.price);
+    }).format(product.price);
   } catch {
-    return `${workshop.currency.toUpperCase()} ${workshop.price}`;
+    return `${product.currency.toUpperCase()} ${product.price}`;
   }
+}
+
+export function formatWorkshopSeriesPrice(
+  series: Pick<WorkshopSeries, 'currency' | 'paymentType' | 'price' | 'pricingConflict'>,
+) {
+  return series.pricingConflict ? 'Pricing required' : formatWorkshopPrice(series);
 }
 
 const workshopIconMap: Record<WorkshopIcon, LucideIcon> = {
@@ -71,7 +89,16 @@ export const workshopStatusLabel: Record<WorkshopStatus, string> = {
   waitlist: 'Waitlist',
 };
 
-export function WorkshopIconBadge({ workshop }: { workshop: Workshop }) {
+export const workshopSeriesStatusLabel: Record<WorkshopSeriesStatus, string> = {
+  ...workshopStatusLabel,
+  closed: 'Registration closed',
+};
+
+export function WorkshopIconBadge({
+  workshop,
+}: {
+  workshop: Pick<Workshop, 'icon' | 'iconTone'>;
+}) {
   const Icon = workshopIconMap[workshop.icon];
 
   return (

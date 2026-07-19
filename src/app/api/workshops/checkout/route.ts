@@ -1,9 +1,9 @@
 import {
-  getRegistrationWorkshop,
+  getProductCurrency,
+  getProductRegistrationError,
+  getRegistrationProduct,
   getStripeUnitAmount,
-  getWorkshopCurrency,
-  getWorkshopRegistrationError,
-  isPaidWorkshop,
+  isPaidProduct,
   normalizeRegistrationInput,
   validateRegistrationInput,
 } from '@/lib/workshop-registration';
@@ -12,6 +12,7 @@ import { getStripe } from '@/lib/stripe';
 type CheckoutBody = {
   email?: unknown;
   name?: unknown;
+  productType?: unknown;
   slug?: unknown;
   website?: unknown;
 };
@@ -59,58 +60,65 @@ export async function POST(request: Request) {
       return Response.json({ error: validationError }, { status: 400 });
     }
 
-    const workshop = await getRegistrationWorkshop(input.slug);
-    const registrationError = getWorkshopRegistrationError(workshop);
+    const product = await getRegistrationProduct(input.productType, input.slug);
+    const registrationError = getProductRegistrationError(product);
 
-    if (!workshop || registrationError) {
+    if (!product || registrationError) {
       return Response.json(
-        { error: registrationError?.message || 'This workshop could not be found.' },
+        { error: registrationError?.message || 'This workshop or series could not be found.' },
         { status: registrationError?.status || 404 },
       );
     }
 
-    if (!isPaidWorkshop(workshop)) {
+    if (!isPaidProduct(product)) {
       return Response.json(
-        { error: 'This workshop does not require payment.' },
+        { error: 'This workshop or series does not require payment.' },
         { status: 400 },
       );
     }
 
-    const unitAmount = getStripeUnitAmount(workshop);
+    const unitAmount = getStripeUnitAmount(product);
     if (unitAmount <= 0) {
       return Response.json(
-        { error: 'This workshop price is not configured correctly.' },
+        { error: 'This price is not configured correctly.' },
         { status: 409 },
       );
     }
 
+    const currency = getProductCurrency(product);
     const stripe = getStripe();
     const baseUrl = getBaseUrl(request);
-    const successUrl = new URL(`/workshops/${input.slug}/register`, baseUrl);
+    const registrationPath =
+      input.productType === 'series'
+        ? `/workshops/series/${input.slug}/register`
+        : `/workshops/${input.slug}/register`;
+    const successUrl = new URL(registrationPath, baseUrl);
     successUrl.searchParams.set('payment', 'success');
     successUrl.searchParams.set('session_id', '{CHECKOUT_SESSION_ID}');
     const successUrlString = successUrl
       .toString()
       .replace('%7BCHECKOUT_SESSION_ID%7D', '{CHECKOUT_SESSION_ID}');
-    const cancelUrl = new URL(`/workshops/${input.slug}/register`, baseUrl);
+    const cancelUrl = new URL(registrationPath, baseUrl);
     cancelUrl.searchParams.set('payment', 'cancelled');
 
-    const metadata = {
+    const metadata: Record<string, string> = {
       email: input.email,
       name: input.name,
+      productId: product._id,
+      productType: input.productType,
       slug: input.slug,
-      workshopId: workshop._id,
+      ...(input.productType === 'workshop' ? { workshopId: product._id } : {}),
     };
 
     const session = await stripe.checkout.sessions.create({
-      client_reference_id: workshop._id,
+      client_reference_id: product._id,
       customer_email: input.email,
       line_items: [
         {
           price_data: {
-            currency: getWorkshopCurrency(workshop),
+            currency,
             product_data: {
-              name: workshop.title || 'DiasporaSpot workshop',
+              name: product.title || 'DiasporaSpot workshop',
             },
             unit_amount: unitAmount,
           },

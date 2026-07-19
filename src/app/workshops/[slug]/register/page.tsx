@@ -101,7 +101,9 @@ async function getPaymentNotice({
   try {
     const session = await getStripe().checkout.sessions.retrieve(sessionId);
     const sessionMatchesWorkshop =
-      session.client_reference_id === workshop._id && session.metadata?.slug === workshop.slug;
+      (session.metadata?.productId === workshop._id || session.metadata?.workshopId === workshop._id) &&
+      (session.metadata?.productType === undefined || session.metadata?.productType === 'workshop') &&
+      session.metadata?.slug === workshop.slug;
 
     return session.payment_status === 'paid' && sessionMatchesWorkshop
       ? 'success'
@@ -157,6 +159,8 @@ export default async function WorkshopRegistrationPage({
                     initialNotice={paymentNotice}
                     isPaid={workshop.paymentType === 'paid'}
                     priceLabel={priceLabel}
+                    productLabel="workshop"
+                    productType="workshop"
                     slug={workshop.slug}
                   />
                 ) : (

@@ -4,9 +4,9 @@ import Topbar from '@/components/Topbar/Topbar';
 import Footer from '@/components/Footer/Footer';
 import Button from '@/components/Button/Button';
 import TypewriterText from '@/components/TypewriterText/TypewriterText';
-import { getUpcomingWorkshops } from '@/content/queries';
+import { getPublishedWorkshopSeries, getUpcomingWorkshops } from '@/content/queries';
 import type { Workshop } from '@/content/types';
-import WorkshopExplorer from './WorkshopExplorer';
+import WorkshopCatalog from './WorkshopCatalog';
 import { formatWorkshopDate, WorkshopIconBadge, workshopStatusLabel } from './workshopShared';
 import styles from './workshops-page.module.css';
 
@@ -34,7 +34,10 @@ type WorkshopsPageContentProps = {
 };
 
 export default async function WorkshopsPageContent({ activeWorkshopSlug }: WorkshopsPageContentProps) {
-  const workshops = await getUpcomingWorkshops();
+  const [workshops, series] = await Promise.all([
+    getUpcomingWorkshops(),
+    getPublishedWorkshopSeries(),
+  ]);
   const featuredWorkshop = workshops.find((workshop) => workshop.featured) ?? workshops[0];
 
   if (activeWorkshopSlug && !workshops.some((workshop) => workshop.slug === activeWorkshopSlug)) {
@@ -92,7 +95,7 @@ export default async function WorkshopsPageContent({ activeWorkshopSlug }: Works
           </div>
         </section>
 
-        <WorkshopExplorer workshops={workshops} />
+        <WorkshopCatalog series={series} workshops={workshops} />
       </main>
       <Footer />
     </div>

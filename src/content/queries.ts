@@ -1,4 +1,5 @@
 import { sanityClient } from '@/sanity/lib/client';
+import { hasSeriesPricingConflict } from '@/lib/workshop-registration-core';
 import {
   allPublishedArticlesQuery,
   articleCategoriesQuery,
@@ -7,6 +8,8 @@ import {
   allPublishedJobsQuery,
   featuredPublishedArticlesQuery,
   upcomingWorkshopsQuery,
+  publishedWorkshopSeriesQuery,
+  workshopSeriesBySlugQuery,
 } from '@/sanity/lib/queries';
 import { articles, events, guides, workshops } from './dummyData';
 import type {
@@ -25,6 +28,9 @@ import type {
   WorkshopIconTone,
   WorkshopPaymentType,
   WorkshopStatus,
+  WorkshopSeries,
+  WorkshopSeriesStatus,
+  WorkshopSeriesSummary,
 } from './types';
 
 type SanityMarkDef = {
@@ -135,6 +141,30 @@ type SanityWorkshop = {
   icon?: WorkshopIcon;
   iconTone?: WorkshopIconTone;
   ctaLabel?: string;
+  registrationReady?: boolean;
+  featured?: boolean;
+  series?: WorkshopSeriesSummary;
+};
+
+type SanityWorkshopSeries = {
+  _id: string;
+  _type: 'workshopSeries';
+  _createdAt?: string;
+  status?: ContentStatus;
+  title?: string;
+  slug?: string;
+  oneLiner?: string;
+  description?: string;
+  workshops?: SanityWorkshop[];
+  salesStatus?: WorkshopSeriesStatus;
+  allowWaitlistedWorkshops?: boolean;
+  paymentType?: WorkshopPaymentType;
+  price?: number;
+  currency?: string;
+  icon?: WorkshopIcon;
+  iconTone?: WorkshopIconTone;
+  ctaLabel?: string;
+  pricingConflict?: boolean;
   registrationReady?: boolean;
   featured?: boolean;
 };
@@ -374,6 +404,37 @@ function normalizeWorkshop(workshop: SanityWorkshop): Workshop {
     ctaLabel: workshop.ctaLabel ?? 'Reserve a seat',
     registrationReady: workshop.registrationReady ?? false,
     featured: workshop.featured ?? false,
+    series: workshop.series,
+  };
+}
+
+function normalizeWorkshopSeries(series: SanityWorkshopSeries): WorkshopSeries {
+  const normalizedWorkshops = (series.workshops ?? []).map(normalizeWorkshop);
+  const pricingConflict =
+    series.pricingConflict ??
+    hasSeriesPricingConflict({ paymentType: series.paymentType, workshops: normalizedWorkshops });
+
+  return {
+    _id: series._id,
+    _type: 'workshopSeries',
+    createdAt: series._createdAt,
+    status: series.status ?? 'published',
+    title: series.title ?? '',
+    slug: series.slug ?? '',
+    oneLiner: series.oneLiner ?? '',
+    description: series.description ?? '',
+    workshops: normalizedWorkshops,
+    salesStatus: series.salesStatus ?? 'booking-open',
+    allowWaitlistedWorkshops: series.allowWaitlistedWorkshops ?? false,
+    paymentType: series.paymentType ?? 'free',
+    price: series.price ?? 0,
+    currency: series.currency ?? 'usd',
+    icon: series.icon ?? 'presentation',
+    iconTone: series.iconTone ?? 'gold',
+    ctaLabel: series.ctaLabel ?? 'Get the complete series',
+    pricingConflict,
+    registrationReady: (series.registrationReady ?? false) && !pricingConflict,
+    featured: series.featured ?? false,
   };
 }
 
@@ -511,6 +572,36 @@ export async function getUpcomingWorkshops() {
   }
 
   return workshops.filter((workshop) => workshop.status === 'published').sort(byDateAsc);
+}
+
+export async function getPublishedWorkshopSeries() {
+  try {
+    const series = await sanityClient.fetch<SanityWorkshopSeries[]>(
+      publishedWorkshopSeriesQuery,
+      {},
+      { cache: 'no-store' },
+    );
+
+    return series.map(normalizeWorkshopSeries);
+  } catch (error) {
+    console.warn('Sanity workshop series fetch failed.', error);
+    return [];
+  }
+}
+
+export async function getWorkshopSeriesBySlug(slug: string) {
+  try {
+    const series = await sanityClient.fetch<SanityWorkshopSeries | null>(
+      workshopSeriesBySlugQuery,
+      { slug },
+      { cache: 'no-store' },
+    );
+
+    return series ? normalizeWorkshopSeries(series) : null;
+  } catch (error) {
+    console.warn('Sanity workshop series fetch failed.', error);
+    return null;
+  }
 }
 
 export async function getAllJobs() {
