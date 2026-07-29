@@ -4,7 +4,9 @@ import Link from 'next/link';
 import { ArrowRight, CalendarRange, Layers3 } from 'lucide-react';
 import ContentList, { type ContentListSort } from '@/components/ContentList/ContentList';
 import type { WorkshopSeries } from '@/content/types';
+import { getWorkshopSeriesPricingComparison } from '@/lib/workshop-series-pricing';
 import {
+  formatCurrencyAmount,
   formatWorkshopDate,
   formatWorkshopPrice,
   formatWorkshopSeriesPrice,
@@ -42,28 +44,6 @@ function getDateRange(series: WorkshopSeries) {
   const lastDate = formatWorkshopDate(dates.at(-1) ?? dates[0], { year: 'numeric' });
 
   return firstDate === lastDate ? firstDate : `${firstDate} – ${lastDate}`;
-}
-
-function getSeriesSaving(series: WorkshopSeries) {
-  if (series.paymentType !== 'paid' || series.pricingConflict) {
-    return '';
-  }
-
-  const comparableWorkshops = series.workshops.filter(
-    (workshop) => workshop.paymentType === 'paid' && workshop.currency === series.currency,
-  );
-  const individualTotal = comparableWorkshops.reduce((total, workshop) => total + workshop.price, 0);
-  const saving = individualTotal - series.price;
-
-  if (comparableWorkshops.length !== series.workshops.length || saving <= 0) {
-    return '';
-  }
-
-  return `Save ${formatWorkshopPrice({
-    currency: series.currency,
-    paymentType: 'paid',
-    price: saving,
-  })}`;
 }
 
 export default function WorkshopSeriesShowcase({ series }: { series: WorkshopSeries[] }) {
@@ -116,7 +96,20 @@ export default function WorkshopSeriesShowcase({ series }: { series: WorkshopSer
 }
 
 function SeriesCard({ item }: { item: WorkshopSeries }) {
-  const saving = getSeriesSaving(item);
+  const comparison = getWorkshopSeriesPricingComparison(item);
+  const individualStartingPrice = comparison.individualStartingPrice
+    ? comparison.individualStartingPrice.paymentType === 'free'
+      ? formatCurrencyAmount(item.currency, 0)
+      : formatWorkshopPrice(comparison.individualStartingPrice)
+    : null;
+  const saving =
+    comparison.saving > 0
+      ? formatWorkshopPrice({
+          currency: item.currency,
+          paymentType: 'paid',
+          price: comparison.saving,
+        })
+      : null;
 
   return (
     <Link className={styles.seriesCard} href={`/workshops/series/${item.slug}`}>
@@ -142,10 +135,28 @@ function SeriesCard({ item }: { item: WorkshopSeries }) {
         </div>
       </div>
       <div className={styles.seriesCardFooter}>
-        <div>
-          <small>Series pass</small>
-          <strong>{formatWorkshopSeriesPrice(item)}</strong>
-          {saving ? <span>{saving}</span> : null}
+        <div className={styles.seriesCardPricing}>
+          <small>Flexible booking</small>
+          {item.paymentType === 'free' && !item.pricingConflict ? (
+            <>
+              <strong>All sessions free</strong>
+              <span>Book one or reserve the complete series</span>
+            </>
+          ) : (
+            <div className={styles.seriesCardPriceRows}>
+              {individualStartingPrice ? (
+                <div>
+                  <span>Single workshops from</span>
+                  <strong>{individualStartingPrice}</strong>
+                </div>
+              ) : null}
+              <div>
+                <span>Complete series</span>
+                <strong>{formatWorkshopSeriesPrice(item)}</strong>
+                {saving ? <em>Save {saving}</em> : null}
+              </div>
+            </div>
+          )}
         </div>
         <span className={styles.seriesArrow}>
           View series <ArrowRight size={16} />

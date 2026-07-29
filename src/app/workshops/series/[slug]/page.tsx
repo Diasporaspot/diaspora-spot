@@ -6,7 +6,6 @@ import {
   ArrowDown,
   CalendarDays,
   CalendarRange,
-  Check,
   Clock3,
   CreditCard,
   Layers3,
@@ -18,6 +17,7 @@ import Topbar from '@/components/Topbar/Topbar';
 import TypewriterText from '@/components/TypewriterText/TypewriterText';
 import { getWorkshopSeriesBySlug } from '@/content/queries';
 import type { WorkshopSeries } from '@/content/types';
+import { getWorkshopSeriesPricingComparison } from '@/lib/workshop-series-pricing';
 import {
   SeriesCurriculumHead,
   SeriesHeroCopy,
@@ -25,6 +25,7 @@ import {
   SeriesSessionItem,
 } from '../SeriesMotion';
 import {
+  formatCurrencyAmount,
   formatWorkshopDate,
   formatWorkshopPrice,
   formatWorkshopSeriesPrice,
@@ -35,23 +36,6 @@ import {
 import styles from '../../workshops-page.module.css';
 
 export const dynamic = 'force-dynamic';
-
-function getIndividualTotal(series: WorkshopSeries) {
-  if (series.paymentType !== 'paid') {
-    return null;
-  }
-
-  const paidWorkshops = series.workshops.filter((workshop) => workshop.paymentType === 'paid');
-
-  if (
-    !paidWorkshops.length ||
-    paidWorkshops.some((workshop) => workshop.currency !== series.currency)
-  ) {
-    return null;
-  }
-
-  return paidWorkshops.reduce((total, workshop) => total + workshop.price, 0);
-}
 
 function getSeriesDateRange(series: WorkshopSeries) {
   const dates = series.workshops.map((workshop) => workshop.date).filter(Boolean).sort();
@@ -78,9 +62,37 @@ export default async function WorkshopSeriesPage({
     notFound();
   }
 
-  const individualTotal = getIndividualTotal(series);
-  const saving = individualTotal !== null ? individualTotal - series.price : 0;
+  const pricing = getWorkshopSeriesPricingComparison(series);
   const priceLabel = formatWorkshopSeriesPrice(series);
+  const individualStartingPrice = pricing.individualStartingPrice
+    ? pricing.individualStartingPrice.paymentType === 'free'
+      ? formatCurrencyAmount(series.currency, 0)
+      : formatWorkshopPrice(pricing.individualStartingPrice)
+    : null;
+  const perSessionPrice =
+    pricing.perSessionPrice !== null
+      ? formatWorkshopPrice({
+          currency: series.currency,
+          paymentType: 'paid',
+          price: pricing.perSessionPrice,
+        })
+      : null;
+  const saving =
+    pricing.saving > 0
+      ? formatWorkshopPrice({
+          currency: series.currency,
+          paymentType: 'paid',
+          price: pricing.saving,
+        })
+      : null;
+  const individualTotal =
+    pricing.individualTotal !== null
+      ? formatWorkshopPrice({
+          currency: series.currency,
+          paymentType: 'paid',
+          price: pricing.individualTotal,
+        })
+      : null;
   const canRegister =
     series.registrationReady &&
     !series.pricingConflict &&
@@ -133,19 +145,23 @@ export default async function WorkshopSeriesPage({
                   <div>
                     <CreditCard size={19} />
                     <span>
-                      <small>Series pass</small>
-                      <strong>{priceLabel}</strong>
+                      <small>Flexible booking</small>
+                      <strong>
+                        {individualStartingPrice
+                          ? `From ${individualStartingPrice} or full series`
+                          : 'Single sessions or full series'}
+                      </strong>
                     </span>
                   </div>
                 </div>
 
                 <div className={styles.seriesDetailActions}>
                   <a href="#series-curriculum">
-                    Explore the learning path <ArrowDown size={15} />
+                    Choose an individual workshop <ArrowDown size={15} />
                   </a>
                   <span>
                     <Layers3 size={17} />
-                    Every workshop can still be booked separately
+                    Or reserve the complete series in one checkout
                   </span>
                 </div>
               </SeriesHeroCopy>
@@ -155,67 +171,74 @@ export default async function WorkshopSeriesPage({
                 className={`${styles.seriesPriceCard} ${series.pricingConflict ? styles.seriesPriceCardAlert : ''}`}
               >
                 <div className={styles.seriesPriceHeading}>
-                  <span>Complete series pass</span>
+                  <span>Choose how you’d like to join</span>
                   <span>{series.workshops.length} sessions</span>
                 </div>
-                <strong>{priceLabel}</strong>
                 <p className={styles.seriesPriceIntro}>
                   {series.pricingConflict
                     ? 'This series includes a paid workshop. Set a paid series price in Sanity before registration can open.'
-                    : series.paymentType === 'paid'
-                      ? 'One secure checkout reserves your place across the complete learning path.'
-                      : 'Register once to reserve your place across every session in this learning path.'}
+                    : 'Start with the workshop that matters now, or take the complete learning path for the best overall value.'}
                 </p>
-                {individualTotal && saving > 0 ? (
-                  <div className={styles.savingsPanel}>
-                    <span>
-                      Individually{' '}
-                      {formatWorkshopPrice({
-                        currency: series.currency,
-                        paymentType: 'paid',
-                        price: individualTotal,
-                      })}
+
+                <div className={styles.seriesPricingChoices}>
+                  <a className={styles.seriesPricingChoice} href="#series-curriculum">
+                    <span className={styles.seriesPricingChoiceTop}>
+                      <span>Book one workshop</span>
+                      <em>Lowest commitment</em>
                     </span>
                     <strong>
-                      Save{' '}
-                      {formatWorkshopPrice({
-                        currency: series.currency,
-                        paymentType: 'paid',
-                        price: saving,
-                      })}
+                      {individualStartingPrice ? `From ${individualStartingPrice}` : 'Choose below'}
                     </strong>
-                  </div>
-                ) : null}
-                {canRegister ? (
-                  <Link
-                    className={styles.seriesPriceCta}
-                    href={`/workshops/series/${series.slug}/register`}
+                    <p>Pick only the session that is most useful to you right now.</p>
+                    <span className={styles.seriesPricingChoiceLink}>
+                      View individual workshops <ArrowDown size={14} />
+                    </span>
+                  </a>
+
+                  <div
+                    className={`${styles.seriesPricingChoice} ${styles.seriesPricingChoiceFeatured}`}
                   >
-                    {series.ctaLabel}
-                    <ArrowRight size={17} />
-                  </Link>
-                ) : (
-                  <button className={styles.seriesPriceCta} disabled type="button">
-                    {series.pricingConflict ? 'Pricing setup required' : 'Registration unavailable'}
-                  </button>
-                )}
+                    <span className={styles.seriesPricingChoiceTop}>
+                      <span>Complete series</span>
+                      <em>{saving ? 'Best value' : 'Complete path'}</em>
+                    </span>
+                    <div className={styles.seriesBundlePrice}>
+                      <strong>{priceLabel}</strong>
+                      <span>{perSessionPrice ? `${perSessionPrice} per session` : 'All sessions included'}</span>
+                    </div>
+                    {saving && individualTotal ? (
+                      <p className={styles.seriesSavingLine}>
+                        <span>{individualTotal} booked separately</span>
+                        <strong>Save {saving}</strong>
+                      </p>
+                    ) : (
+                      <p>One registration reserves your place across the complete learning path.</p>
+                    )}
+
+                    {canRegister ? (
+                      <Link
+                        className={styles.seriesPriceCta}
+                        href={`/workshops/series/${series.slug}/register`}
+                      >
+                        {series.ctaLabel}
+                        <ArrowRight size={17} />
+                      </Link>
+                    ) : (
+                      <button className={styles.seriesPriceCta} disabled type="button">
+                        {series.pricingConflict
+                          ? 'Pricing setup required'
+                          : 'Registration unavailable'}
+                      </button>
+                    )}
+                  </div>
+                </div>
+
                 <span className={styles.seriesPriceAssurance}>
                   <ShieldCheck size={16} />
                   {series.paymentType === 'paid' && !series.pricingConflict
                     ? 'Secure payment powered by Stripe'
                     : 'One registration covers the complete series'}
                 </span>
-                <ul>
-                  <li>
-                    <Check size={16} /> One registration for every session
-                  </li>
-                  <li>
-                    <Check size={16} /> Session reminders sent by email
-                  </li>
-                  <li>
-                    <Check size={16} /> Individual workshops remain available separately
-                  </li>
-                </ul>
               </SeriesPricePanel>
             </div>
           </div>

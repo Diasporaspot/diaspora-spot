@@ -46,13 +46,18 @@ export function formatWorkshopPrice(product: {
     return 'Free';
   }
 
+  return formatCurrencyAmount(product.currency, product.price);
+}
+
+export function formatCurrencyAmount(currency: string, price: number) {
   try {
     return new Intl.NumberFormat('en', {
-      currency: product.currency.toUpperCase(),
+      currency: currency.toUpperCase(),
       style: 'currency',
-    }).format(product.price);
+      ...(price === 0 ? { maximumFractionDigits: 0, minimumFractionDigits: 0 } : {}),
+    }).format(price);
   } catch {
-    return `${product.currency.toUpperCase()} ${product.price}`;
+    return `${currency.toUpperCase()} ${price}`;
   }
 }
 
