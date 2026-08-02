@@ -73,48 +73,73 @@ const sections = [
     ],
   },
   {
-    title: '4. Site uptime',
+    title: '4. Membership accounts',
     clauses: [
       {
         number: '4.1',
         content:
-          'DiasporaSpot ensures the website is operational all day. Diaspora Spot is not liable in any way for any occasional technical issues that may result in some down time.',
+          'You may create a free DiasporaSpot membership using a secure email link. You are responsible for maintaining control of the email address used to access your membership.',
       },
       {
         number: '4.2',
+        content:
+          'Creating an account does not by itself unlock paid benefits. Where offered, an active membership subscription is required for subscriber discounts and members-only access.',
+      },
+      {
+        number: '4.3',
+        content:
+          'Subscription prices, billing intervals, renewals and cancellation terms will be displayed before purchase. Benefits may vary, be subject to availability and change over time. A subscription does not guarantee a place at a workshop or event unless expressly stated.',
+      },
+      {
+        number: '4.4',
+        content:
+          'We may suspend or revoke a membership used to misuse benefits, interfere with the service, impersonate another person or breach these terms.',
+      },
+    ],
+  },
+  {
+    title: '5. Site uptime',
+    clauses: [
+      {
+        number: '5.1',
+        content:
+          'DiasporaSpot ensures the website is operational all day. Diaspora Spot is not liable in any way for any occasional technical issues that may result in some down time.',
+      },
+      {
+        number: '5.2',
         content:
           'DiasporaSpot will always try to give a warning in advance of maintenance issues, however there is no obligation on our part to provide this sort of notice.',
       },
     ],
   },
   {
-    title: '5. Third party links',
+    title: '6. Third party links',
     clauses: [
       {
-        number: '5.1',
+        number: '6.1',
         content:
           'Our website may contain links to third party websites. Any third party links on our website does not condone the endorsement of such sites.',
       },
       {
-        number: '5.2',
+        number: '6.2',
         content: 'Any party willing to link our website is allowed to do so under these conditions:',
         items: [
           {
-            number: '5.2.2',
+            number: '6.2.2',
             content: 'You do not misrepresent your relationship with the website.',
           },
           {
-            number: '5.2.3',
+            number: '6.2.3',
             content:
               'You are not trying to implicate our endorsement to any products or services of third parties without prior written agreement.',
           },
           {
-            number: '5.2.4',
+            number: '6.2.4',
             content:
               'You do not link our website to another website that contains offensive, xenophbic, controversial content or any content that infringes any intellectual rights or rights of a third party.',
           },
           {
-            number: '5.2.5',
+            number: '6.2.5',
             content:
               'You shall indemnify us for any loss or damage suffered on this website as a result for breaching any of those terms as a result of linking our website.',
           },
@@ -123,45 +148,45 @@ const sections = [
     ],
   },
   {
-    title: '6. Disclaimer and warranties',
+    title: '7. Disclaimer and warranties',
     clauses: [
       {
-        number: '6.1',
+        number: '7.1',
         content:
           'DiasporaSpot takes the necessary steps to ensure accuracy and certainty in the information in this website. However there is no guarantee that all material is and will be up to date.',
       },
       {
-        number: '6.2',
+        number: '7.2',
         content:
           'DiasporaSpot declares that all material provided on our website is without any warranty of any kind. You shall use the material on our website at your own discretion.',
       },
     ],
   },
   {
-    title: '7. Limitations of liability',
+    title: '8. Limitations of liability',
     clauses: [
       {
-        number: '7.1',
+        number: '8.1',
         content:
           'DiasporaSpot does not accept liability for any loss or damage that you suffer as a result of using our website.',
       },
       {
-        number: '7.2',
+        number: '8.2',
         content:
           'If you continue to use our website after such changes, that entails your acceptance of our privacy policy.',
       },
       {
-        number: '7.3',
+        number: '8.3',
         content:
           'DiasporaSpot is not liable in any means for any decisions taken on the basis of the material in our website.',
       },
     ],
   },
   {
-    title: '8. Law and jurisdiction',
+    title: '9. Law and jurisdiction',
     clauses: [
       {
-        number: '8.1',
+        number: '9.1',
         content:
           'Our terms and conditions are governed by the laws of England and Wales and any disputes will be subject exclusively under the courts of England and Wales.',
       },

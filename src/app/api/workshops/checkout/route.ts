@@ -12,8 +12,10 @@ import { getStripe } from '@/lib/stripe';
 type CheckoutBody = {
   email?: unknown;
   name?: unknown;
+  phone?: unknown;
   productType?: unknown;
   slug?: unknown;
+  smsMarketingConsent?: unknown;
   website?: unknown;
 };
 
@@ -108,6 +110,13 @@ export async function POST(request: Request) {
       productType: input.productType,
       slug: input.slug,
       ...(input.productType === 'workshop' ? { workshopId: product._id } : {}),
+      ...(input.phone ? { phone: input.phone } : {}),
+      ...(input.smsMarketingConsent
+        ? {
+            smsMarketingConsent: 'true',
+            smsConsentAt: new Date().toISOString(),
+          }
+        : {}),
     };
 
     const session = await stripe.checkout.sessions.create({

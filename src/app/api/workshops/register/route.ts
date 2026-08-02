@@ -10,8 +10,10 @@ import {
 type RegistrationBody = {
   email?: unknown;
   name?: unknown;
+  phone?: unknown;
   productType?: unknown;
   slug?: unknown;
+  smsMarketingConsent?: unknown;
   website?: unknown;
 };
 
@@ -74,7 +76,10 @@ export async function POST(request: Request) {
     await registerProductAttendee({
       email: input.email,
       name: input.name,
+      phone: input.phone,
       product,
+      smsConsentAt: input.smsMarketingConsent ? new Date().toISOString() : undefined,
+      smsMarketingConsent: input.smsMarketingConsent,
     });
 
     return Response.json({ ok: true });

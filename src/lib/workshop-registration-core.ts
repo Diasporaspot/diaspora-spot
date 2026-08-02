@@ -1,4 +1,8 @@
 import { isValidEmail } from '@/lib/mailerlite';
+import {
+  isValidInternationalPhoneNumber,
+  normalizeInternationalPhoneNumber,
+} from '@/lib/phone';
 
 export type WorkshopPaymentType = 'free' | 'paid';
 export type RegistrationProductType = 'series' | 'workshop';
@@ -6,8 +10,10 @@ export type RegistrationProductType = 'series' | 'workshop';
 export type RegistrationInput = {
   email: string;
   name: string;
+  phone: string;
   productType: RegistrationProductType;
   slug: string;
+  smsMarketingConsent: boolean;
 };
 
 type PricedProduct = {
@@ -42,24 +48,42 @@ const ZERO_DECIMAL_CURRENCIES = new Set([
 export function normalizeRegistrationInput(input: {
   email?: unknown;
   name?: unknown;
+  phone?: unknown;
   productType?: unknown;
   slug?: unknown;
+  smsMarketingConsent?: unknown;
 }): RegistrationInput {
   return {
     email: typeof input.email === 'string' ? input.email.trim().toLowerCase() : '',
     name: typeof input.name === 'string' ? input.name.trim() : '',
+    phone: normalizeInternationalPhoneNumber(input.phone),
     productType: input.productType === 'series' ? 'series' : 'workshop',
     slug: typeof input.slug === 'string' ? input.slug.trim() : '',
+    smsMarketingConsent: input.smsMarketingConsent === true,
   };
 }
 
-export function validateRegistrationInput({ email, name, slug }: RegistrationInput) {
+export function validateRegistrationInput({
+  email,
+  name,
+  phone,
+  slug,
+  smsMarketingConsent,
+}: RegistrationInput) {
   if (!name || name.length > 120) {
     return 'Enter your name.';
   }
 
   if (!isValidEmail(email)) {
     return 'Enter a valid email address.';
+  }
+
+  if (phone && !isValidInternationalPhoneNumber(phone)) {
+    return 'Enter a valid international phone number including the country code.';
+  }
+
+  if (smsMarketingConsent && !phone) {
+    return 'Enter a phone number to receive SMS updates.';
   }
 
   if (!slug) {

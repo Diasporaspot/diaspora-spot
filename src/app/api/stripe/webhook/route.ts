@@ -19,6 +19,8 @@ async function fulfillPaidPurchase(session: Stripe.Checkout.Session) {
     session.customer_details?.email ||
     (typeof session.customer_email === 'string' ? session.customer_email : '');
   const name = session.metadata?.name || session.customer_details?.name || '';
+  const phone = session.metadata?.phone || session.customer_details?.phone || '';
+  const smsMarketingConsent = session.metadata?.smsMarketingConsent === 'true';
   const productType: RegistrationProductType =
     session.metadata?.productType === 'series' ? 'series' : 'workshop';
   const productId = session.metadata?.productId || session.metadata?.workshopId || '';
@@ -34,7 +36,14 @@ async function fulfillPaidPurchase(session: Stripe.Checkout.Session) {
     throw new Error(registrationError?.message || 'This workshop or series could not be found.');
   }
 
-  await registerProductAttendee({ email, name, product });
+  await registerProductAttendee({
+    email,
+    name,
+    phone,
+    product,
+    smsConsentAt: session.metadata?.smsConsentAt,
+    smsMarketingConsent,
+  });
 }
 
 export async function POST(request: Request) {

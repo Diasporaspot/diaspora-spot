@@ -151,7 +151,7 @@ export default async function WorkshopRegistrationPage({
                 <p>
                   {workshop.paymentType === 'paid'
                     ? `Enter your details below, then complete the ${priceLabel} payment securely through Stripe.`
-                    : 'Enter your details below. The team will use your email to send confirmation, reminders, and workshop updates.'}
+                    : 'Enter your details below. We will use your email for registration updates, and your phone only for workshop coordination or SMS updates you choose.'}
                 </p>
 
                 {workshop.registrationReady ? (

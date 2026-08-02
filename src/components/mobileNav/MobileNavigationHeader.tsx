@@ -10,7 +10,7 @@ import MobileNavigation from './MobileNavigation';
 import SpecialMenuButton from './SpecialMenuButton';
 import styles from './styles/navigationheader.module.css';
 
-function MobileNavigationHeader() {
+function MobileNavigationHeader({ isSignedIn }: { isSignedIn: boolean }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const closeMenu = () => setIsMenuOpen(false);
@@ -76,7 +76,9 @@ function MobileNavigationHeader() {
         initial="closed"
       >
         <AnimatePresence>
-          {isMenuOpen && <MobileNavigation closeMenu={closeMenu} />}
+          {isMenuOpen && (
+            <MobileNavigation closeMenu={closeMenu} isSignedIn={isSignedIn} />
+          )}
         </AnimatePresence>
       </motion.div>
       <SpecialMenuButton

@@ -4,14 +4,14 @@ import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { AnimatePresence, motion } from 'framer-motion';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, CircleUserRound } from 'lucide-react';
 
 import Button from '@/components/Button/Button';
 import { navLinks } from '@/data/menu';
 import NavLink from './NavLink';
 import styles from './styles/navigation.module.css';
 
-function Navigation() {
+function Navigation({ isSignedIn }: { isSignedIn: boolean }) {
   const [isScrolled, setIsScrolled] = useState(false);
 
   useEffect(() => {
@@ -63,18 +63,26 @@ function Navigation() {
             ))}
           </ul>
 
-          <AuthButtons />
+          <AuthButtons isSignedIn={isSignedIn} />
         </nav>
       </motion.header>
     </AnimatePresence>
   );
 }
 
-function AuthButtons() {
+function AuthButtons({ isSignedIn }: { isSignedIn: boolean }) {
   return (
     <div className={styles.authButtons}>
-      <Button href="/workshops" variant="primary" className={styles.ctaButton}>
-        Join Us <ArrowRight size={14} strokeWidth={2} />
+      <Button
+        href="/members"
+        variant="primary"
+        className={`${styles.ctaButton} ${isSignedIn ? styles.accountButton : ''}`}
+      >
+        {isSignedIn ? (
+          <><CircleUserRound size={16} strokeWidth={2} /> My account</>
+        ) : (
+          <>Member access <ArrowRight size={14} strokeWidth={2} /></>
+        )}
       </Button>
     </div>
   );

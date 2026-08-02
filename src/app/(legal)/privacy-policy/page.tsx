@@ -62,7 +62,17 @@ const sections = [
       {
         number: '3.3',
         content:
-          'When you register for a workshop, we use your name and email address to manage your registration and send confirmation, reminders and other communications about that workshop.',
+          'When you register for a workshop, we use your name, email address and any phone number you provide to manage your registration and send confirmation, reminders and other communications about that workshop. We use your phone number for SMS marketing only where you separately choose to receive it, and you may withdraw that consent at any time.',
+      },
+      {
+        number: '3.4',
+        content:
+          'When you create a DiasporaSpot membership, we use your name, email address, mobile number, authentication details, registration status and communication preferences to administer your free account. If you subscribe, we also use subscription status and payment-provider identifiers to provide paid benefits and members-only access.',
+      },
+      {
+        number: '3.5',
+        content:
+          'We send essential membership communications needed to operate your account. We send member news, offers and event marketing by email or SMS only where you have separately chosen to receive them, and you may change either choice or unsubscribe at any time.',
       },
     ],
   },
@@ -92,7 +102,17 @@ const sections = [
       {
         number: '4.6',
         content:
-          'We use MailerLite to store workshop registration details and deliver workshop emails. MailerLite processes your name and email address on our behalf for these purposes.',
+          'We use MailerLite to store workshop registration details and communication preferences and to deliver workshop emails. MailerLite may process your name, email address, phone number and recorded SMS consent details on our behalf for these purposes.',
+      },
+      {
+        number: '4.7',
+        content:
+          'We use Supabase to authenticate members through secure, passwordless email links and to store member account, preference and access information.',
+      },
+      {
+        number: '4.8',
+        content:
+          'We use MailerLite to maintain our member communication groups and store member names, email addresses, mobile numbers and communication preferences. We do not use membership signup to override an unsubscribe or reactivate an unsubscribed contact without permission.',
       },
     ],
   },

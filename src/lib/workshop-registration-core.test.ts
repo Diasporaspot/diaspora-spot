@@ -16,14 +16,18 @@ describe('workshop registration input', () => {
       normalizeRegistrationInput({
         email: ' Person@Example.com ',
         name: ' Ada Lovelace ',
+        phone: ' +44 7911 123456 ',
         productType: 'series',
         slug: ' career-series ',
+        smsMarketingConsent: true,
       }),
       {
         email: 'person@example.com',
         name: 'Ada Lovelace',
+        phone: '+447911123456',
         productType: 'series',
         slug: 'career-series',
+        smsMarketingConsent: true,
       },
     );
   });
@@ -37,8 +41,10 @@ describe('workshop registration input', () => {
       validateRegistrationInput({
         email: 'person@example.com',
         name: 'Ada Lovelace',
+        phone: '',
         productType: 'series',
         slug: 'career-series',
+        smsMarketingConsent: false,
       }),
       '',
     );
@@ -46,10 +52,34 @@ describe('workshop registration input', () => {
       validateRegistrationInput({
         email: 'not-an-email',
         name: 'Ada Lovelace',
+        phone: '',
         productType: 'workshop',
         slug: 'cv-review',
+        smsMarketingConsent: false,
       }),
       'Enter a valid email address.',
+    );
+    assert.equal(
+      validateRegistrationInput({
+        email: 'person@example.com',
+        name: 'Ada Lovelace',
+        phone: '',
+        productType: 'workshop',
+        slug: 'cv-review',
+        smsMarketingConsent: true,
+      }),
+      'Enter a phone number to receive SMS updates.',
+    );
+    assert.equal(
+      validateRegistrationInput({
+        email: 'person@example.com',
+        name: 'Ada Lovelace',
+        phone: '07700 900123',
+        productType: 'workshop',
+        slug: 'cv-review',
+        smsMarketingConsent: false,
+      }),
+      'Enter a valid international phone number including the country code.',
     );
   });
 });

@@ -1,6 +1,8 @@
 type SubscribeInput = {
   email: string;
+  fields?: Record<string, string | number | null>;
   name: string;
+  phone?: string;
   groupIds?: string[];
 };
 
@@ -17,6 +19,21 @@ type MailerLiteGroupResponse = {
   data?: MailerLiteGroup;
 };
 
+type MailerLiteField = {
+  id: string;
+  key: string;
+  name: string;
+  type: 'date' | 'number' | 'text';
+};
+
+type MailerLiteFieldList = {
+  data?: MailerLiteField[];
+};
+
+type MailerLiteFieldResponse = {
+  data?: MailerLiteField;
+};
+
 type MailerLiteErrorBody = {
   message?: string;
   error?: string;
@@ -25,6 +42,7 @@ type MailerLiteErrorBody = {
 
 const MAILERLITE_SUBSCRIBERS_URL = 'https://connect.mailerlite.com/api/subscribers';
 const MAILERLITE_GROUPS_URL = 'https://connect.mailerlite.com/api/groups';
+const MAILERLITE_FIELDS_URL = 'https://connect.mailerlite.com/api/fields';
 
 export function isValidEmail(email: string) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
@@ -70,7 +88,7 @@ async function mailerLiteFetch(url: string, init: RequestInit) {
   return response;
 }
 
-export async function subscribeToMailerLite({ email, name, groupIds }: SubscribeInput) {
+export async function subscribeToMailerLite({ email, fields, name, phone, groupIds }: SubscribeInput) {
   const defaultGroupId = process.env.MAILERLITE_GROUP_ID;
   const groups = groupIds ?? (defaultGroupId ? [defaultGroupId] : []);
 
@@ -78,10 +96,42 @@ export async function subscribeToMailerLite({ email, name, groupIds }: Subscribe
     method: 'POST',
     body: JSON.stringify({
       email,
-      fields: { name },
+      fields: {
+        name,
+        ...(phone ? { phone } : {}),
+        ...fields,
+      },
       ...(groups.length ? { groups } : {}),
     }),
   });
+}
+
+export async function findOrCreateMailerLiteField(
+  name: string,
+  type: MailerLiteField['type'] = 'text',
+) {
+  const searchUrl = new URL(MAILERLITE_FIELDS_URL);
+  searchUrl.searchParams.set('limit', '100');
+
+  const searchResponse = await mailerLiteFetch(searchUrl.toString(), { method: 'GET' });
+  const searchBody = (await searchResponse.json()) as MailerLiteFieldList;
+  const existingField = searchBody.data?.find((field) => field.name === name);
+
+  if (existingField) {
+    return existingField;
+  }
+
+  const createResponse = await mailerLiteFetch(MAILERLITE_FIELDS_URL, {
+    method: 'POST',
+    body: JSON.stringify({ name, type }),
+  });
+  const createBody = (await createResponse.json()) as MailerLiteFieldResponse;
+
+  if (!createBody.data?.id || !createBody.data.key) {
+    throw new Error('MailerLite returned an invalid field response.');
+  }
+
+  return createBody.data;
 }
 
 export async function findOrCreateMailerLiteGroup(name: string) {

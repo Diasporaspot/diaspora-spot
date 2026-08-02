@@ -1,7 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, CircleUserRound } from 'lucide-react';
 
 import Button from '@/components/Button/Button';
 import { perspective } from '@/data/anim';
@@ -9,13 +9,13 @@ import { navLinks } from '@/data/menu';
 import MobileNavLinks from './MobileNavLinks';
 import styles from './styles/mobilenavigation.module.css';
 
-function MobileNavigation({ closeMenu }: { closeMenu: () => void }) {
-  function handleCtaClick(event: React.MouseEvent<HTMLElement>) {
-    event.preventDefault();
-    window.location.hash = 'final';
-    window.setTimeout(closeMenu, 100);
-  }
-
+function MobileNavigation({
+  closeMenu,
+  isSignedIn,
+}: {
+  closeMenu: () => void;
+  isSignedIn: boolean;
+}) {
   return (
     <div className={styles.nav}>
       <ul className={styles.mainNavLinks}>
@@ -36,12 +36,16 @@ function MobileNavigation({ closeMenu }: { closeMenu: () => void }) {
         custom={navLinks.length}
       >
         <Button
-          href="/workshops"
+          href="/members"
           variant="primary"
           className={styles.ctaButton}
-          onClick={handleCtaClick}
+          onClick={closeMenu}
         >
-          Join Us <ArrowRight size={14} strokeWidth={2} />
+          {isSignedIn ? (
+            <><CircleUserRound size={17} strokeWidth={2} /> My account</>
+          ) : (
+            <>Member access <ArrowRight size={14} strokeWidth={2} /></>
+          )}
         </Button>
       </motion.div>
     </div>

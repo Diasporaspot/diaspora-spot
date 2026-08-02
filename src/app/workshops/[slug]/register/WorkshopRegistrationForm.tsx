@@ -34,6 +34,7 @@ export default function WorkshopRegistrationForm({
   slug,
 }: WorkshopRegistrationFormProps) {
   const [state, setState] = useState<'idle' | 'submitting' | 'success'>('idle');
+  const [smsMarketingConsent, setSmsMarketingConsent] = useState(false);
   const [error, setError] = useState(
     initialNotice === 'cancelled' ? 'Payment was cancelled. You can try again below.' : '',
   );
@@ -71,8 +72,10 @@ export default function WorkshopRegistrationForm({
           body: JSON.stringify({
             email: formData.get('email'),
             name: formData.get('name'),
+            phone: formData.get('phone'),
             productType,
             slug,
+            smsMarketingConsent: formData.get('smsMarketingConsent') === 'on',
             website: formData.get('website'),
           }),
         },
@@ -93,6 +96,7 @@ export default function WorkshopRegistrationForm({
       }
 
       form.reset();
+      setSmsMarketingConsent(false);
       setState('success');
       trackCompleteRegistration();
     } catch (reason) {
@@ -161,6 +165,37 @@ export default function WorkshopRegistrationForm({
           type="email"
         />
       </div>
+      <div className={styles.registrationField}>
+        <label htmlFor="registration-phone">Phone number <span>(optional)</span></label>
+        <input
+          aria-describedby="registration-phone-help"
+          autoComplete="tel"
+          id="registration-phone"
+          name="phone"
+          placeholder="+44 7911 123456"
+          required={smsMarketingConsent}
+          type="tel"
+        />
+        <small id="registration-phone-help">
+          Include your country code. Used for workshop coordination, and for marketing texts only
+          if you opt in below.
+        </small>
+      </div>
+      <label className={styles.smsConsent}>
+        <input
+          checked={smsMarketingConsent}
+          name="smsMarketingConsent"
+          onChange={(event) => setSmsMarketingConsent(event.target.checked)}
+          type="checkbox"
+        />
+        <span>
+          <strong>Send me workshop news and offers by SMS</strong>
+          <small>
+            Optional. Message and data rates may apply. Frequency varies. You can opt out at any
+            time.
+          </small>
+        </span>
+      </label>
       <label className={styles.honeypot} aria-hidden="true">
         Website
         <input autoComplete="off" name="website" tabIndex={-1} type="text" />

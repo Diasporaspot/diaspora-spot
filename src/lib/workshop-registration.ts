@@ -164,30 +164,76 @@ async function registerAttendeeWithGroups({
   email,
   groupIds,
   name,
+  phone,
+  smsConsentAt,
+  smsConsentSource,
+  smsMarketingConsent,
 }: {
   email: string;
   groupIds: string[];
   name: string;
+  phone: string;
+  smsConsentAt?: string;
+  smsConsentSource: string;
+  smsMarketingConsent: boolean;
 }) {
   if (!groupIds.length) {
     throw new Error('Registration groups are missing.');
   }
 
-  await subscribeToMailerLite({ email, name, groupIds });
+  const smsMarketingGroupId = process.env.MAILERLITE_SMS_MARKETING_GROUP_ID;
+
+  if (smsMarketingConsent && !smsMarketingGroupId) {
+    throw new Error('MAILERLITE_SMS_MARKETING_GROUP_ID is not configured.');
+  }
+
+  const subscriberGroupIds = Array.from(
+    new Set([
+      ...groupIds,
+      ...(smsMarketingConsent && smsMarketingGroupId ? [smsMarketingGroupId] : []),
+    ]),
+  );
+
+  await subscribeToMailerLite({
+    email,
+    name,
+    phone,
+    groupIds: subscriberGroupIds,
+    ...(smsMarketingConsent
+      ? {
+          fields: {
+            sms_marketing_consent: 'yes',
+            sms_consent_at: smsConsentAt || new Date().toISOString(),
+            sms_consent_source: smsConsentSource,
+          },
+        }
+      : {}),
+  });
 }
 
 export async function registerProductAttendee({
   email,
   name,
+  phone,
   product,
+  smsConsentAt,
+  smsMarketingConsent,
 }: {
   email: string;
   name: string;
+  phone: string;
   product: RegistrationProduct;
+  smsConsentAt?: string;
+  smsMarketingConsent: boolean;
 }) {
   await registerAttendeeWithGroups({
     email,
     name,
+    phone,
     groupIds: getProductGroupIds(product),
+    smsConsentAt,
+    smsConsentSource:
+      product._type === 'workshopSeries' ? 'series_registration' : 'workshop_registration',
+    smsMarketingConsent,
   });
 }
