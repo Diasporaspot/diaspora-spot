@@ -297,7 +297,12 @@ export default async function WorkshopSeriesPage({
                   <span className={`${styles.status} ${styles[workshop.bookingStatus]}`}>
                     {workshopStatusLabel[workshop.bookingStatus]}
                   </span>
-                  <Link href={`/workshops/${workshop.slug}/register`}>
+                  <Link
+                    href={{
+                      pathname: `/workshops/${workshop.slug}/register`,
+                      query: { fromSeries: series.slug },
+                    }}
+                  >
                     Reserve a seat <ArrowRight size={15} />
                   </Link>
                 </div>

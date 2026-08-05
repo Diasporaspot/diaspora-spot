@@ -5,6 +5,7 @@ import { CheckCircle2, LoaderCircle } from 'lucide-react';
 import styles from '../../workshops-page.module.css';
 
 type WorkshopRegistrationFormProps = {
+  fromSeriesSlug?: string;
   initialNotice?: 'cancelled' | 'success' | 'unconfirmed';
   isPaid: boolean;
   priceLabel: string;
@@ -26,6 +27,7 @@ function trackCompleteRegistration() {
 }
 
 export default function WorkshopRegistrationForm({
+  fromSeriesSlug,
   initialNotice,
   isPaid,
   priceLabel,
@@ -75,6 +77,7 @@ export default function WorkshopRegistrationForm({
             phone: formData.get('phone'),
             productType,
             slug,
+            fromSeries: fromSeriesSlug,
             smsMarketingConsent: formData.get('smsMarketingConsent') === 'on',
             website: formData.get('website'),
           }),

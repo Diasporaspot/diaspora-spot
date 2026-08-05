@@ -11,15 +11,19 @@ import styles from './workshops-page.module.css';
 type CatalogView = 'sessions' | 'series';
 
 export default function WorkshopCatalog({
+  activeWorkshopSlug,
   series,
   workshops,
 }: {
+  activeWorkshopSlug?: string;
   series: WorkshopSeries[];
   workshops: Workshop[];
 }) {
   const hasSeries = series.length > 0;
-  const [activeView, setActiveView] = useState<CatalogView>(hasSeries ? 'series' : 'sessions');
-  const visibleView = hasSeries ? activeView : 'sessions';
+  const [activeView, setActiveView] = useState<CatalogView>(
+    activeWorkshopSlug || !hasSeries ? 'sessions' : 'series',
+  );
+  const visibleView = activeWorkshopSlug ? 'sessions' : hasSeries ? activeView : 'sessions';
 
   function handleTabKey(event: KeyboardEvent<HTMLButtonElement>) {
     if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) {

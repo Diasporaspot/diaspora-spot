@@ -11,6 +11,7 @@ import { getStripe } from '@/lib/stripe';
 
 type CheckoutBody = {
   email?: unknown;
+  fromSeries?: unknown;
   name?: unknown;
   phone?: unknown;
   productType?: unknown;
@@ -22,6 +23,7 @@ type CheckoutBody = {
 const RATE_LIMIT_WINDOW_MS = 10 * 60 * 1000;
 const RATE_LIMIT_MAX_ATTEMPTS = 5;
 const attempts = new Map<string, number[]>();
+const seriesSlugPattern = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 
 function isRateLimited(request: Request) {
   const forwardedFor = request.headers.get('x-forwarded-for');
@@ -51,6 +53,12 @@ export async function POST(request: Request) {
   try {
     const body = (await request.json()) as CheckoutBody;
     const input = normalizeRegistrationInput(body);
+    const fromSeries =
+      input.productType === 'workshop' &&
+      typeof body.fromSeries === 'string' &&
+      seriesSlugPattern.test(body.fromSeries.trim())
+        ? body.fromSeries.trim()
+        : undefined;
     const website = typeof body.website === 'string' ? body.website.trim() : '';
 
     if (website) {
@@ -97,11 +105,17 @@ export async function POST(request: Request) {
     const successUrl = new URL(registrationPath, baseUrl);
     successUrl.searchParams.set('payment', 'success');
     successUrl.searchParams.set('session_id', '{CHECKOUT_SESSION_ID}');
+    if (fromSeries) {
+      successUrl.searchParams.set('fromSeries', fromSeries);
+    }
     const successUrlString = successUrl
       .toString()
       .replace('%7BCHECKOUT_SESSION_ID%7D', '{CHECKOUT_SESSION_ID}');
     const cancelUrl = new URL(registrationPath, baseUrl);
     cancelUrl.searchParams.set('payment', 'cancelled');
+    if (fromSeries) {
+      cancelUrl.searchParams.set('fromSeries', fromSeries);
+    }
 
     const metadata: Record<string, string> = {
       email: input.email,

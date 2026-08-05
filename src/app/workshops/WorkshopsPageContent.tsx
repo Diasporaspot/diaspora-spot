@@ -95,7 +95,11 @@ export default async function WorkshopsPageContent({ activeWorkshopSlug }: Works
           </div>
         </section>
 
-        <WorkshopCatalog series={series} workshops={workshops} />
+        <WorkshopCatalog
+          activeWorkshopSlug={activeWorkshopSlug}
+          series={series}
+          workshops={workshops}
+        />
       </main>
       <Footer />
     </div>

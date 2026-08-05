@@ -22,6 +22,7 @@ type WorkshopRegistrationPageProps = {
     slug: string;
   }>;
   searchParams?: Promise<{
+    fromSeries?: string;
     payment?: string;
     session_id?: string;
   }>;
@@ -127,6 +128,15 @@ export default async function WorkshopRegistrationPage({
     notFound();
   }
 
+  const workshopSeriesSlug = workshop.series?.slug;
+  const fromSeriesSlug =
+    workshopSeriesSlug && resolvedSearchParams?.fromSeries === workshopSeriesSlug
+      ? workshopSeriesSlug
+      : undefined;
+  const backHref = fromSeriesSlug
+    ? `/workshops/series/${fromSeriesSlug}#series-curriculum`
+    : `/workshops/${workshop.slug}`;
+
   const priceLabel = formatWorkshopPrice(workshop);
   const paymentNotice = await getPaymentNotice({
     searchParams: resolvedSearchParams,
@@ -139,9 +149,9 @@ export default async function WorkshopRegistrationPage({
       <main>
         <section className={styles.registrationPage}>
           <div className={`wrap ${styles.registrationWrap}`}>
-            <Link className={styles.backLink} href={`/workshops/${workshop.slug}`}>
+            <Link className={styles.backLink} href={backHref}>
               <ArrowLeft size={16} />
-              Back to workshop details
+              {fromSeriesSlug ? 'Back to series details' : 'Back to workshop details'}
             </Link>
 
             <div className={styles.registrationLayout}>
@@ -156,6 +166,7 @@ export default async function WorkshopRegistrationPage({
 
                 {workshop.registrationReady ? (
                   <WorkshopRegistrationForm
+                    fromSeriesSlug={fromSeriesSlug}
                     initialNotice={paymentNotice}
                     isPaid={workshop.paymentType === 'paid'}
                     priceLabel={priceLabel}
