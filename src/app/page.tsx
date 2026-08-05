@@ -26,7 +26,7 @@ export default async function Home() {
         <Problem />
         <Solution />
         <Articles articles={articles} />
-        <Workshops workshops={workshops} />
+        <Workshops workshops={workshops.slice(0, 3)} />
         <Community />
         <FinalCta />
       </main>
