@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation';
 import Topbar from '@/components/Topbar/Topbar';
 import Footer from '@/components/Footer/Footer';
 import Button from '@/components/Button/Button';
+import MetaPixelEvent from '@/components/MetaPixelEvent/MetaPixelEvent';
 import TypewriterText from '@/components/TypewriterText/TypewriterText';
 import { getPublishedWorkshopSeries, getUpcomingWorkshops } from '@/content/queries';
 import type { Workshop } from '@/content/types';
@@ -39,13 +40,37 @@ export default async function WorkshopsPageContent({ activeWorkshopSlug }: Works
     getPublishedWorkshopSeries(),
   ]);
   const featuredWorkshop = workshops.find((workshop) => workshop.featured) ?? workshops[0];
+  const activeWorkshop = activeWorkshopSlug
+    ? workshops.find((workshop) => workshop.slug === activeWorkshopSlug)
+    : undefined;
 
-  if (activeWorkshopSlug && !workshops.some((workshop) => workshop.slug === activeWorkshopSlug)) {
+  if (activeWorkshopSlug && !activeWorkshop) {
     notFound();
   }
 
   return (
     <div className={styles.page}>
+      {activeWorkshop ? (
+        <MetaPixelEvent
+          eventName="ViewContent"
+          properties={{
+            content_category: 'Standard Series',
+            content_ids: [activeWorkshop.slug],
+            content_name: activeWorkshop.title,
+            content_type: 'workshop',
+          }}
+        />
+      ) : (
+        <MetaPixelEvent
+          eventName="ViewContent"
+          properties={{
+            content_category: 'Standard Series',
+            content_ids: ['workshops'],
+            content_name: 'Workshop and series listing',
+            content_type: 'product_group',
+          }}
+        />
+      )}
       <Topbar />
       <main>
         <section className={styles.hero}>

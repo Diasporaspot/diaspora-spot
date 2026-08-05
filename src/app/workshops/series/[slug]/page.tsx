@@ -13,6 +13,7 @@ import {
   Users,
 } from 'lucide-react';
 import Footer from '@/components/Footer/Footer';
+import MetaPixelEvent from '@/components/MetaPixelEvent/MetaPixelEvent';
 import Topbar from '@/components/Topbar/Topbar';
 import TypewriterText from '@/components/TypewriterText/TypewriterText';
 import { getWorkshopSeriesBySlug } from '@/content/queries';
@@ -101,6 +102,15 @@ export default async function WorkshopSeriesPage({
 
   return (
     <div className={styles.page}>
+      <MetaPixelEvent
+        eventName="ViewContent"
+        properties={{
+          content_category: 'Standard Series',
+          content_ids: [series.slug],
+          content_name: series.title,
+          content_type: 'series',
+        }}
+      />
       <Topbar />
       <main>
         <section className={styles.seriesDetailHero}>

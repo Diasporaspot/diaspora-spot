@@ -2,6 +2,7 @@
 
 import { type FormEvent, useEffect, useState } from 'react';
 import { CheckCircle2, LoaderCircle } from 'lucide-react';
+import { trackMetaPixelEvent } from '@/components/MetaPixelEvent/MetaPixelEvent';
 import styles from '../../workshops-page.module.css';
 
 type WorkshopRegistrationFormProps = {
@@ -13,18 +14,6 @@ type WorkshopRegistrationFormProps = {
   productType?: 'series' | 'workshop';
   slug: string;
 };
-
-type MetaPixelWindow = Window & {
-  fbq?: (action: 'track', eventName: 'CompleteRegistration') => void;
-};
-
-function trackCompleteRegistration() {
-  const fbq = (window as MetaPixelWindow).fbq;
-
-  if (typeof fbq === 'function') {
-    fbq('track', 'CompleteRegistration');
-  }
-}
 
 export default function WorkshopRegistrationForm({
   fromSeriesSlug,
@@ -53,9 +42,19 @@ export default function WorkshopRegistrationForm({
       return;
     }
 
-    trackCompleteRegistration();
-    window.sessionStorage.setItem(trackingKey, 'true');
-  }, [initialNotice, isPaid, productType, slug]);
+    trackMetaPixelEvent(
+      'CompleteRegistration',
+      {
+        content_category: 'Standard Series',
+        content_ids: [slug],
+        content_name: productLabel,
+        content_type: productType,
+      },
+      {
+        onSent: () => window.sessionStorage.setItem(trackingKey, 'true'),
+      },
+    );
+  }, [initialNotice, isPaid, productLabel, productType, slug]);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -101,7 +100,12 @@ export default function WorkshopRegistrationForm({
       form.reset();
       setSmsMarketingConsent(false);
       setState('success');
-      trackCompleteRegistration();
+      trackMetaPixelEvent('CompleteRegistration', {
+        content_category: 'Standard Series',
+        content_ids: [slug],
+        content_name: productLabel,
+        content_type: productType,
+      });
     } catch (reason) {
       setError(
         reason instanceof Error ? reason.message : 'Registration failed. Please try again.',
