@@ -7,6 +7,14 @@ export const metadata = {
 
 export const dynamic = 'force-dynamic';
 
-export default async function WorkshopsPage() {
-  return <WorkshopsPageContent />;
+type WorkshopsPageProps = {
+  searchParams: Promise<{
+    view?: string | string[];
+  }>;
+};
+
+export default async function WorkshopsPage({ searchParams }: WorkshopsPageProps) {
+  const { view } = await searchParams;
+
+  return <WorkshopsPageContent initialCatalogView={view === 'sessions' ? 'sessions' : undefined} />;
 }

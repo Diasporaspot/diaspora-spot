@@ -32,9 +32,13 @@ function WorkshopMeta({ workshop }: { workshop: Workshop }) {
 
 type WorkshopsPageContentProps = {
   activeWorkshopSlug?: string;
+  initialCatalogView?: 'sessions' | 'series';
 };
 
-export default async function WorkshopsPageContent({ activeWorkshopSlug }: WorkshopsPageContentProps) {
+export default async function WorkshopsPageContent({
+  activeWorkshopSlug,
+  initialCatalogView,
+}: WorkshopsPageContentProps) {
   const [workshops, series] = await Promise.all([
     getUpcomingWorkshops(),
     getPublishedWorkshopSeries(),
@@ -122,6 +126,7 @@ export default async function WorkshopsPageContent({ activeWorkshopSlug }: Works
 
         <WorkshopCatalog
           activeWorkshopSlug={activeWorkshopSlug}
+          initialView={initialCatalogView}
           series={series}
           workshops={workshops}
         />

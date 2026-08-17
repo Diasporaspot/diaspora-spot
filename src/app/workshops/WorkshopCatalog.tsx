@@ -12,16 +12,18 @@ type CatalogView = 'sessions' | 'series';
 
 export default function WorkshopCatalog({
   activeWorkshopSlug,
+  initialView,
   series,
   workshops,
 }: {
   activeWorkshopSlug?: string;
+  initialView?: CatalogView;
   series: WorkshopSeries[];
   workshops: Workshop[];
 }) {
   const hasSeries = series.length > 0;
   const [activeView, setActiveView] = useState<CatalogView>(
-    activeWorkshopSlug || !hasSeries ? 'sessions' : 'series',
+    activeWorkshopSlug || initialView === 'sessions' || !hasSeries ? 'sessions' : 'series',
   );
   const visibleView = activeWorkshopSlug ? 'sessions' : hasSeries ? activeView : 'sessions';
 

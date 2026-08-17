@@ -303,7 +303,7 @@ export default function WorkshopExplorer({
   }
 
   function closeWorkshop() {
-    router.replace('/workshops', { scroll: false });
+    router.replace('/workshops?view=sessions', { scroll: false });
   }
 
   function copyWorkshopLink() {
