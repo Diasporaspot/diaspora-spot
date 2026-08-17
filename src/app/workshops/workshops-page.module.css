@@ -903,7 +903,8 @@
   line-height: 1.5;
 }
 
-.registrationField input {
+.registrationField input,
+.registrationField select {
   background: rgba(251, 250, 248, 0.96);
   border: 1px solid rgba(43, 38, 34, 0.16);
   border-radius: 14px;
@@ -920,11 +921,24 @@
     box-shadow var(--dur-base) var(--ease-out);
 }
 
+.phoneInputRow {
+  display: grid;
+  gap: 10px;
+  grid-template-columns: minmax(170px, 0.55fr) minmax(0, 1fr);
+}
+
+.registrationField select {
+  cursor: pointer;
+  padding: 0 42px 0 16px;
+  text-overflow: ellipsis;
+}
+
 .registrationField input::placeholder {
   color: rgba(92, 82, 75, 0.58);
 }
 
-.registrationField input:focus {
+.registrationField input:focus,
+.registrationField select:focus {
   background: white;
   border-color: rgba(43, 38, 34, 0.4);
   box-shadow:
@@ -2170,15 +2184,72 @@
   }
 
   .modalLayout {
+    gap: 16px;
     padding: 28px 18px 18px;
   }
 
   .modalTitle {
+    font-size: clamp(30px, 9vw, 40px);
+    line-height: 1.08;
     max-width: 100%;
   }
 
+  .modalBody {
+    gap: 12px;
+  }
+
+  .modalOneLiner,
+  .hostPanel,
+  .seriesInlineLink {
+    display: none;
+  }
+
+  .modalDescription {
+    display: -webkit-box;
+    font-size: 14px;
+    line-height: 1.5;
+    overflow: hidden;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+  }
+
+  .bookingPanel {
+    gap: 12px;
+    padding: 14px;
+  }
+
+  .bookingPanelHead {
+    order: -2;
+    padding-bottom: 10px;
+  }
+
+  .modalActions {
+    gap: 8px;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    order: -1;
+  }
+
+  .modalActions > :first-child {
+    grid-column: 1 / -1;
+  }
+
+  .modalActions .copyButton,
+  .modalActions .seriesSecondaryButton {
+    font-size: 10px;
+    letter-spacing: 0.06em;
+    padding-left: 8px;
+    padding-right: 8px;
+  }
+
   .modalMetaGrid {
-    grid-template-columns: 1fr;
+    gap: 8px;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .modalMetaGrid span {
+    gap: 6px;
+    min-height: 76px;
+    padding: 11px;
   }
 
   .modalActions a,
@@ -2203,6 +2274,10 @@
 
   .registrationLayout {
     gap: 18px;
+  }
+
+  .phoneInputRow {
+    grid-template-columns: minmax(128px, 0.56fr) minmax(0, 1fr);
   }
 
   .registrationSummary {

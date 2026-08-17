@@ -3,7 +3,27 @@
 import { type FormEvent, useEffect, useState } from 'react';
 import { CheckCircle2, LoaderCircle } from 'lucide-react';
 import { trackMetaPixelEvent } from '@/components/MetaPixelEvent/MetaPixelEvent';
+import {
+  getPhoneCountries,
+  getPhoneCountryCallingCode,
+  normalizePhoneNumberForCountry,
+  type PhoneCountryCode,
+} from '@/lib/phone';
 import styles from '../../workshops-page.module.css';
+
+function getCountryFlag(country: PhoneCountryCode) {
+  return [...country]
+    .map((character) => String.fromCodePoint(127397 + character.charCodeAt(0)))
+    .join('');
+}
+
+const phoneCountryOptions = getPhoneCountries()
+  .map((country) => ({
+    callingCode: getPhoneCountryCallingCode(country),
+    country,
+    flag: getCountryFlag(country),
+  }))
+  .sort((a, b) => a.country.localeCompare(b.country));
 
 type WorkshopRegistrationFormProps = {
   fromSeriesSlug?: string;
@@ -26,6 +46,7 @@ export default function WorkshopRegistrationForm({
 }: WorkshopRegistrationFormProps) {
   const [state, setState] = useState<'idle' | 'submitting' | 'success'>('idle');
   const [smsMarketingConsent, setSmsMarketingConsent] = useState(false);
+  const [phoneCountry, setPhoneCountry] = useState<PhoneCountryCode>('GB');
   const [error, setError] = useState(
     initialNotice === 'cancelled' ? 'Payment was cancelled. You can try again below.' : '',
   );
@@ -73,7 +94,7 @@ export default function WorkshopRegistrationForm({
           body: JSON.stringify({
             email: formData.get('email'),
             name: formData.get('name'),
-            phone: formData.get('phone'),
+            phone: normalizePhoneNumberForCountry(formData.get('phone'), phoneCountry),
             productType,
             slug,
             fromSeries: fromSeriesSlug,
@@ -174,18 +195,34 @@ export default function WorkshopRegistrationForm({
       </div>
       <div className={styles.registrationField}>
         <label htmlFor="registration-phone">Phone number <span>(optional)</span></label>
-        <input
-          aria-describedby="registration-phone-help"
-          autoComplete="tel"
-          id="registration-phone"
-          name="phone"
-          placeholder="+44 7911 123456"
-          required={smsMarketingConsent}
-          type="tel"
-        />
+        <div className={styles.phoneInputRow}>
+          <select
+            aria-label="Country code"
+            id="registration-phone-country"
+            name="phoneCountry"
+            onChange={(event) => setPhoneCountry(event.target.value as PhoneCountryCode)}
+            value={phoneCountry}
+          >
+            {phoneCountryOptions.map(({ callingCode, country, flag }) => (
+              <option key={country} value={country}>
+                {flag} {country} +{callingCode}
+              </option>
+            ))}
+          </select>
+          <input
+            aria-describedby="registration-phone-help"
+            autoComplete="tel-national"
+            id="registration-phone"
+            inputMode="tel"
+            name="phone"
+            placeholder="Mobile number"
+            required={smsMarketingConsent}
+            type="tel"
+          />
+        </div>
         <small id="registration-phone-help">
-          Include your country code. Used for workshop coordination, and for marketing texts only
-          if you opt in below.
+          Select your country code, then enter your mobile number. Used for workshop coordination,
+          and for marketing texts only if you opt in below.
         </small>
       </div>
       <label className={styles.smsConsent}>
