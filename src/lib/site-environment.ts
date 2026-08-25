@@ -50,6 +50,10 @@ export function getVisibleWorkshopStatuses() {
   return getVisibleContentStatuses();
 }
 
+export function getVisibleJobStatuses() {
+  return getVisibleContentStatuses();
+}
+
 export function isProductionEnvironment() {
   return getSiteEnvironment() === 'production';
 }

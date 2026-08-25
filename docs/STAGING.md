@@ -55,6 +55,12 @@ Staging registration is intentionally isolated:
 For a Stripe test checkout, use card number `4242 4242 4242 4242`, any future expiry date, and any
 three-digit CVC. No real charge is created.
 
+### Job editorial workflow
+
+Jobs use the same **Draft → Staging → Published** visibility workflow. A staged job appears on the
+staging careers page only. When approved, change its visibility to **Published**, then click
+Sanity’s **Publish** button.
+
 ## One-time Vercel setup
 
 1. Connect `Diasporaspot/diaspora-spot` to one Vercel project.
@@ -115,6 +121,7 @@ Recommended GitHub branch protection:
 - A push to `staging` updates the stable Vercel branch URL and not `diasporaspot.com`.
 - A Sanity article in **Staging** appears at the staging URL and returns 404 in production.
 - A Sanity workshop or series in **Staging** appears at the staging URL and not in production.
+- A Sanity job in **Staging** appears on the staging careers page and not in production.
 - A paid staging workshop opens Stripe test checkout and returns to the staging URL after payment.
 - A draft edit to an already-published article appears on staging while production keeps the old copy.
 - Promoting the article to **Published** and publishing it makes it visible in production.

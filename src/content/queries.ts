@@ -5,6 +5,7 @@ import { hasSeriesPricingConflict } from '@/lib/workshop-registration-core';
 import {
   getSiteEnvironment,
   getVisibleArticleStatuses,
+  getVisibleJobStatuses,
   getVisibleWorkshopStatuses,
 } from '@/lib/site-environment';
 import {
@@ -639,8 +640,8 @@ export async function getAllJobs() {
   try {
     const sanityJobs = await sanityClient.fetch<SanityJob[]>(
       allPublishedJobsQuery,
-      {},
-      { cache: 'no-store' },
+      { jobStatuses: [...getVisibleJobStatuses()] },
+      getContentFetchOptions(),
     );
 
     return sanityJobs.map(normalizeJob);

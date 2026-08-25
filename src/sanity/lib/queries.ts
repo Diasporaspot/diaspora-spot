@@ -151,4 +151,4 @@ const jobProjection = `{
   featured
 }`;
 
-export const allPublishedJobsQuery = `*[_type == "job" && status == "published"] | order(featured desc, postedAt desc, _createdAt desc) ${jobProjection}`;
+export const allPublishedJobsQuery = `*[_type == "job" && status in $jobStatuses] | order(featured desc, postedAt desc, _createdAt desc) ${jobProjection}`;

@@ -29,12 +29,15 @@ export const job = defineType({
   fields: [
     defineField({
       name: 'status',
-      title: 'Status',
+      title: 'Website visibility',
       type: 'string',
       initialValue: 'draft',
+      description:
+        'Choose Staging to review this job on the staging website. Choose Published before using Sanity’s Publish button to make it live.',
       options: {
         list: [
           { title: 'Draft', value: 'draft' },
+          { title: 'Staging', value: 'staging' },
           { title: 'Published', value: 'published' },
           { title: 'Archived', value: 'archived' },
         ],
