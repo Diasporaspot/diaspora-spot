@@ -6,7 +6,7 @@ The website uses one long-lived `staging` Git branch and `main` as the productio
 | --- | --- | --- |
 | Git branch | `staging` | `main` |
 | Vercel environment | Preview, scoped to `staging` | Production |
-| Website URL | Vercel's stable `staging` branch URL | `https://diasporaspot.com` |
+| Website URL | `https://diasporaspotstaging.vercel.app` | `https://diasporaspot.com` |
 | `SITE_ENV` | `staging` | `production` |
 | Article visibility | `staging` and `published` | `published` only |
 | Search indexing | Disabled | Enabled |
@@ -66,7 +66,7 @@ Configure these variables:
 | `NEXT_PUBLIC_SANITY_DATASET` | `production` | `production` |
 | `NEXT_PUBLIC_SANITY_API_VERSION` | `2025-06-02` | `2025-06-02` |
 | `SANITY_API_READ_TOKEN` | Viewer token | not required |
-| `NEXT_PUBLIC_SITE_URL` | leave unset so request origin is used | `https://diasporaspot.com` |
+| `NEXT_PUBLIC_SITE_URL` | `https://diasporaspotstaging.vercel.app` | `https://diasporaspot.com` |
 
 Add the staging values as **Preview variables scoped specifically to the `staging` Git branch**.
 Vercel branch-specific values override the general Preview values.
@@ -82,7 +82,7 @@ not alter deployments that already exist.
 ## Day-to-day release flow
 
 ```text
-feature branch → pull request into staging → client QA on *.vercel.app
+feature branch → pull request into staging → client QA on diasporaspotstaging.vercel.app
               → fixes into staging       → pull request staging into main
               → merge to main            → production deploy to diasporaspot.com
 ```
