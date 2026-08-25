@@ -24,6 +24,12 @@ NEXT_PUBLIC_SITE_URL=https://your-production-domain.com
 `MAILERLITE_GROUP_ID` is optional. When present, early-access submissions are added to that existing MailerLite group.
 `NEXT_PUBLIC_SITE_URL` is used for Stripe Checkout success and cancel redirects in deployed environments.
 
+## Staging
+
+The project supports a long-lived `staging` branch on Vercel and draft-aware article review in
+Sanity. See [the staging and production workflow](docs/STAGING.md) for environment variables,
+one-time configuration, editorial promotion, and the release checklist.
+
 ## Membership workflow
 
 Supabase owns authentication, profiles and membership status. Members request a passwordless email

@@ -28,17 +28,17 @@ const articleProjection = `{
   }
 }`;
 
-export const allPublishedArticlesQuery = `*[_type == "article" && status == "published"] | order(publishedAt desc, _createdAt desc) ${articleProjection}`;
+export const allVisibleArticlesQuery = `*[_type == "article" && status in $articleStatuses] | order(publishedAt desc, _createdAt desc) ${articleProjection}`;
 
-export const featuredPublishedArticlesQuery = `*[_type == "article" && status == "published" && featured == true] | order(publishedAt desc, _createdAt desc) ${articleProjection}`;
+export const featuredVisibleArticlesQuery = `*[_type == "article" && status in $articleStatuses && featured == true] | order(publishedAt desc, _createdAt desc) ${articleProjection}`;
 
-export const articleBySlugQuery = `*[_type == "article" && status == "published" && slug.current == $slug][0] ${articleProjection}`;
+export const articleBySlugQuery = `*[_type == "article" && status in $articleStatuses && slug.current == $slug][0] ${articleProjection}`;
 
-export const articleSlugsQuery = `*[_type == "article" && status == "published" && defined(slug.current)] | order(publishedAt desc, _createdAt desc) {
+export const articleSlugsQuery = `*[_type == "article" && status in $articleStatuses && defined(slug.current)] | order(publishedAt desc, _createdAt desc) {
   "slug": slug.current
 }`;
 
-export const articleCategoriesQuery = `array::unique(*[_type == "article" && status == "published" && defined(category)].category)`;
+export const articleCategoriesQuery = `array::unique(*[_type == "article" && status in $articleStatuses && defined(category)].category)`;
 
 const workshopFields = `
   _id,

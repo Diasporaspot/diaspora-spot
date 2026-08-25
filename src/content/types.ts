@@ -1,4 +1,4 @@
-export type ContentStatus = 'draft' | 'published' | 'archived';
+export type ContentStatus = 'draft' | 'staging' | 'published' | 'archived';
 
 export type SanityImage = {
   alt: string;

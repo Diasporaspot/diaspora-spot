@@ -1,12 +1,15 @@
+import 'server-only';
+
 import { sanityClient } from '@/sanity/lib/client';
 import { hasSeriesPricingConflict } from '@/lib/workshop-registration-core';
+import { getSiteEnvironment, getVisibleArticleStatuses } from '@/lib/site-environment';
 import {
-  allPublishedArticlesQuery,
+  allVisibleArticlesQuery,
   articleCategoriesQuery,
   articleBySlugQuery,
   articleSlugsQuery,
   allPublishedJobsQuery,
-  featuredPublishedArticlesQuery,
+  featuredVisibleArticlesQuery,
   upcomingWorkshopsQuery,
   publishedWorkshopSeriesQuery,
   workshopSeriesBySlugQuery,
@@ -464,11 +467,28 @@ function normalizeJob(job: SanityJob): Job {
   };
 }
 
-async function fetchSanityArticles(query: string, params: Record<string, string> = {}) {
+function getArticleQueryParams() {
+  return { articleStatuses: [...getVisibleArticleStatuses()] };
+}
+
+function getArticleFetchOptions() {
+  const token = process.env.SANITY_API_READ_TOKEN;
+  const shouldReadDrafts = getSiteEnvironment() === 'staging' && Boolean(token);
+
+  return {
+    cache: 'no-store' as const,
+    perspective: shouldReadDrafts ? ('drafts' as const) : ('published' as const),
+    ...(shouldReadDrafts ? { token } : {}),
+  };
+}
+
+async function fetchSanityArticles(query: string) {
   try {
-    const sanityArticles = await sanityClient.fetch<SanityArticle[]>(query, params, {
-      cache: 'no-store',
-    });
+    const sanityArticles = await sanityClient.fetch<SanityArticle[]>(
+      query,
+      getArticleQueryParams(),
+      getArticleFetchOptions(),
+    );
 
     return sanityArticles.map(normalizeArticle);
   } catch (error) {
@@ -481,8 +501,8 @@ async function fetchSanityArticleBySlug(slug: string) {
   try {
     const article = await sanityClient.fetch<SanityArticle | null>(
       articleBySlugQuery,
-      { slug },
-      { cache: 'no-store' },
+      { slug, ...getArticleQueryParams() },
+      getArticleFetchOptions(),
     );
 
     return article ? normalizeArticle(article) : null;
@@ -493,7 +513,7 @@ async function fetchSanityArticleBySlug(slug: string) {
 }
 
 export async function getFeaturedArticles(limit = 4) {
-  const sanityArticles = await fetchSanityArticles(featuredPublishedArticlesQuery);
+  const sanityArticles = await fetchSanityArticles(featuredVisibleArticlesQuery);
   const sourceArticles =
     sanityArticles.length > 0
       ? sanityArticles
@@ -513,16 +533,18 @@ export async function getHomepageArticles() {
 }
 
 export async function getAllArticles() {
-  const sanityArticles = await fetchSanityArticles(allPublishedArticlesQuery);
+  const sanityArticles = await fetchSanityArticles(allVisibleArticlesQuery);
 
   return sanityArticles.length > 0 ? sanityArticles : getLocalArticles();
 }
 
 export async function getArticleCategories() {
   try {
-    const categories = await sanityClient.fetch<string[]>(articleCategoriesQuery, {}, {
-      cache: 'no-store',
-    });
+    const categories = await sanityClient.fetch<string[]>(
+      articleCategoriesQuery,
+      getArticleQueryParams(),
+      getArticleFetchOptions(),
+    );
 
     if (categories.length > 0) {
       return categories.filter(Boolean).sort((a, b) => a.localeCompare(b));
@@ -544,9 +566,11 @@ export async function getArticleBySlug(slug: string) {
 
 export async function getArticleSlugs() {
   try {
-    const sanitySlugs = await sanityClient.fetch<ArticleSlug[]>(articleSlugsQuery, {}, {
-      cache: 'no-store',
-    });
+    const sanitySlugs = await sanityClient.fetch<ArticleSlug[]>(
+      articleSlugsQuery,
+      getArticleQueryParams(),
+      getArticleFetchOptions(),
+    );
 
     if (sanitySlugs.length > 0) {
       return sanitySlugs;

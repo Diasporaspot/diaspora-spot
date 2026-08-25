@@ -46,17 +46,44 @@ export const article = defineType({
   fields: [
     defineField({
       name: 'status',
-      title: 'Status',
+      title: 'Website visibility',
       type: 'string',
       initialValue: 'draft',
+      description:
+        'Draft stays hidden. Staging is visible on the staging website. Published is visible on both staging and production. Use Sanity’s Publish button after choosing a state.',
       options: {
         list: [
           { title: 'Draft', value: 'draft' },
+          { title: 'Staging', value: 'staging' },
           { title: 'Published', value: 'published' },
         ],
         layout: 'radio',
       },
-      validation: (rule) => rule.required(),
+      validation: (rule) =>
+        rule.required().custom(async (value, context) => {
+          if (
+            (value !== 'staging' && value !== 'published') ||
+            context.document?.featured !== true
+          ) {
+            return true;
+          }
+
+          const documentId = context.document?._id?.replace(/^drafts\./, '') ?? '';
+          const client = context.getClient({ apiVersion: '2025-06-02' });
+          const conflictingTitle = await client.fetch<string | null>(
+            `*[
+              _type == "article" &&
+              status == $status &&
+              featured == true &&
+              !(_id in [$documentId, "drafts." + $documentId])
+            ][0].title`,
+            { documentId, status: value },
+          );
+
+          return conflictingTitle
+            ? `“${conflictingTitle}” is already the featured ${value} article. Unfeature it first.`
+            : true;
+        }),
     }),
     defineField({
       name: 'title',
@@ -139,7 +166,7 @@ export const article = defineType({
       title: 'Featured',
       type: 'boolean',
       initialValue: false,
-      description: 'Only one article can be featured at a time.',
+      description: 'Only one article can be featured in each website visibility state.',
       components: {
         input: UniqueFeaturedInput,
       },

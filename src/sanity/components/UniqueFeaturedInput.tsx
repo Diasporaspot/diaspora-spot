@@ -32,6 +32,7 @@ export function UniqueFeaturedInput(props: BooleanInputProps) {
   const client = useClient({ apiVersion: '2025-06-02' });
   const documentId = useFormValue(['_id']);
   const documentType = useFormValue(['_type']);
+  const documentStatus = useFormValue(['status']);
   const [isUpdating, setIsUpdating] = useState(false);
 
   const handleChange = useCallback(
@@ -39,7 +40,8 @@ export function UniqueFeaturedInput(props: BooleanInputProps) {
       const shouldUnsetOtherFeaturedDocs =
         patchSetsFeaturedTrue(patch) &&
         typeof documentId === 'string' &&
-        typeof documentType === 'string';
+        typeof documentType === 'string' &&
+        typeof documentStatus === 'string';
 
       props.onChange(patch);
 
@@ -50,9 +52,10 @@ export function UniqueFeaturedInput(props: BooleanInputProps) {
 
         try {
           const featuredDocuments = await client.fetch<FeaturedDocument[]>(
-            '*[_type == $documentType && featured == true && _id != $draftId && _id != $publishedId]{_id}',
+            '*[_type == $documentType && status == $documentStatus && featured == true && _id != $draftId && _id != $publishedId]{_id}',
             {
               documentType,
+              documentStatus,
               draftId,
               publishedId,
             },
@@ -74,7 +77,7 @@ export function UniqueFeaturedInput(props: BooleanInputProps) {
         }
       }
     },
-    [client, documentId, documentType, props],
+    [client, documentId, documentStatus, documentType, props],
   );
 
   return props.renderDefault({
