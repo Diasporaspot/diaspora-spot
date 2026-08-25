@@ -5,6 +5,7 @@ import Footer from '@/components/Footer/Footer';
 import Topbar from '@/components/Topbar/Topbar';
 import { getWorkshopSeriesBySlug } from '@/content/queries';
 import type { WorkshopSeries } from '@/content/types';
+import { getSiteEnvironment } from '@/lib/site-environment';
 import { getStripe } from '@/lib/stripe';
 import WorkshopRegistrationForm from '../../../[slug]/register/WorkshopRegistrationForm';
 import {
@@ -146,6 +147,7 @@ export default async function WorkshopSeriesRegistrationPage({
                   <WorkshopRegistrationForm
                     initialNotice={paymentNotice}
                     isPaid={series.paymentType === 'paid'}
+                    isStaging={getSiteEnvironment() === 'staging'}
                     priceLabel={priceLabel}
                     productLabel="series"
                     productType="series"

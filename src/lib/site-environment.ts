@@ -36,10 +36,18 @@ export function getSiteEnvironment(): SiteEnvironment {
   });
 }
 
-export function getVisibleArticleStatuses() {
+export function getVisibleContentStatuses() {
   return getSiteEnvironment() === 'staging'
     ? (['staging', 'published'] as const)
     : (['published'] as const);
+}
+
+export function getVisibleArticleStatuses() {
+  return getVisibleContentStatuses();
+}
+
+export function getVisibleWorkshopStatuses() {
+  return getVisibleContentStatuses();
 }
 
 export function isProductionEnvironment() {

@@ -46,10 +46,11 @@ export const workshop = defineType({
       type: 'string',
       initialValue: 'draft',
       description:
-        'Choose Published when this workshop is ready for the website, then use Sanity’s Publish button.',
+        'Choose Staging to review this workshop on the staging website. Choose Published before using Sanity’s Publish button to make it live.',
       options: {
         list: [
           { title: 'Draft', value: 'draft' },
+          { title: 'Staging', value: 'staging' },
           { title: 'Published', value: 'published' },
         ],
         layout: 'radio',

@@ -2,7 +2,11 @@ import 'server-only';
 
 import { sanityClient } from '@/sanity/lib/client';
 import { hasSeriesPricingConflict } from '@/lib/workshop-registration-core';
-import { getSiteEnvironment, getVisibleArticleStatuses } from '@/lib/site-environment';
+import {
+  getSiteEnvironment,
+  getVisibleArticleStatuses,
+  getVisibleWorkshopStatuses,
+} from '@/lib/site-environment';
 import {
   allVisibleArticlesQuery,
   articleCategoriesQuery,
@@ -382,6 +386,8 @@ function normalizeArticle(article: SanityArticle): Article {
 }
 
 function normalizeWorkshop(workshop: SanityWorkshop): Workshop {
+  const isStaging = getSiteEnvironment() === 'staging';
+
   return {
     _id: workshop._id,
     _type: 'workshop',
@@ -405,13 +411,14 @@ function normalizeWorkshop(workshop: SanityWorkshop): Workshop {
     icon: workshop.icon ?? 'document',
     iconTone: workshop.iconTone ?? 'warm',
     ctaLabel: workshop.ctaLabel ?? 'Reserve a seat',
-    registrationReady: workshop.registrationReady ?? false,
+    registrationReady: isStaging || (workshop.registrationReady ?? false),
     featured: workshop.featured ?? false,
     series: workshop.series,
   };
 }
 
 function normalizeWorkshopSeries(series: SanityWorkshopSeries): WorkshopSeries {
+  const isStaging = getSiteEnvironment() === 'staging';
   const normalizedWorkshops = (series.workshops ?? []).map(normalizeWorkshop);
   const pricingConflict =
     series.pricingConflict ??
@@ -436,7 +443,7 @@ function normalizeWorkshopSeries(series: SanityWorkshopSeries): WorkshopSeries {
     iconTone: series.iconTone ?? 'gold',
     ctaLabel: series.ctaLabel ?? 'Get the complete series',
     pricingConflict,
-    registrationReady: (series.registrationReady ?? false) && !pricingConflict,
+    registrationReady: (isStaging || (series.registrationReady ?? false)) && !pricingConflict,
     featured: series.featured ?? false,
   };
 }
@@ -471,7 +478,7 @@ function getArticleQueryParams() {
   return { articleStatuses: [...getVisibleArticleStatuses()] };
 }
 
-function getArticleFetchOptions() {
+function getContentFetchOptions() {
   const token = process.env.SANITY_API_READ_TOKEN;
   const shouldReadDrafts = getSiteEnvironment() === 'staging' && Boolean(token);
 
@@ -487,7 +494,7 @@ async function fetchSanityArticles(query: string) {
     const sanityArticles = await sanityClient.fetch<SanityArticle[]>(
       query,
       getArticleQueryParams(),
-      getArticleFetchOptions(),
+      getContentFetchOptions(),
     );
 
     return sanityArticles.map(normalizeArticle);
@@ -502,7 +509,7 @@ async function fetchSanityArticleBySlug(slug: string) {
     const article = await sanityClient.fetch<SanityArticle | null>(
       articleBySlugQuery,
       { slug, ...getArticleQueryParams() },
-      getArticleFetchOptions(),
+      getContentFetchOptions(),
     );
 
     return article ? normalizeArticle(article) : null;
@@ -543,7 +550,7 @@ export async function getArticleCategories() {
     const categories = await sanityClient.fetch<string[]>(
       articleCategoriesQuery,
       getArticleQueryParams(),
-      getArticleFetchOptions(),
+      getContentFetchOptions(),
     );
 
     if (categories.length > 0) {
@@ -569,7 +576,7 @@ export async function getArticleSlugs() {
     const sanitySlugs = await sanityClient.fetch<ArticleSlug[]>(
       articleSlugsQuery,
       getArticleQueryParams(),
-      getArticleFetchOptions(),
+      getContentFetchOptions(),
     );
 
     if (sanitySlugs.length > 0) {
@@ -586,8 +593,8 @@ export async function getUpcomingWorkshops() {
   try {
     const sanityWorkshops = await sanityClient.fetch<SanityWorkshop[]>(
       upcomingWorkshopsQuery,
-      {},
-      { cache: 'no-store' },
+      { workshopStatuses: [...getVisibleWorkshopStatuses()] },
+      getContentFetchOptions(),
     );
 
     return sanityWorkshops.map(normalizeWorkshop);
@@ -602,8 +609,8 @@ export async function getPublishedWorkshopSeries() {
   try {
     const series = await sanityClient.fetch<SanityWorkshopSeries[]>(
       publishedWorkshopSeriesQuery,
-      {},
-      { cache: 'no-store' },
+      { workshopStatuses: [...getVisibleWorkshopStatuses()] },
+      getContentFetchOptions(),
     );
 
     return series.map(normalizeWorkshopSeries);
@@ -617,8 +624,8 @@ export async function getWorkshopSeriesBySlug(slug: string) {
   try {
     const series = await sanityClient.fetch<SanityWorkshopSeries | null>(
       workshopSeriesBySlugQuery,
-      { slug },
-      { cache: 'no-store' },
+      { slug, workshopStatuses: [...getVisibleWorkshopStatuses()] },
+      getContentFetchOptions(),
     );
 
     return series ? normalizeWorkshopSeries(series) : null;

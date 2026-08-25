@@ -29,6 +29,7 @@ type WorkshopRegistrationFormProps = {
   fromSeriesSlug?: string;
   initialNotice?: 'cancelled' | 'success' | 'unconfirmed';
   isPaid: boolean;
+  isStaging?: boolean;
   priceLabel: string;
   productLabel?: string;
   productType?: 'series' | 'workshop';
@@ -39,6 +40,7 @@ export default function WorkshopRegistrationForm({
   fromSeriesSlug,
   initialNotice,
   isPaid,
+  isStaging = false,
   priceLabel,
   productLabel = 'workshop',
   productType = 'workshop',
@@ -141,7 +143,11 @@ export default function WorkshopRegistrationForm({
         <CheckCircle2 size={26} />
         <div>
           <strong>You are registered for the {productLabel}.</strong>
-          <span>Check your inbox for confirmation and session updates from the team.</span>
+          <span>
+            {isStaging
+              ? 'This was a staging test. No confirmation email was sent.'
+              : 'Check your inbox for confirmation and session updates from the team.'}
+          </span>
         </div>
       </div>
     );
@@ -153,7 +159,11 @@ export default function WorkshopRegistrationForm({
         <CheckCircle2 size={26} />
         <div>
           <strong>Your {productLabel} registration is confirmed.</strong>
-          <span>We will send confirmation and session updates by email shortly.</span>
+          <span>
+            {isStaging
+              ? 'Stripe processed this in test mode. No confirmation email was sent.'
+              : 'We will send confirmation and session updates by email shortly.'}
+          </span>
         </div>
       </div>
     );
@@ -245,9 +255,13 @@ export default function WorkshopRegistrationForm({
         <input autoComplete="off" name="website" tabIndex={-1} type="text" />
       </label>
       <p className={styles.registrationNotice}>
-        {isPaid
-          ? `You will be redirected to Stripe to pay ${priceLabel}. After payment, we will send confirmation, reminders, and related updates.`
-          : `By registering, you agree to receive emails about this ${productLabel}, including confirmation, reminders, and related updates.`}{' '}
+        {isStaging
+          ? isPaid
+            ? 'Staging uses Stripe test mode. You will not be charged, and no confirmation email will be sent.'
+            : 'This is a staging registration test. No confirmation email will be sent.'
+          : isPaid
+            ? `You will be redirected to Stripe to pay ${priceLabel}. After payment, we will send confirmation, reminders, and related updates.`
+            : `By registering, you agree to receive emails about this ${productLabel}, including confirmation, reminders, and related updates.`}{' '}
         See our <a href="/privacy-policy">privacy policy</a>.
       </p>
       {error ? (

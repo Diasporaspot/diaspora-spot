@@ -5,6 +5,7 @@ import Topbar from '@/components/Topbar/Topbar';
 import Footer from '@/components/Footer/Footer';
 import { getUpcomingWorkshops } from '@/content/queries';
 import type { Workshop } from '@/content/types';
+import { getSiteEnvironment } from '@/lib/site-environment';
 import { getStripe } from '@/lib/stripe';
 import {
   formatWorkshopPrice,
@@ -169,6 +170,7 @@ export default async function WorkshopRegistrationPage({
                     fromSeriesSlug={fromSeriesSlug}
                     initialNotice={paymentNotice}
                     isPaid={workshop.paymentType === 'paid'}
+                    isStaging={getSiteEnvironment() === 'staging'}
                     priceLabel={priceLabel}
                     productLabel="workshop"
                     productType="workshop"

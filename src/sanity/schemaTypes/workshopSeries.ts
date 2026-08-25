@@ -49,9 +49,12 @@ export const workshopSeries = defineType({
       title: 'Website visibility',
       type: 'string',
       initialValue: 'draft',
+      description:
+        'Choose Staging to review this series on the staging website. Choose Published before using Sanity’s Publish button to make it live.',
       options: {
         list: [
           { title: 'Draft', value: 'draft' },
+          { title: 'Staging', value: 'staging' },
           { title: 'Published', value: 'published' },
         ],
         layout: 'radio',
@@ -110,15 +113,16 @@ export const workshopSeries = defineType({
             }
 
             const documentId = context.document?._id?.replace(/^drafts\./, '') ?? '';
+            const documentStatus = context.document?.status ?? 'draft';
             const client = context.getClient({ apiVersion: '2025-06-02' });
             const conflicts = await client.fetch<string[]>(
               `*[
                 _type == "workshopSeries" &&
-                status == "published" &&
+                status == $documentStatus &&
                 !(_id in [$documentId, "drafts." + $documentId]) &&
                 count(workshops[@._ref in $references]) > 0
               ].title`,
-              { documentId, references },
+              { documentId, documentStatus, references },
             );
 
             return conflicts.length

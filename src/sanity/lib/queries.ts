@@ -70,7 +70,7 @@ const workshopProjection = `{
   ${workshopFields},
   "series": *[
     _type == "workshopSeries" &&
-    status == "published" &&
+    status in $workshopStatuses &&
     ^._id in workshops[]._ref
   ][0]{
     _id,
@@ -98,34 +98,34 @@ const workshopSeriesProjection = `{
   ctaLabel,
   "pricingConflict":
     paymentType != "paid" &&
-    count(workshops[@->status == "published" && @->paymentType == "paid"]) > 0,
+    count(workshops[@->status in $workshopStatuses && @->paymentType == "paid"]) > 0,
   "registrationReady":
     defined(mailerLiteGroupId) &&
     mailerLiteProvisioningStatus == "ready" &&
-    count(workshops[@->status == "published"]) > 0 &&
+    count(workshops[@->status in $workshopStatuses]) > 0 &&
     count(workshops[
-      @->status == "published" &&
+      @->status in $workshopStatuses &&
       (!defined(@->mailerLiteGroupId) || @->mailerLiteProvisioningStatus != "ready")
     ]) == 0 &&
     (
       allowWaitlistedWorkshops == true ||
-      count(workshops[@->status == "published" && @->bookingStatus == "waitlist"]) == 0
+      count(workshops[@->status in $workshopStatuses && @->bookingStatus == "waitlist"]) == 0
     ) &&
     (
       paymentType == "paid" ||
-      count(workshops[@->status == "published" && @->paymentType == "paid"]) == 0
+      count(workshops[@->status in $workshopStatuses && @->paymentType == "paid"]) == 0
     ),
   featured,
-  "workshops": workshops[@->status == "published"][]->{${workshopFields}}
+  "workshops": workshops[@->status in $workshopStatuses][]->{${workshopFields}}
 }`;
 
-export const upcomingWorkshopsQuery = `*[_type == "workshop" && status == "published"] | order(featured desc, date asc) ${workshopProjection}`;
+export const upcomingWorkshopsQuery = `*[_type == "workshop" && status in $workshopStatuses] | order(featured desc, date asc) ${workshopProjection}`;
 
-export const featuredWorkshopsQuery = `*[_type == "workshop" && status == "published" && featured == true] | order(date asc) ${workshopProjection}`;
+export const featuredWorkshopsQuery = `*[_type == "workshop" && status in $workshopStatuses && featured == true] | order(date asc) ${workshopProjection}`;
 
-export const publishedWorkshopSeriesQuery = `*[_type == "workshopSeries" && status == "published"] | order(featured desc, _createdAt desc) ${workshopSeriesProjection}`;
+export const publishedWorkshopSeriesQuery = `*[_type == "workshopSeries" && status in $workshopStatuses] | order(featured desc, _createdAt desc) ${workshopSeriesProjection}`;
 
-export const workshopSeriesBySlugQuery = `*[_type == "workshopSeries" && status == "published" && slug.current == $slug][0] ${workshopSeriesProjection}`;
+export const workshopSeriesBySlugQuery = `*[_type == "workshopSeries" && status in $workshopStatuses && slug.current == $slug][0] ${workshopSeriesProjection}`;
 
 const jobProjection = `{
   _id,

@@ -5,7 +5,8 @@ import {
   registerProductAttendee,
   type RegistrationProductType,
 } from '@/lib/workshop-registration';
-import { getStripe } from '@/lib/stripe';
+import { getStripe, validateStripeEventForEnvironment } from '@/lib/stripe';
+import { getSiteEnvironment } from '@/lib/site-environment';
 
 export const runtime = 'nodejs';
 
@@ -64,6 +65,7 @@ export async function POST(request: Request) {
 
   try {
     event = getStripe().webhooks.constructEvent(payload, signature, webhookSecret);
+    validateStripeEventForEnvironment(event.livemode, getSiteEnvironment());
   } catch (reason) {
     const message = reason instanceof Error ? reason.message : 'Invalid webhook signature.';
     return Response.json({ error: message }, { status: 400 });

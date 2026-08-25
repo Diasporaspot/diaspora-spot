@@ -8,6 +8,7 @@ import {
   validateRegistrationInput,
 } from '@/lib/workshop-registration';
 import { getStripe } from '@/lib/stripe';
+import { getSiteEnvironment } from '@/lib/site-environment';
 
 type CheckoutBody = {
   email?: unknown;
@@ -122,6 +123,7 @@ export async function POST(request: Request) {
       name: input.name,
       productId: product._id,
       productType: input.productType,
+      siteEnvironment: getSiteEnvironment(),
       slug: input.slug,
       ...(input.productType === 'workshop' ? { workshopId: product._id } : {}),
       ...(input.phone ? { phone: input.phone } : {}),

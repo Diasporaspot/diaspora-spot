@@ -3,6 +3,7 @@ import 'server-only';
 import { subscribeToMailerLite } from '@/lib/mailerlite';
 import { sanityClient } from '@/sanity/lib/client';
 import { hasSeriesPricingConflict } from '@/lib/workshop-registration-core';
+import { getSiteEnvironment, getVisibleWorkshopStatuses } from '@/lib/site-environment';
 import type {
   RegistrationProductType,
   WorkshopPaymentType,
@@ -70,25 +71,40 @@ export function getProductGroupIds(product: RegistrationProduct) {
   );
 }
 
+function getRegistrationQueryParams() {
+  return { workshopStatuses: [...getVisibleWorkshopStatuses()] };
+}
+
+function getRegistrationFetchOptions() {
+  const token = process.env.SANITY_API_READ_TOKEN;
+  const shouldReadDrafts = getSiteEnvironment() === 'staging' && Boolean(token);
+
+  return {
+    cache: 'no-store' as const,
+    perspective: shouldReadDrafts ? ('drafts' as const) : ('published' as const),
+    ...(shouldReadDrafts ? { token } : {}),
+  };
+}
+
 export async function getRegistrationProduct(productType: RegistrationProductType, slug: string) {
   if (productType === 'series') {
     return sanityClient.fetch<RegistrationProduct | null>(
-      `*[_type == "workshopSeries" && status == "published" && slug.current == $slug][0]{
+      `*[_type == "workshopSeries" && status in $workshopStatuses && slug.current == $slug][0]{
         ${registrationProductFields},
-        "workshops": workshops[]->{${registrationProductFields}}
+        "workshops": workshops[@->status in $workshopStatuses][]->{${registrationProductFields}}
       }`,
-      { slug },
-      { cache: 'no-store' },
+      { slug, ...getRegistrationQueryParams() },
+      getRegistrationFetchOptions(),
     );
   }
 
   return sanityClient.fetch<RegistrationProduct | null>(
-    `*[_type == "workshop" && status == "published" && slug.current == $slug][0]{
+    `*[_type == "workshop" && status in $workshopStatuses && slug.current == $slug][0]{
       ${registrationProductFields},
       "workshops": []
     }`,
-    { slug },
-    { cache: 'no-store' },
+    { slug, ...getRegistrationQueryParams() },
+    getRegistrationFetchOptions(),
   );
 }
 
@@ -96,7 +112,7 @@ export async function getRegistrationProductById(productType: RegistrationProduc
   const sanityType = productType === 'series' ? 'workshopSeries' : 'workshop';
   const workshopsProjection =
     productType === 'series'
-      ? `"workshops": workshops[]->{${registrationProductFields}}`
+      ? `"workshops": workshops[@->status in $workshopStatuses][]->{${registrationProductFields}}`
       : '"workshops": []';
 
   return sanityClient.fetch<RegistrationProduct | null>(
@@ -104,8 +120,8 @@ export async function getRegistrationProductById(productType: RegistrationProduc
       ${registrationProductFields},
       ${workshopsProjection}
     }`,
-    { id, sanityType },
-    { cache: 'no-store' },
+    { id, sanityType, ...getRegistrationQueryParams() },
+    getRegistrationFetchOptions(),
   );
 }
 
@@ -129,7 +145,12 @@ export function getProductRegistrationError(product: RegistrationProduct | null)
     };
   }
 
-  if (!product.mailerLiteGroupId || product.mailerLiteProvisioningStatus !== 'ready') {
+  const isStaging = getSiteEnvironment() === 'staging';
+
+  if (
+    !isStaging &&
+    (!product.mailerLiteGroupId || product.mailerLiteProvisioningStatus !== 'ready')
+  ) {
     return {
       message: 'Registration is not available for this workshop or series yet.',
       status: 409,
@@ -141,12 +162,14 @@ export function getProductRegistrationError(product: RegistrationProduct | null)
       return { message: 'This series does not contain any workshops yet.', status: 409 };
     }
 
+    const visibleStatuses: readonly string[] = getVisibleWorkshopStatuses();
     const unavailableWorkshop = product.workshops.find(
       (workshop) =>
-        workshop.status !== 'published' ||
+        !workshop.status ||
+        !visibleStatuses.includes(workshop.status) ||
         (workshop.bookingStatus === 'waitlist' && !product.allowWaitlistedWorkshops) ||
-        !workshop.mailerLiteGroupId ||
-        workshop.mailerLiteProvisioningStatus !== 'ready',
+        (!isStaging &&
+          (!workshop.mailerLiteGroupId || workshop.mailerLiteProvisioningStatus !== 'ready')),
     );
 
     if (unavailableWorkshop) {
@@ -226,6 +249,10 @@ export async function registerProductAttendee({
   smsConsentAt?: string;
   smsMarketingConsent: boolean;
 }) {
+  if (getSiteEnvironment() === 'staging') {
+    return;
+  }
+
   await registerAttendeeWithGroups({
     email,
     name,

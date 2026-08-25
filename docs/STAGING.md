@@ -40,9 +40,20 @@ Setting an article to **Draft** hides its draft from both websites. Publishing a
 status is **Staging** would replace the live version with a staging-only version, so promotion must
 always be **Published status first, Sanity Publish second**.
 
-Workshop and workshop-series content remains production-only. Those document types trigger Stripe
-and MailerLite workflows, so they should only gain staging visibility after separate test accounts
-and test webhooks are available.
+### Workshop editorial and payment workflow
+
+Workshops and workshop series use the same **Draft → Staging → Published** visibility workflow as
+articles. Staged workshop drafts are visible only at `https://diasporaspotstaging.vercel.app`.
+
+Staging registration is intentionally isolated:
+
+- Paid registrations use Stripe test mode and the staging-only webhook.
+- Free and paid staging registrations do not add subscribers to MailerLite or send confirmation
+  emails.
+- Production continues to use Stripe live mode and the existing MailerLite groups.
+
+For a Stripe test checkout, use card number `4242 4242 4242 4242`, any future expiry date, and any
+three-digit CVC. No real charge is created.
 
 ## One-time Vercel setup
 
@@ -67,14 +78,17 @@ Configure these variables:
 | `NEXT_PUBLIC_SANITY_API_VERSION` | `2025-06-02` | `2025-06-02` |
 | `SANITY_API_READ_TOKEN` | Viewer token | not required |
 | `NEXT_PUBLIC_SITE_URL` | `https://diasporaspotstaging.vercel.app` | `https://diasporaspot.com` |
+| `STRIPE_SECRET_KEY` | Stripe test key (`sk_test_...`) | Stripe live key (`sk_live_...`) |
+| `STRIPE_WEBHOOK_SECRET` | Staging test webhook signing secret | Production webhook signing secret |
 
 Add the staging values as **Preview variables scoped specifically to the `staging` Git branch**.
 Vercel branch-specific values override the general Preview values.
 
 All other environment variables from `.env.example` must also be reviewed. For safe end-to-end
-testing, Preview should use a separate Supabase project, Stripe test keys and webhook, and isolated
-MailerLite test groups. Do not copy production write credentials into Preview merely to make a build
-pass. Public/read-only values can be shared where appropriate.
+testing, Preview should use a separate Supabase project when staged features write to Supabase.
+Stripe is isolated with test keys and a staging webhook, and MailerLite writes are suppressed by the
+application on staging. Do not copy other production write credentials into Preview merely to make
+a build pass. Public/read-only values can be shared where appropriate.
 
 After changing any Vercel environment variable, redeploy the affected branch; environment changes do
 not alter deployments that already exist.
@@ -100,6 +114,8 @@ Recommended GitHub branch protection:
 
 - A push to `staging` updates the stable Vercel branch URL and not `diasporaspot.com`.
 - A Sanity article in **Staging** appears at the staging URL and returns 404 in production.
+- A Sanity workshop or series in **Staging** appears at the staging URL and not in production.
+- A paid staging workshop opens Stripe test checkout and returns to the staging URL after payment.
 - A draft edit to an already-published article appears on staging while production keeps the old copy.
 - Promoting the article to **Published** and publishing it makes it visible in production.
 - Staging pages output `noindex, nofollow`; production pages remain indexable.
