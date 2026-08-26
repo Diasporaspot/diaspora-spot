@@ -1,7 +1,6 @@
 import 'server-only';
 
 import { createHash } from 'node:crypto';
-import { isProductionEnvironment } from '@/lib/site-environment';
 import type {
   MetaEventName,
   MetaEventProperties,
@@ -60,6 +59,11 @@ function getMetaConfiguration() {
   };
 }
 
+export function isMetaConversionsConfigured() {
+  const { accessToken, pixelId } = getMetaConfiguration();
+  return Boolean(accessToken && pixelId);
+}
+
 export async function sendMetaConversion({
   eventId,
   eventName,
@@ -68,10 +72,6 @@ export async function sendMetaConversion({
   requestContext = {},
   userData = {},
 }: SendMetaConversionInput) {
-  if (!isProductionEnvironment()) {
-    return { sent: false as const, skipped: 'non-production' as const };
-  }
-
   const { accessToken, graphApiVersion, pixelId, testEventCode } = getMetaConfiguration();
 
   if (!accessToken || !pixelId) {

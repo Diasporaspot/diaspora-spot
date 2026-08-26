@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import CookieConsent from "@/components/CookieConsent/CookieConsent";
+import { isMetaConversionsConfigured } from "@/lib/meta-conversions";
 import { isProductionEnvironment } from "@/lib/site-environment";
 import "./globals.css";
 
@@ -48,7 +49,7 @@ export default function RootLayout({
     <html lang="en" className={poppins.variable}>
       <body>
         {children}
-        <CookieConsent enableMetaTracking={isProductionEnvironment()} />
+        <CookieConsent enableMetaTracking={isMetaConversionsConfigured()} />
       </body>
     </html>
   );

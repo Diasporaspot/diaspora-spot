@@ -86,6 +86,10 @@ Configure these variables:
 | `NEXT_PUBLIC_SITE_URL` | `https://diasporaspotstaging.vercel.app` | `https://diasporaspot.com` |
 | `STRIPE_SECRET_KEY` | Stripe test key (`sk_test_...`) | Stripe live key (`sk_live_...`) |
 | `STRIPE_WEBHOOK_SECRET` | Staging test webhook signing secret | Production webhook signing secret |
+| `NEXT_PUBLIC_META_PIXEL_ID` | Meta Pixel ID | Meta Pixel ID |
+| `META_PIXEL_ID` | Meta Pixel ID | Meta Pixel ID |
+| `META_CONVERSIONS_API_TOKEN` | Server-only Meta token | Server-only Meta token |
+| `META_GRAPH_API_VERSION` | `v25.0` | `v25.0` |
 
 Add the staging values as **Preview variables scoped specifically to the `staging` Git branch**.
 Vercel branch-specific values override the general Preview values.
@@ -93,8 +97,9 @@ Vercel branch-specific values override the general Preview values.
 All other environment variables from `.env.example` must also be reviewed. For safe end-to-end
 testing, Preview should use a separate Supabase project when staged features write to Supabase.
 Stripe is isolated with test keys and a staging webhook, and MailerLite writes are suppressed by the
-application on staging. Do not copy other production write credentials into Preview merely to make
-a build pass. Public/read-only values can be shared where appropriate.
+application on staging. Meta tracking is intentionally enabled in both environments when the four
+Meta variables above are configured. Do not copy other production write credentials into Preview
+merely to make a build pass. Public/read-only values can be shared where appropriate.
 
 After changing any Vercel environment variable, redeploy the affected branch; environment changes do
 not alter deployments that already exist.
