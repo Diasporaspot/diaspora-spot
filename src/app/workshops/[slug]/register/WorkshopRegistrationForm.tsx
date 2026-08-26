@@ -2,7 +2,11 @@
 
 import { type FormEvent, useEffect, useState } from 'react';
 import { CheckCircle2, LoaderCircle } from 'lucide-react';
-import { trackMetaPixelEvent } from '@/components/MetaPixelEvent/MetaPixelEvent';
+import {
+  createMetaEventId,
+  hasMetaAdvertisingConsent,
+  trackMetaPixelEvent,
+} from '@/components/MetaPixelEvent/MetaPixelEvent';
 import {
   getPhoneCountries,
   getPhoneCountryCallingCode,
@@ -27,6 +31,7 @@ const phoneCountryOptions = getPhoneCountries()
 
 type WorkshopRegistrationFormProps = {
   fromSeriesSlug?: string;
+  initialMetaEventId?: string;
   initialNotice?: 'cancelled' | 'success' | 'unconfirmed';
   isPaid: boolean;
   isStaging?: boolean;
@@ -38,6 +43,7 @@ type WorkshopRegistrationFormProps = {
 
 export default function WorkshopRegistrationForm({
   fromSeriesSlug,
+  initialMetaEventId,
   initialNotice,
   isPaid,
   isStaging = false,
@@ -59,6 +65,7 @@ export default function WorkshopRegistrationForm({
     }
 
     const sessionId = new URLSearchParams(window.location.search).get('session_id') || slug;
+    const eventId = initialMetaEventId || `ds:CompleteRegistration:stripe:${sessionId}`;
     const trackingKey = `ds_meta_complete_registration:${productType}:${slug}:${sessionId}`;
 
     if (window.sessionStorage.getItem(trackingKey)) {
@@ -74,10 +81,12 @@ export default function WorkshopRegistrationForm({
         content_type: productType,
       },
       {
+        eventId,
         onSent: () => window.sessionStorage.setItem(trackingKey, 'true'),
+        serverEventAlreadySent: Boolean(initialMetaEventId),
       },
     );
-  }, [initialNotice, isPaid, productLabel, productType, slug]);
+  }, [initialMetaEventId, initialNotice, isPaid, productLabel, productType, slug]);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -86,6 +95,9 @@ export default function WorkshopRegistrationForm({
 
     const form = event.currentTarget;
     const formData = new FormData(form);
+    const metaEventId = hasMetaAdvertisingConsent()
+      ? createMetaEventId('CompleteRegistration')
+      : undefined;
 
     try {
       const response = await fetch(
@@ -100,6 +112,8 @@ export default function WorkshopRegistrationForm({
             productType,
             slug,
             fromSeries: fromSeriesSlug,
+            metaEventId,
+            metaEventSourceUrl: window.location.href,
             smsMarketingConsent: formData.get('smsMarketingConsent') === 'on',
             website: formData.get('website'),
           }),
@@ -123,12 +137,19 @@ export default function WorkshopRegistrationForm({
       form.reset();
       setSmsMarketingConsent(false);
       setState('success');
-      trackMetaPixelEvent('CompleteRegistration', {
-        content_category: 'Standard Series',
-        content_ids: [slug],
-        content_name: productLabel,
-        content_type: productType,
-      });
+      trackMetaPixelEvent(
+        'CompleteRegistration',
+        {
+          content_category: 'Standard Series',
+          content_ids: [slug],
+          content_name: productLabel,
+          content_type: productType,
+        },
+        {
+          eventId: metaEventId,
+          serverEventAlreadySent: Boolean(metaEventId),
+        },
+      );
     } catch (reason) {
       setError(
         reason instanceof Error ? reason.message : 'Registration failed. Please try again.',

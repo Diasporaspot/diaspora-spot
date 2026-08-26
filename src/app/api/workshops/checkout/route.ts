@@ -9,10 +9,18 @@ import {
 } from '@/lib/workshop-registration';
 import { getStripe } from '@/lib/stripe';
 import { getSiteEnvironment } from '@/lib/site-environment';
+import {
+  getMetaRequestContext,
+  hasMetaAdvertisingConsent,
+  normalizeMetaEventId,
+  sanitizeMetaEventSourceUrl,
+} from '@/lib/meta-conversions-core';
 
 type CheckoutBody = {
   email?: unknown;
   fromSeries?: unknown;
+  metaEventId?: unknown;
+  metaEventSourceUrl?: unknown;
   name?: unknown;
   phone?: unknown;
   productType?: unknown;
@@ -118,6 +126,10 @@ export async function POST(request: Request) {
       cancelUrl.searchParams.set('fromSeries', fromSeries);
     }
 
+    const metaEventId = hasMetaAdvertisingConsent(request.headers.get('cookie'))
+      ? normalizeMetaEventId(body.metaEventId)
+      : '';
+    const metaRequestContext = getMetaRequestContext(request);
     const metadata: Record<string, string> = {
       email: input.email,
       name: input.name,
@@ -125,6 +137,22 @@ export async function POST(request: Request) {
       productType: input.productType,
       siteEnvironment: getSiteEnvironment(),
       slug: input.slug,
+      ...(metaEventId
+        ? {
+            metaEventId,
+            metaEventSourceUrl:
+              sanitizeMetaEventSourceUrl(body.metaEventSourceUrl, request.url)?.slice(0, 500) ||
+              baseUrl,
+            ...(metaRequestContext.clientIpAddress
+              ? { metaClientIpAddress: metaRequestContext.clientIpAddress.slice(0, 500) }
+              : {}),
+            ...(metaRequestContext.clientUserAgent
+              ? { metaClientUserAgent: metaRequestContext.clientUserAgent.slice(0, 500) }
+              : {}),
+            ...(metaRequestContext.fbc ? { metaFbc: metaRequestContext.fbc.slice(0, 500) } : {}),
+            ...(metaRequestContext.fbp ? { metaFbp: metaRequestContext.fbp.slice(0, 500) } : {}),
+          }
+        : {}),
       ...(input.productType === 'workshop' ? { workshopId: product._id } : {}),
       ...(input.phone ? { phone: input.phone } : {}),
       ...(input.smsMarketingConsent

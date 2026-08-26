@@ -6,9 +6,18 @@ import {
   registerProductAttendee,
   validateRegistrationInput,
 } from '@/lib/workshop-registration';
+import {
+  getMetaRequestContext,
+  hasMetaAdvertisingConsent,
+  normalizeMetaEventId,
+  sanitizeMetaEventSourceUrl,
+} from '@/lib/meta-conversions-core';
+import { sendMetaConversionSafely } from '@/lib/meta-conversions';
 
 type RegistrationBody = {
   email?: unknown;
+  metaEventId?: unknown;
+  metaEventSourceUrl?: unknown;
   name?: unknown;
   phone?: unknown;
   productType?: unknown;
@@ -81,6 +90,30 @@ export async function POST(request: Request) {
       smsConsentAt: input.smsMarketingConsent ? new Date().toISOString() : undefined,
       smsMarketingConsent: input.smsMarketingConsent,
     });
+
+    const metaEventId = hasMetaAdvertisingConsent(request.headers.get('cookie'))
+      ? normalizeMetaEventId(body.metaEventId)
+      : '';
+
+    if (metaEventId) {
+      await sendMetaConversionSafely({
+        eventId: metaEventId,
+        eventName: 'CompleteRegistration',
+        eventSourceUrl: sanitizeMetaEventSourceUrl(body.metaEventSourceUrl, request.url),
+        properties: {
+          content_category: 'Standard Series',
+          content_ids: [input.slug],
+          content_name: product.title || input.productType,
+          content_type: input.productType,
+        },
+        requestContext: getMetaRequestContext(request),
+        userData: {
+          email: input.email,
+          name: input.name,
+          phone: input.phone,
+        },
+      });
+    }
 
     return Response.json({ ok: true });
   } catch (reason) {

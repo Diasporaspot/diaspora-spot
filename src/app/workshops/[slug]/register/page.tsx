@@ -30,6 +30,7 @@ type WorkshopRegistrationPageProps = {
 };
 
 type PaymentNotice = 'cancelled' | 'success' | 'unconfirmed';
+type PaymentResult = { metaEventId?: string; notice?: PaymentNotice };
 
 function RegistrationSummary({ workshop }: { workshop: Workshop }) {
   return (
@@ -85,19 +86,19 @@ async function getPaymentNotice({
 }: {
   searchParams?: { payment?: string; session_id?: string };
   workshop: Workshop;
-}): Promise<PaymentNotice | undefined> {
+}): Promise<PaymentResult> {
   if (searchParams?.payment === 'cancelled') {
-    return 'cancelled';
+    return { notice: 'cancelled' };
   }
 
   if (searchParams?.payment !== 'success' || workshop.paymentType !== 'paid') {
-    return undefined;
+    return {};
   }
 
   const sessionId = searchParams.session_id;
 
   if (!sessionId || sessionId === '{CHECKOUT_SESSION_ID}') {
-    return 'unconfirmed';
+    return { notice: 'unconfirmed' };
   }
 
   try {
@@ -108,11 +109,11 @@ async function getPaymentNotice({
       session.metadata?.slug === workshop.slug;
 
     return session.payment_status === 'paid' && sessionMatchesWorkshop
-      ? 'success'
-      : 'unconfirmed';
+      ? { metaEventId: session.metadata?.metaEventId, notice: 'success' }
+      : { notice: 'unconfirmed' };
   } catch (reason) {
     console.error('Could not verify Stripe checkout session.', reason);
-    return 'unconfirmed';
+    return { notice: 'unconfirmed' };
   }
 }
 
@@ -139,7 +140,7 @@ export default async function WorkshopRegistrationPage({
     : `/workshops/${workshop.slug}`;
 
   const priceLabel = formatWorkshopPrice(workshop);
-  const paymentNotice = await getPaymentNotice({
+  const paymentResult = await getPaymentNotice({
     searchParams: resolvedSearchParams,
     workshop,
   });
@@ -168,7 +169,8 @@ export default async function WorkshopRegistrationPage({
                 {workshop.registrationReady ? (
                   <WorkshopRegistrationForm
                     fromSeriesSlug={fromSeriesSlug}
-                    initialNotice={paymentNotice}
+                    initialMetaEventId={paymentResult.metaEventId}
+                    initialNotice={paymentResult.notice}
                     isPaid={workshop.paymentType === 'paid'}
                     isStaging={getSiteEnvironment() === 'staging'}
                     priceLabel={priceLabel}

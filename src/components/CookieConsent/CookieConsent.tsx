@@ -4,7 +4,9 @@ import { useEffect, useMemo, useState, useSyncExternalStore } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Cookie, X } from 'lucide-react';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import Script from 'next/script';
+import MetaPixelEvent from '@/components/MetaPixelEvent/MetaPixelEvent';
 import styles from './cookieConsent.module.css';
 
 const COOKIE_NAME = 'ds_cookie_consent';
@@ -105,7 +107,14 @@ function subscribeToMount() {
   return () => undefined;
 }
 
-function CookieScripts({ consent }: { consent: ConsentState | null }) {
+function CookieScripts({
+  consent,
+  enableMetaTracking,
+}: {
+  consent: ConsentState | null;
+  enableMetaTracking: boolean;
+}) {
+  const pathname = usePathname();
   const analyticsId = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID || DEFAULT_GA_MEASUREMENT_ID;
   const clarityId = process.env.NEXT_PUBLIC_CLARITY_PROJECT_ID || DEFAULT_CLARITY_PROJECT_ID;
   const adsenseClientId = process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID;
@@ -147,27 +156,29 @@ function CookieScripts({ consent }: { consent: ConsentState | null }) {
         />
       ) : null}
 
-      {consent?.advertising && metaPixelId ? (
-        <Script id="meta-pixel-consent" strategy="afterInteractive">
-          {`
-            !function(f,b,e,v,n,t,s)
-            {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-            n.callMethod.apply(n,arguments):n.queue.push(arguments)};
-            if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
-            n.queue=[];t=b.createElement(e);t.async=!0;
-            t.src=v;s=b.getElementsByTagName(e)[0];
-            s.parentNode.insertBefore(t,s)}(window,document,'script',
-            'https://connect.facebook.net/en_US/fbevents.js');
-            fbq('init', '${metaPixelId}');
-            fbq('track', 'PageView');
-          `}
-        </Script>
+      {enableMetaTracking && consent?.advertising && metaPixelId ? (
+        <>
+          <Script id="meta-pixel-consent" strategy="afterInteractive">
+            {`
+              !function(f,b,e,v,n,t,s)
+              {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+              n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+              if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+              n.queue=[];t=b.createElement(e);t.async=!0;
+              t.src=v;s=b.getElementsByTagName(e)[0];
+              s.parentNode.insertBefore(t,s)}(window,document,'script',
+              'https://connect.facebook.net/en_US/fbevents.js');
+              fbq('init', '${metaPixelId}');
+            `}
+          </Script>
+          <MetaPixelEvent dedupeKey={pathname} eventName="PageView" />
+        </>
       ) : null}
     </>
   );
 }
 
-export default function CookieConsent() {
+export default function CookieConsent({ enableMetaTracking = false }: { enableMetaTracking?: boolean }) {
   const hasMounted = useSyncExternalStore(subscribeToMount, () => true, () => false);
   const consentCookie = useSyncExternalStore(subscribeToConsentChanges, getConsentCookieValue, () => '');
   const consent = useMemo(() => parseConsentCookie(consentCookie), [consentCookie]);
@@ -244,7 +255,7 @@ export default function CookieConsent() {
 
   return (
     <>
-      <CookieScripts consent={consent} />
+      <CookieScripts consent={consent} enableMetaTracking={enableMetaTracking} />
 
       <AnimatePresence>
         {showFloatingButton ? (

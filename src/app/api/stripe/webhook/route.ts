@@ -7,6 +7,8 @@ import {
 } from '@/lib/workshop-registration';
 import { getStripe, validateStripeEventForEnvironment } from '@/lib/stripe';
 import { getSiteEnvironment } from '@/lib/site-environment';
+import { normalizeMetaEventId } from '@/lib/meta-conversions-core';
+import { sendMetaConversionSafely } from '@/lib/meta-conversions';
 
 export const runtime = 'nodejs';
 
@@ -45,6 +47,30 @@ async function fulfillPaidPurchase(session: Stripe.Checkout.Session) {
     smsConsentAt: session.metadata?.smsConsentAt,
     smsMarketingConsent,
   });
+
+  const metaEventId = normalizeMetaEventId(session.metadata?.metaEventId);
+  if (metaEventId) {
+    await sendMetaConversionSafely({
+      eventId: metaEventId,
+      eventName: 'CompleteRegistration',
+      eventSourceUrl: session.metadata?.metaEventSourceUrl,
+      properties: {
+        content_category: 'Standard Series',
+        content_ids: [session.metadata?.slug || productId],
+        content_name: product.title || productType,
+        content_type: productType,
+        currency: session.currency || undefined,
+        value: typeof session.amount_total === 'number' ? session.amount_total / 100 : undefined,
+      },
+      requestContext: {
+        clientIpAddress: session.metadata?.metaClientIpAddress,
+        clientUserAgent: session.metadata?.metaClientUserAgent,
+        fbc: session.metadata?.metaFbc,
+        fbp: session.metadata?.metaFbp,
+      },
+      userData: { email, name, phone },
+    });
+  }
 }
 
 export async function POST(request: Request) {
