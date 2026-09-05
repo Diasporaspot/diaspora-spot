@@ -62,7 +62,7 @@ function Problem() {
             animate={inView ? 'animate' : 'initial'}
             transition={{ duration: 0.6, delay: 0.08, ease: [0.22, 0.61, 0.36, 1] }}
           >
-            Living abroad is <span>hard.</span>
+            Finding people like you shouldn&apos;t be <span>hard.</span>
           </motion.h2>
 
           <motion.p
@@ -72,7 +72,7 @@ function Problem() {
             animate={inView ? 'animate' : 'initial'}
             transition={{ duration: 0.5, delay: 0.16, ease: [0.22, 0.61, 0.36, 1] }}
           >
-            Navigating how to live, work and grow in a new country can feel overwhelming.{' '}
+             No matter where you live, finding your people should be easy.{' '}
             <em>At DiasporaSpot, you don&apos;t have to do it alone.</em>
           </motion.p>
 

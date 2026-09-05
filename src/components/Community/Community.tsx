@@ -159,7 +159,7 @@ function Community() {
             variants={fadeUp}
             transition={{ duration: 0.5, ease: [0.22, 0.61, 0.36, 1] }}
           >
-            Join the mailing list for people building life abroad. Get practical notes, useful resources,
+            Join the mailing list for people building life anywhere. Get practical notes, useful resources,
             and early access to what DiasporaSpot shares with the community.
           </motion.p>
 
