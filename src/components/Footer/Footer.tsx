@@ -10,7 +10,7 @@ function Footer() {
       <div className={styles.inner}>
         <div className={styles.brand}>
           <Image src="/assets/logo-primary-white.png" alt="DiasporaSpot" width={142} height={26} />
-          <p className={styles.brandTag}>A digital hub to help you build and grow your life abroad.</p>
+          <p className={styles.brandTag}>A digital hub to help you build and grow your life anywhere.</p>
           <div className={styles.socialWrap}>
             <SocialLinks />
           </div>

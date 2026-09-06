@@ -97,7 +97,7 @@ function Hero() {
             >
               Build your
               <br />
-              life abroad
+              life anywhere
             </motion.h1>
           </div>
 
@@ -111,7 +111,7 @@ function Hero() {
             }}
           >
             DiasporaSpot is a digital hub created to help you build and grow
-            your life abroad — with practical articles, workshops, and
+            your life anywhere — with practical articles, workshops, and
             community.
           </motion.p>
 
