@@ -7,27 +7,7 @@ import {
   hasMetaAdvertisingConsent,
   trackMetaPixelEvent,
 } from '@/components/MetaPixelEvent/MetaPixelEvent';
-import {
-  getPhoneCountries,
-  getPhoneCountryCallingCode,
-  normalizePhoneNumberForCountry,
-  type PhoneCountryCode,
-} from '@/lib/phone';
 import styles from '../../workshops-page.module.css';
-
-function getCountryFlag(country: PhoneCountryCode) {
-  return [...country]
-    .map((character) => String.fromCodePoint(127397 + character.charCodeAt(0)))
-    .join('');
-}
-
-const phoneCountryOptions = getPhoneCountries()
-  .map((country) => ({
-    callingCode: getPhoneCountryCallingCode(country),
-    country,
-    flag: getCountryFlag(country),
-  }))
-  .sort((a, b) => a.country.localeCompare(b.country));
 
 type WorkshopRegistrationFormProps = {
   fromSeriesSlug?: string;
@@ -53,8 +33,6 @@ export default function WorkshopRegistrationForm({
   slug,
 }: WorkshopRegistrationFormProps) {
   const [state, setState] = useState<'idle' | 'submitting' | 'success'>('idle');
-  const [smsMarketingConsent, setSmsMarketingConsent] = useState(false);
-  const [phoneCountry, setPhoneCountry] = useState<PhoneCountryCode>('GB');
   const [error, setError] = useState(
     initialNotice === 'cancelled' ? 'Payment was cancelled. You can try again below.' : '',
   );
@@ -108,13 +86,11 @@ export default function WorkshopRegistrationForm({
           body: JSON.stringify({
             email: formData.get('email'),
             name: formData.get('name'),
-            phone: normalizePhoneNumberForCountry(formData.get('phone'), phoneCountry),
             productType,
             slug,
             fromSeries: fromSeriesSlug,
             metaEventId,
             metaEventSourceUrl: window.location.href,
-            smsMarketingConsent: formData.get('smsMarketingConsent') === 'on',
             website: formData.get('website'),
           }),
         },
@@ -135,7 +111,6 @@ export default function WorkshopRegistrationForm({
       }
 
       form.reset();
-      setSmsMarketingConsent(false);
       setState('success');
       trackMetaPixelEvent(
         'CompleteRegistration',
@@ -224,53 +199,6 @@ export default function WorkshopRegistrationForm({
           type="email"
         />
       </div>
-      <div className={styles.registrationField}>
-        <label htmlFor="registration-phone">Phone number <span>(optional)</span></label>
-        <div className={styles.phoneInputRow}>
-          <select
-            aria-label="Country code"
-            id="registration-phone-country"
-            name="phoneCountry"
-            onChange={(event) => setPhoneCountry(event.target.value as PhoneCountryCode)}
-            value={phoneCountry}
-          >
-            {phoneCountryOptions.map(({ callingCode, country, flag }) => (
-              <option key={country} value={country}>
-                {flag} {country} +{callingCode}
-              </option>
-            ))}
-          </select>
-          <input
-            aria-describedby="registration-phone-help"
-            autoComplete="tel-national"
-            id="registration-phone"
-            inputMode="tel"
-            name="phone"
-            placeholder="Mobile number"
-            required={smsMarketingConsent}
-            type="tel"
-          />
-        </div>
-        <small id="registration-phone-help">
-          Select your country code, then enter your mobile number. Used for workshop coordination,
-          and for marketing texts only if you opt in below.
-        </small>
-      </div>
-      <label className={styles.smsConsent}>
-        <input
-          checked={smsMarketingConsent}
-          name="smsMarketingConsent"
-          onChange={(event) => setSmsMarketingConsent(event.target.checked)}
-          type="checkbox"
-        />
-        <span>
-          <strong>Send me workshop news and offers by SMS</strong>
-          <small>
-            Optional. Message and data rates may apply. Frequency varies. You can opt out at any
-            time.
-          </small>
-        </span>
-      </label>
       <label className={styles.honeypot} aria-hidden="true">
         Website
         <input autoComplete="off" name="website" tabIndex={-1} type="text" />

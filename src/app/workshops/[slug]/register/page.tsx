@@ -160,11 +160,6 @@ export default async function WorkshopRegistrationPage({
               <section className={styles.registrationCard} aria-labelledby="registration-title">
                 <span className={styles.eyebrow}>Workshop registration</span>
                 <h1 id="registration-title">Reserve your seat</h1>
-                <p>
-                  {workshop.paymentType === 'paid'
-                    ? `Enter your details below, then complete the ${priceLabel} payment securely through Stripe.`
-                    : 'Enter your details below. We will use your email for registration updates, and your phone only for workshop coordination or SMS updates you choose.'}
-                </p>
 
                 {workshop.registrationReady ? (
                   <WorkshopRegistrationForm
