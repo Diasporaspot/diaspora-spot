@@ -66,7 +66,7 @@ function RegistrationSummary({ workshop }: { workshop: Workshop }) {
         </span>
         <span>
           <CreditCard size={17} />
-          <small>Price</small>
+          <small>Standard price</small>
           <strong>{formatWorkshopPrice(workshop)}</strong>
         </span>
       </div>
@@ -108,7 +108,7 @@ async function getPaymentNotice({
       (session.metadata?.productType === undefined || session.metadata?.productType === 'workshop') &&
       session.metadata?.slug === workshop.slug;
 
-    return session.payment_status === 'paid' && sessionMatchesWorkshop
+    return (session.payment_status === 'paid' || (session.payment_status === 'no_payment_required' && session.status === 'complete')) && sessionMatchesWorkshop
       ? { metaEventId: session.metadata?.metaEventId, notice: 'success' }
       : { notice: 'unconfirmed' };
   } catch (reason) {

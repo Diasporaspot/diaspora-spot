@@ -1,3 +1,4 @@
+import { quoteDiscount } from '@/lib/workshop-discounts';
 import {
   getProductCurrency,
   getProductRegistrationError,
@@ -17,6 +18,8 @@ import {
 } from '@/lib/meta-conversions-core';
 
 type CheckoutBody = {
+  expectedAmount?: unknown;
+  discountCode?: unknown;
   email?: unknown;
   fromSeries?: unknown;
   metaEventId?: unknown;
@@ -104,6 +107,12 @@ export async function POST(request: Request) {
       );
     }
 
+    let quote;
+    try { quote = quoteDiscount(product, body.discountCode); }
+    catch (error) { return Response.json({ error: (error as Error).message }, { status: 400 }); }
+    if (quote.code && body.expectedAmount !== quote.amount) {
+      return Response.json({ error: 'The price or discount has changed. Remove and reapply your code to review the updated total.' }, { status: 409 });
+    }
     const currency = getProductCurrency(product);
     const stripe = getStripe();
     const baseUrl = getBaseUrl(request);
@@ -131,6 +140,9 @@ export async function POST(request: Request) {
       : '';
     const metaRequestContext = getMetaRequestContext(request);
     const metadata: Record<string, string> = {
+      discountCode: quote.code,
+      originalAmount: String(quote.originalAmount),
+      discountAmount: String(quote.discountAmount),
       email: input.email,
       name: input.name,
       productId: product._id,
@@ -172,8 +184,9 @@ export async function POST(request: Request) {
             currency,
             product_data: {
               name: product.title || 'DiasporaSpot workshop',
+              ...(quote.code ? { description: `Discount code ${quote.code} applied` } : {}),
             },
-            unit_amount: unitAmount,
+            unit_amount: quote.amount,
           },
           quantity: 1,
         },

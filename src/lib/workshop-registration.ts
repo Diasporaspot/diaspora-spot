@@ -26,6 +26,9 @@ export type {
 } from '@/lib/workshop-registration-core';
 
 export type RegistrationWorkshop = {
+  date?: string;
+  timezone?: string;
+  discountCodes?: import('./workshop-discounts').DiscountCode[];
   _id: string;
   _type?: 'workshop';
   bookingStatus?: string;
@@ -59,6 +62,9 @@ const registrationProductFields = `
   mailerLiteGroupId,
   mailerLiteProvisioningStatus,
   paymentType,
+  date,
+  timezone,
+  discountCodes,
   price
 `;
 

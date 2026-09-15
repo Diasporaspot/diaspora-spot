@@ -13,7 +13,7 @@ import { sendMetaConversionSafely } from '@/lib/meta-conversions';
 export const runtime = 'nodejs';
 
 async function fulfillPaidPurchase(session: Stripe.Checkout.Session) {
-  if (session.payment_status !== 'paid') {
+  if (session.payment_status !== 'paid' && !(session.payment_status === 'no_payment_required' && session.status === 'complete')) {
     return;
   }
 

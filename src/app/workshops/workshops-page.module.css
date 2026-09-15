@@ -2436,3 +2436,91 @@
     width: 100%;
   }
 }
+
+
+.discountInputRow {
+  display: flex;
+  gap: 10px;
+}
+
+.discountInputRow input {
+  flex: 1;
+  min-width: 0;
+  width: 100%;
+}
+
+.discountApply {
+  border: 1px solid rgba(43, 38, 34, 0.2);
+  border-radius: 14px;
+  background: var(--ds-espresso);
+  color: white;
+  cursor: pointer;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  padding: 12px 18px;
+  flex-shrink: 0;
+}
+
+.discountApply:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.discountSummary {
+  border: 1px solid #c3dacb;
+  border-radius: 14px;
+  padding: 18px;
+  background: #f0f7f2;
+  color: var(--fg1);
+  font-size: 14px;
+}
+
+.discountApplied,
+.discountSummary dl > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.discountApplied {
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.discountApplied strong {
+  overflow-wrap: anywhere;
+}
+
+.discountApplied button {
+  border: 0;
+  background: transparent;
+  color: var(--fg1);
+  cursor: pointer;
+  font: inherit;
+  font-size: 12px;
+  text-decoration: underline;
+  padding: 8px 0;
+}
+
+.discountSummary dl {
+  display: grid;
+  gap: 12px;
+  margin: 16px 0 0;
+}
+
+.discountSummary dd {
+  margin: 0;
+}
+
+.discountTotal {
+  border-top: 1px solid #c3dacb;
+  padding-top: 12px;
+  font-weight: 700;
+  font-size: 17px;
+}
+
+.discountSummary small {
+  display: block;
+  margin-top: 12px;
+}

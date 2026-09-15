@@ -207,6 +207,36 @@ export const workshop = defineType({
         }),
     }),
     defineField({
+      name: 'discountCodes',
+      title: 'Discount codes',
+      type: 'array',
+      hidden: ({ parent }) => parent?.paymentType !== 'paid',
+      description: 'Each code can be reused by any number of attendees; only one code can be applied to each booking. Dates include the whole day in the event timezone. Draft edits are available on staging; publish to activate on the live website.',
+      validation: (rule) => rule.custom((items) => {
+        const codes = (items || []).map((item) => String((item as { code?: string }).code || '').trim().toUpperCase());
+        return new Set(codes).size === codes.length || 'Each code must be unique within this event.';
+      }),
+      of: [{
+        type: 'object',
+        name: 'discountCode',
+        fields: [
+          defineField({ name: 'code', title: 'Code', type: 'string', description: 'Case-insensitive, for example EARLY20.', validation: (rule) => rule.required().max(64).regex(/^[A-Za-z0-9_-]+$/, { name: 'letters, numbers, hyphens and underscores only' }) }),
+          defineField({ name: 'type', title: 'Discount type', type: 'string', initialValue: 'percentage', options: { list: [{ title: 'Percentage off', value: 'percentage' }, { title: 'Fixed amount off', value: 'amount' }] }, validation: (rule) => rule.required() }),
+          defineField({ name: 'value', title: 'Discount value', type: 'number', description: 'For a percentage, enter 20 for 20%. For an amount, use the event currency (25 means 25 off).', validation: (rule) => rule.required().positive().custom((value, context) => (context.parent as { type?: string })?.type === 'percentage' && Number(value) > 100 ? 'Percentage cannot exceed 100.' : true) }),
+          defineField({ name: 'startDate', title: 'Start date', type: 'date', validation: (rule) => rule.required() }),
+          defineField({ name: 'endMode', title: 'Expires', type: 'string', initialValue: 'event', options: { list: [{ title: 'On the event day', value: 'event' }, { title: 'On a specific date', value: 'date' }] }, validation: (rule) => rule.required() }),
+          defineField({ name: 'endDate', title: 'End date', type: 'date', hidden: ({ parent }) => parent?.endMode !== 'date' }),
+        ],
+        validation: (rule) => rule.custom((value, context) => {
+          const item = value as { startDate?: string; endMode?: string; endDate?: string } | undefined;
+          if (!item) return true;
+          const end = item.endMode === 'event' ? context.document?.date as string : item.endDate;
+          return end && item.startDate && end >= item.startDate ? true : 'Choose an end date on or after the start date (or check the event date).';
+        }),
+        preview: { select: { title: 'code', type: 'type', value: 'value' }, prepare: ({ title, type, value }) => ({ title, subtitle: type === 'percentage' ? `${value}% off` : `${value} off in event currency` }) },
+      }],
+    }),
+    defineField({
       name: 'icon',
       title: 'Card icon',
       type: 'string',

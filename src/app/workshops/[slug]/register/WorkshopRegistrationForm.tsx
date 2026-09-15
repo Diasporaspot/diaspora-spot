@@ -37,6 +37,29 @@ export default function WorkshopRegistrationForm({
     initialNotice === 'cancelled' ? 'Payment was cancelled. You can try again below.' : '',
   );
 
+  const [discountCode, setDiscountCode] = useState('');
+  const [discount, setDiscount] = useState<{ code: string; label: string; saved: string; original: string; amount: number } | null>(null);
+  const [checkingCode, setCheckingCode] = useState(false);
+  const [discountError, setDiscountError] = useState('');
+  const totalLabel = discount?.label || priceLabel;
+
+  async function applyCode() {
+    setCheckingCode(true);
+    setDiscountError('');
+    setDiscount(null);
+    try {
+      const response = await fetch('/api/workshops/discount', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ slug, code: discountCode }),
+      });
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.error);
+      const format = (amount: number) => new Intl.NumberFormat(undefined, { style: 'currency', currency: result.currency }).format(amount / 100);
+      setDiscount({ code: result.code, label: format(result.amount), saved: format(result.discountAmount), original: format(result.originalAmount), amount: result.amount });
+    } catch (error) { setDiscountError(error instanceof Error ? error.message : 'Unable to apply code.'); }
+    finally { setCheckingCode(false); }
+  }
+
   useEffect(() => {
     if (!isPaid || initialNotice !== 'success') {
       return;
@@ -69,6 +92,7 @@ export default function WorkshopRegistrationForm({
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setError('');
+    if (discountCode.trim() && !discount) { setDiscountError('Apply or remove your discount code before continuing.'); return; }
     setState('submitting');
 
     const form = event.currentTarget;
@@ -84,6 +108,8 @@ export default function WorkshopRegistrationForm({
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
+            discountCode: discount?.code,
+            expectedAmount: discount?.amount,
             email: formData.get('email'),
             name: formData.get('name'),
             productType,
@@ -199,6 +225,34 @@ export default function WorkshopRegistrationForm({
           type="email"
         />
       </div>
+      {isPaid && productType === 'workshop' ? (
+        <div className={styles.registrationField}>
+          <label htmlFor="discount-code">Discount code (optional)</label>
+          <div className={styles.discountInputRow}>
+          <input id="discount-code" autoComplete="off" maxLength={64} value={discountCode}
+            aria-invalid={Boolean(discountError)} aria-describedby={discountError ? "discount-error" : "discount-help"}
+            onKeyDown={(event) => { if (event.key === "Enter") { event.preventDefault(); if (!checkingCode && state !== "submitting" && discountCode.trim()) void applyCode(); } }}
+            disabled={checkingCode || state === 'submitting'}
+            onChange={(event) => { setDiscountCode(event.target.value); setDiscount(null); setDiscountError(''); }} />
+          <button type="button" className={styles.discountApply} disabled={checkingCode || state === 'submitting' || !discountCode.trim()} onClick={applyCode}>
+            {checkingCode ? 'Checking code…' : 'Apply code'}
+          </button>
+          </div>
+          <small id="discount-help">Enter your code to see your savings before checkout.</small>
+          {discount ? (
+            <div className={styles.discountSummary} role="status" aria-live="polite">
+              <div className={styles.discountApplied}><strong>{discount.code} applied</strong><button type="button" disabled={state === 'submitting' || checkingCode} onClick={() => { setDiscountCode(''); setDiscount(null); setDiscountError(''); }}>Remove code</button></div>
+              <dl>
+                <div><dt>Original price</dt><dd>{discount.original}</dd></div>
+                <div><dt>Discount</dt><dd>−{discount.saved}</dd></div>
+                <div className={styles.discountTotal}><dt>Total</dt><dd>{discount.label}</dd></div>
+              </dl>
+              {discount.amount === 0 ? <small>No payment required. Continue to confirm your booking.</small> : null}
+            </div>
+          ) : null}
+          {discountError ? <p id="discount-error" className={styles.registrationError} role="alert">{discountError}</p> : null}
+        </div>
+      ) : null}
       <label className={styles.honeypot} aria-hidden="true">
         Website
         <input autoComplete="off" name="website" tabIndex={-1} type="text" />
@@ -209,7 +263,9 @@ export default function WorkshopRegistrationForm({
             ? 'Staging uses Stripe test mode. You will not be charged, and no confirmation email will be sent.'
             : 'This is a staging registration test. No confirmation email will be sent.'
           : isPaid
-            ? `You will be redirected to Stripe to pay ${priceLabel}. After payment, we will send confirmation, reminders, and related updates.`
+            ? discount?.amount === 0
+              ? 'You will be redirected to confirm your free booking. No payment details are needed.'
+              : `You will be redirected to Stripe to pay ${totalLabel}. After payment, we will send confirmation, reminders, and related updates.`
             : `By registering, you agree to receive emails about this ${productLabel}, including confirmation, reminders, and related updates.`}{' '}
         See our <a href="/privacy-policy">privacy policy</a>.
       </p>
@@ -220,16 +276,16 @@ export default function WorkshopRegistrationForm({
       ) : null}
       <button
         className={styles.registrationSubmit}
-        disabled={state === 'submitting'}
+        disabled={state === 'submitting' || checkingCode}
         type="submit"
       >
         {state === 'submitting' ? (
           <>
             <LoaderCircle className={styles.spinner} size={16} />
-            {isPaid ? 'Starting payment' : 'Registering'}
+            {isPaid ? 'Opening checkout' : 'Registering'}
           </>
         ) : isPaid ? (
-          `Continue to payment - ${priceLabel}`
+          discount?.amount === 0 ? 'Confirm free booking' : `Continue to payment - ${totalLabel}`
         ) : (
           'Confirm registration'
         )}
