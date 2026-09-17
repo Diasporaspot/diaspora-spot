@@ -5,7 +5,7 @@ export type DiscountCode = {
   type: 'percentage' | 'amount';
   value: number;
   startDate: string;
-  endMode: 'date' | 'event';
+  endMode: 'date' | 'event' | 'never';
   endDate?: string;
 };
 
@@ -42,9 +42,9 @@ export function quoteDiscount(product: DiscountProduct, input: unknown, now = ne
     const part = (type: string) => parts.find((item) => item.type === type)?.value;
     today = `${part('year')}-${part('month')}-${part('day')}`;
   } catch { throw new Error('The event timezone needs to be configured before this code can be used.'); }
-  const end = discount.endMode === 'event' ? product.date : discount.endDate;
+  const end = discount.endMode === 'never' ? '9999-12-31' : discount.endMode === 'event' ? product.date : discount.endDate;
   const validDate = (value: string | undefined) => Boolean(value && /^\d{4}-\d{2}-\d{2}$/.test(value) && Number.isFinite(Date.parse(value)) && new Date(value).toISOString().slice(0, 10) === value);
-  if (!validDate(discount.startDate) || !validDate(end) || !end || end < discount.startDate || !['date', 'event'].includes(discount.endMode)) throw new Error('This discount code is not configured correctly.');
+  if (!validDate(discount.startDate) || !validDate(end) || !end || end < discount.startDate || !['date', 'event', 'never'].includes(discount.endMode)) throw new Error('This discount code is not configured correctly.');
   if (today < discount.startDate) throw new Error('This discount code is not active yet.');
   if (today > end) throw new Error('This discount code has expired.');
   if (!Number.isFinite(discount.value) || discount.value <= 0 || !['percentage', 'amount'].includes(discount.type) || (discount.type === 'percentage' && discount.value > 100)) throw new Error('This discount code is not configured correctly.');

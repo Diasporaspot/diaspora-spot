@@ -132,3 +132,20 @@ Recommended GitHub branch protection:
 - Promoting the article to **Published** and publishing it makes it visible in production.
 - Staging pages output `noindex, nofollow`; production pages remain indexable.
 - A merge to `main` creates a Production deployment and keeps `diasporaspot.com` assigned to it.
+
+## Reusable member discounts
+
+In Sanity, create a **Member discount** with a code, percentage or fixed amount, start date,
+and either **No expiry date** or an end date. Choose all paid workshops or selected workshops.
+Fixed amounts apply only to the selected currency. Codes do not stack with event discounts.
+Use **Staging** for client testing; **Disabled** stops new uses. Codes must be unique across
+member discount documents; duplicate codes are rejected at checkout.
+
+The website checks the signed-in user's existing `has_active_membership_subscription()` rule
+both for previews and checkout: active or trialing subscriptions whose period has not ended.
+A free registration alone does not qualify. The booking email must match the signed-in account.
+This feature does not add subscription billing or student-status verification. Subscription
+records must be provisioned through the existing trusted membership administration workflow.
+
+Member codes take precedence over identical event codes, including when disabled, so an event
+code cannot bypass membership checks. Keep member codes distinct from ordinary event codes.
