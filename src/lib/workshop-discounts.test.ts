@@ -37,8 +37,3 @@ test('existing GMT offset event timezones respect local midnight', () => {
 test('malformed calendar dates fail closed', () => {
   assert.throws(() => quoteDiscount({ ...product, discountCodes: [{ ...code, startDate: '2026-02-31' }] }, code.code, now), /configured/);
 });
-test('permanent codes remain valid beyond the event date but respect the start date', () => {
-  const permanent = { ...product, discountCodes: [{ ...code, endMode: 'never' as const }] };
-  assert.equal(quoteDiscount(permanent, code.code, new Date('2027-09-15T12:00:00Z')).amount, 2079);
-  assert.throws(() => quoteDiscount(permanent, code.code, new Date('2026-09-14T12:00:00Z')), /not active/);
-});

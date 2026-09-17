@@ -39,7 +39,6 @@ export default function WorkshopRegistrationForm({
 
   const [discountCode, setDiscountCode] = useState('');
   const [discount, setDiscount] = useState<{ code: string; label: string; saved: string; original: string; amount: number } | null>(null);
-  const [signInRequired, setSignInRequired] = useState(false);
   const [checkingCode, setCheckingCode] = useState(false);
   const [discountError, setDiscountError] = useState('');
   const totalLabel = discount?.label || priceLabel;
@@ -47,7 +46,6 @@ export default function WorkshopRegistrationForm({
   async function applyCode() {
     setCheckingCode(true);
     setDiscountError('');
-    setSignInRequired(false);
     setDiscount(null);
     try {
       const response = await fetch('/api/workshops/discount', {
@@ -55,7 +53,7 @@ export default function WorkshopRegistrationForm({
         body: JSON.stringify({ slug, code: discountCode }),
       });
       const result = await response.json();
-      if (!response.ok) { setSignInRequired(Boolean(result.signInRequired)); throw new Error(result.error); }
+      if (!response.ok) throw new Error(result.error);
       const format = (amount: number) => new Intl.NumberFormat(undefined, { style: 'currency', currency: result.currency }).format(amount / 100);
       setDiscount({ code: result.code, label: format(result.amount), saved: format(result.discountAmount), original: format(result.originalAmount), amount: result.amount });
     } catch (error) { setDiscountError(error instanceof Error ? error.message : 'Unable to apply code.'); }
@@ -123,10 +121,9 @@ export default function WorkshopRegistrationForm({
           }),
         },
       );
-      const result = (await response.json()) as { error?: string; ok?: boolean; url?: string; signInRequired?: boolean };
+      const result = (await response.json()) as { error?: string; ok?: boolean; url?: string };
 
       if (!response.ok || !result.ok) {
-        setSignInRequired(Boolean(result.signInRequired));
         throw new Error(result.error || 'Registration failed.');
       }
 
@@ -253,7 +250,6 @@ export default function WorkshopRegistrationForm({
               {discount.amount === 0 ? <small>No payment required. Continue to confirm your booking.</small> : null}
             </div>
           ) : null}
-          {signInRequired ? <a href="/members" target="_blank" rel="noopener noreferrer">Sign in to your member account, then return here and apply your code.</a> : null}
           {discountError ? <p id="discount-error" className={styles.registrationError} role="alert">{discountError}</p> : null}
         </div>
       ) : null}

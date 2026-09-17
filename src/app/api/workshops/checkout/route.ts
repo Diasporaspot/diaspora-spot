@@ -1,4 +1,4 @@
-import { quoteRegistrationDiscount, MemberDiscountError } from '@/lib/member-discounts';
+import { quoteDiscount } from '@/lib/workshop-discounts';
 import {
   getProductCurrency,
   getProductRegistrationError,
@@ -108,8 +108,8 @@ export async function POST(request: Request) {
     }
 
     let quote;
-    try { quote = await quoteRegistrationDiscount(product, body.discountCode, input.email); }
-    catch (error) { return Response.json({ error: (error as Error).message, signInRequired: error instanceof MemberDiscountError && error.signInRequired }, { status: 400 }); }
+    try { quote = quoteDiscount(product, body.discountCode); }
+    catch (error) { return Response.json({ error: (error as Error).message }, { status: 400 }); }
     if (quote.code && body.expectedAmount !== quote.amount) {
       return Response.json({ error: 'The price or discount has changed. Remove and reapply your code to review the updated total.' }, { status: 409 });
     }
@@ -140,7 +140,6 @@ export async function POST(request: Request) {
       : '';
     const metaRequestContext = getMetaRequestContext(request);
     const metadata: Record<string, string> = {
-      ...(quote.memberId ? { memberId: quote.memberId } : {}),
       discountCode: quote.code,
       originalAmount: String(quote.originalAmount),
       discountAmount: String(quote.discountAmount),
