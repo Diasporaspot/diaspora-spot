@@ -51,6 +51,7 @@ const statusLabel = {
   'booking-open': 'Booking open',
   'few-spots': 'Few spots left',
   waitlist: 'Waitlist',
+  closed: 'Closed',
 };
 
 const formatWorkshopDate = (date: string) =>

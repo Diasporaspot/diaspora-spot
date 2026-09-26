@@ -92,6 +92,7 @@ export const workshopStatusLabel: Record<WorkshopStatus, string> = {
   'booking-open': 'Booking open',
   'few-spots': 'Few spots left',
   waitlist: 'Waitlist',
+  closed: 'Closed',
 };
 
 export const workshopSeriesStatusLabel: Record<WorkshopSeriesStatus, string> = {

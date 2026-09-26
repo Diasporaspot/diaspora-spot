@@ -995,6 +995,59 @@
   font-weight: 700;
 }
 
+.availabilityStatus {
+  align-items: flex-start;
+  border: 1px solid;
+  border-radius: 10px;
+  display: flex;
+  gap: 13px;
+  padding: 16px;
+}
+
+.availabilityStatus > div {
+  display: grid;
+  gap: 4px;
+}
+
+.availabilityStatus strong {
+  font-size: 15px;
+  line-height: 1.35;
+}
+
+.availabilityStatus span:not(.availabilityIcon) {
+  font-size: 12px;
+  line-height: 1.55;
+}
+
+.availabilityIcon {
+  align-items: center;
+  border-radius: 999px;
+  display: inline-flex;
+  flex: 0 0 38px;
+  height: 38px;
+  justify-content: center;
+}
+
+.availabilityOpen {
+  background: #e8f4ec;
+  border-color: #b8d9c3;
+  color: #1f6a3c;
+}
+
+.availabilityOpen .availabilityIcon {
+  background: #d2eadb;
+}
+
+.availabilityAttention {
+  background: #fff4d6;
+  border-color: #e4c96e;
+  color: #684f05;
+}
+
+.availabilityAttention .availabilityIcon {
+  background: #f7df91;
+}
+
 .registrationError {
   color: #a12828;
   font-weight: 700;

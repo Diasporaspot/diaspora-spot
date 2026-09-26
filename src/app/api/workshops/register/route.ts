@@ -1,3 +1,5 @@
+import { reserveSeats, CapacityError } from '@/lib/event-capacity';
+import { syncBooking } from '@/lib/event-mailing';
 import {
   getProductRegistrationError,
   getRegistrationProduct,
@@ -82,7 +84,9 @@ export async function POST(request: Request) {
       );
     }
 
-    await registerProductAttendee({
+    const booking = await reserveSeats(product, input, false);
+    if (booking) await syncBooking(booking, product);
+    else await registerProductAttendee({
       email: input.email,
       name: input.name,
       phone: input.phone,
@@ -117,6 +121,7 @@ export async function POST(request: Request) {
 
     return Response.json({ ok: true });
   } catch (reason) {
+    if (reason instanceof CapacityError) return Response.json({ error: reason.message, code: reason.code }, { status: 409 });
     console.error('Workshop registration failed.', reason);
     return Response.json(
       { error: 'We could not complete your registration. Please try again.' },

@@ -1,3 +1,4 @@
+import { reserveSeats, transitionBooking, CapacityError } from '@/lib/event-capacity';
 import { quoteDiscount } from '@/lib/workshop-discounts';
 import {
   getProductCurrency,
@@ -175,7 +176,10 @@ export async function POST(request: Request) {
         : {}),
     };
 
+    const booking = await reserveSeats(product, input, true);
+    if (booking) metadata.bookingId = booking.id;
     const session = await stripe.checkout.sessions.create({
+      ...(booking ? { expires_at: Math.floor(new Date(booking.expires_at).getTime() / 1000), payment_method_types: ['card'] as const } : {}),
       client_reference_id: product._id,
       customer_email: input.email,
       line_items: [
@@ -198,7 +202,8 @@ export async function POST(request: Request) {
       },
       success_url: successUrlString,
       cancel_url: cancelUrl.toString(),
-    });
+    }, booking ? { idempotencyKey: `booking:${booking.id}` } : undefined);
+    if (booking) await transitionBooking(booking.id, 'held', session.id);
 
     if (!session.url) {
       throw new Error('Stripe did not return a checkout URL.');
@@ -206,6 +211,7 @@ export async function POST(request: Request) {
 
     return Response.json({ ok: true, url: session.url });
   } catch (reason) {
+    if (reason instanceof CapacityError) return Response.json({ error: reason.message, code: reason.code }, { status: 409 });
     console.error('Workshop checkout failed.', reason);
     return Response.json(
       { error: 'We could not start payment. Please try again.' },

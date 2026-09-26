@@ -75,7 +75,7 @@ export type Article = {
   };
 };
 
-export type WorkshopStatus = 'booking-open' | 'few-spots' | 'waitlist';
+export type WorkshopStatus = 'booking-open' | 'few-spots' | 'waitlist' | 'closed';
 export type WorkshopPaymentType = 'free' | 'paid';
 export type WorkshopSeriesStatus = WorkshopStatus | 'closed';
 

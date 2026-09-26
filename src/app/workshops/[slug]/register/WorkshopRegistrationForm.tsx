@@ -1,7 +1,7 @@
 'use client';
 
 import { type FormEvent, useEffect, useState } from 'react';
-import { CheckCircle2, LoaderCircle } from 'lucide-react';
+import { CheckCircle2, CircleAlert, LoaderCircle, TicketCheck } from 'lucide-react';
 import {
   createMetaEventId,
   hasMetaAdvertisingConsent,
@@ -37,11 +37,50 @@ export default function WorkshopRegistrationForm({
     initialNotice === 'cancelled' ? 'Payment was cancelled. You can try again below.' : '',
   );
 
+  const [availability, setAvailability] = useState<{ full: boolean; closed: boolean; remaining: number | null } | null>(null);
+  const [availabilityError, setAvailabilityError] = useState('');
+  const [waitlisted, setWaitlisted] = useState(false);
+  const waitlist = availability?.full === true;
+  useEffect(() => {
+    let cancelled = false;
+    async function refresh() {
+      try {
+        const response = await fetch(`/api/workshops/availability?productType=${productType}&slug=${encodeURIComponent(slug)}`, { cache: 'no-store' });
+        const result = await response.json();
+        if (!response.ok) throw new Error(result.error);
+        if (!cancelled) { setAvailability(result); setAvailabilityError(''); }
+      } catch { if (!cancelled) setAvailabilityError('Availability could not be checked. Retrying shortly.'); }
+    }
+    void refresh();
+    const timer = setInterval(() => void refresh(), 15000);
+    return () => { cancelled = true; clearInterval(timer); };
+  }, [productType, slug]);
+
   const [discountCode, setDiscountCode] = useState('');
   const [discount, setDiscount] = useState<{ code: string; label: string; saved: string; original: string; amount: number } | null>(null);
   const [checkingCode, setCheckingCode] = useState(false);
   const [discountError, setDiscountError] = useState('');
   const totalLabel = discount?.label || priceLabel;
+  const availabilityTitle = availabilityError
+    ? 'We could not check availability'
+    : !availability
+      ? 'Checking availability…'
+      : availability.closed
+        ? 'Registration is closed'
+        : waitlist
+          ? 'This event is full — waiting list open'
+          : availability.remaining !== null
+            ? `${availability.remaining} ${availability.remaining === 1 ? 'seat' : 'seats'} available`
+            : 'Registration is open';
+  const availabilityMessage = availabilityError
+    ? 'We’ll keep trying. Please wait a moment before continuing.'
+    : waitlist
+      ? 'Join the waiting list and we’ll email you if a place becomes available. You won’t be charged and a seat is not reserved.'
+      : availability?.closed
+        ? 'This event is no longer accepting registrations.'
+        : availability
+          ? 'Complete the form below to reserve your place.'
+          : 'Please wait while we check the latest capacity.';
 
   async function applyCode() {
     setCheckingCode(true);
@@ -92,7 +131,7 @@ export default function WorkshopRegistrationForm({
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setError('');
-    if (discountCode.trim() && !discount) { setDiscountError('Apply or remove your discount code before continuing.'); return; }
+    if (!waitlist && discountCode.trim() && !discount) { setDiscountError('Apply or remove your discount code before continuing.'); return; }
     setState('submitting');
 
     const form = event.currentTarget;
@@ -103,7 +142,7 @@ export default function WorkshopRegistrationForm({
 
     try {
       const response = await fetch(
-        isPaid ? '/api/workshops/checkout' : '/api/workshops/register',
+        waitlist ? '/api/workshops/waitlist' : isPaid ? '/api/workshops/checkout' : '/api/workshops/register',
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -121,12 +160,15 @@ export default function WorkshopRegistrationForm({
           }),
         },
       );
-      const result = (await response.json()) as { error?: string; ok?: boolean; url?: string };
+      const result = (await response.json()) as { error?: string; code?: string; ok?: boolean; url?: string; waitlisted?: boolean };
 
+      if (result.code === 'full') setAvailability(current => ({ ...current!, full: true }));
+      if (result.code === 'available') setAvailability(current => ({ ...current!, full: false }));
       if (!response.ok || !result.ok) {
         throw new Error(result.error || 'Registration failed.');
       }
 
+      if (result.waitlisted) { setWaitlisted(true); setState('success'); return; }
       if (isPaid) {
         if (!result.url) {
           throw new Error('Payment could not be started. Please try again.');
@@ -158,6 +200,8 @@ export default function WorkshopRegistrationForm({
       setState('idle');
     }
   }
+
+  if (waitlisted) return <div className={styles.registrationSuccess} role="status"><CheckCircle2 size={26} /><div><strong>You’re on the waiting list.</strong><span>{isStaging ? 'Staging test saved. Email delivery is limited to approved test addresses.' : 'The team can email you if more places become available. No payment was taken and a seat is not reserved.'}</span></div></div>;
 
   if (state === 'success') {
     return (
@@ -202,6 +246,15 @@ export default function WorkshopRegistrationForm({
 
   return (
     <form className={styles.registrationForm} onSubmit={handleSubmit}>
+      <div className={`${styles.availabilityStatus} ${waitlist || availability?.closed || availabilityError ? styles.availabilityAttention : styles.availabilityOpen}`} role="status" aria-live="polite">
+        <span className={styles.availabilityIcon} aria-hidden="true">
+          {waitlist || availability?.closed || availabilityError ? <CircleAlert size={22} /> : <TicketCheck size={22} />}
+        </span>
+        <div>
+          <strong>{availabilityTitle}</strong>
+          <span>{availabilityMessage}</span>
+        </div>
+      </div>
       <div className={styles.registrationField}>
         <label htmlFor="registration-name">Full name</label>
         <input
@@ -225,7 +278,7 @@ export default function WorkshopRegistrationForm({
           type="email"
         />
       </div>
-      {isPaid && productType === 'workshop' ? (
+      {!waitlist && isPaid && productType === 'workshop' ? (
         <div className={styles.registrationField}>
           <label htmlFor="discount-code">Discount code (optional)</label>
           <div className={styles.discountInputRow}>
@@ -258,7 +311,7 @@ export default function WorkshopRegistrationForm({
         <input autoComplete="off" name="website" tabIndex={-1} type="text" />
       </label>
       <p className={styles.registrationNotice}>
-        {isStaging
+        {waitlist ? 'By joining, you agree to receive emails about availability for this event.' : isStaging
           ? isPaid
             ? 'Staging uses Stripe test mode. You will not be charged, and no confirmation email will be sent.'
             : 'This is a staging registration test. No confirmation email will be sent.'
@@ -276,15 +329,15 @@ export default function WorkshopRegistrationForm({
       ) : null}
       <button
         className={styles.registrationSubmit}
-        disabled={state === 'submitting' || checkingCode}
+        disabled={state === 'submitting' || checkingCode || !availability || Boolean(availabilityError) || availability.closed}
         type="submit"
       >
         {state === 'submitting' ? (
           <>
             <LoaderCircle className={styles.spinner} size={16} />
-            {isPaid ? 'Opening checkout' : 'Registering'}
+            {waitlist ? 'Joining waiting list' : isPaid ? 'Opening checkout' : 'Registering'}
           </>
-        ) : isPaid ? (
+        ) : waitlist ? 'Join waiting list' : isPaid ? (
           discount?.amount === 0 ? 'Confirm free booking' : `Continue to payment - ${totalLabel}`
         ) : (
           'Confirm registration'

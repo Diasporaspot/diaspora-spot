@@ -1,3 +1,4 @@
+import { EventOverview } from '../components/EventOverview';
 import { defineField, defineType } from 'sanity';
 import { UniqueFeaturedInput } from '../components/UniqueFeaturedInput';
 
@@ -5,6 +6,7 @@ const bookingStatusOptions = [
   { title: 'Booking open', value: 'booking-open' },
   { title: 'Few spots left', value: 'few-spots' },
   { title: 'Waitlist', value: 'waitlist' },
+  { title: 'Closed', value: 'closed' },
 ];
 
 const iconOptions = [
@@ -40,6 +42,8 @@ export const workshop = defineType({
   title: 'Workshop',
   type: 'document',
   fields: [
+    defineField({ name: 'eventOverview', title: 'Registration overview', type: 'string', readOnly: true, components: { input: EventOverview } }),
+    defineField({ name: 'capacity', title: 'Maximum attendees', type: 'number', description: 'Leave empty for unlimited places. Includes confirmed attendees and active checkouts. Series bookings also consume a place in each workshop.', validation: rule => rule.integer().min(0) }),
     defineField({
       name: 'status',
       title: 'Website visibility',

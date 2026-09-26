@@ -97,8 +97,7 @@ export default async function WorkshopSeriesPage({
   const canRegister =
     series.registrationReady &&
     !series.pricingConflict &&
-    series.salesStatus !== 'closed' &&
-    series.salesStatus !== 'waitlist';
+    series.salesStatus !== 'closed';
 
   return (
     <div className={styles.page}>

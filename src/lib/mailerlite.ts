@@ -159,3 +159,15 @@ export async function findOrCreateMailerLiteGroup(name: string) {
 
   return createBody.data;
 }
+
+export async function removeFromMailerLiteGroup(email: string, groupId: string) {
+  const subscriber = await fetch(`${MAILERLITE_SUBSCRIBERS_URL}/${encodeURIComponent(email)}`, { headers: { Authorization: `Bearer ${getApiKey()}` } });
+  if (subscriber.status === 404) return;
+  if (!subscriber.ok) throw new Error(await parseMailerLiteError(subscriber));
+  const body = await subscriber.json() as { data?: { id?: string } };
+  if (!body.data?.id) throw new Error('MailerLite subscriber lookup failed.');
+  const response = await fetch(`${MAILERLITE_SUBSCRIBERS_URL}/${body.data.id}/groups/${encodeURIComponent(groupId)}`, {
+    method: 'DELETE', headers: { Authorization: `Bearer ${getApiKey()}` },
+  });
+  if (!response.ok && response.status !== 404) throw new Error(await parseMailerLiteError(response));
+}

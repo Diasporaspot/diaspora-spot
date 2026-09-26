@@ -26,6 +26,7 @@ export type {
 } from '@/lib/workshop-registration-core';
 
 export type RegistrationWorkshop = {
+  capacity?: number;
   date?: string;
   timezone?: string;
   discountCodes?: import('./workshop-discounts').DiscountCode[];
@@ -51,6 +52,7 @@ export type RegistrationProduct = Omit<RegistrationWorkshop, '_type'> & {
 
 const registrationProductFields = `
   _id,
+  capacity,
   _type,
   status,
   title,
@@ -140,9 +142,6 @@ export function getProductRegistrationError(product: RegistrationProduct | null)
     return { message: 'Registration for this series is closed.', status: 409 };
   }
 
-  if (product._type === 'workshopSeries' && product.salesStatus === 'waitlist') {
-    return { message: 'This series is currently on a waitlist.', status: 409 };
-  }
 
   if (product._type === 'workshopSeries' && hasSeriesPricingConflict(product)) {
     return {
@@ -173,7 +172,6 @@ export function getProductRegistrationError(product: RegistrationProduct | null)
       (workshop) =>
         !workshop.status ||
         !visibleStatuses.includes(workshop.status) ||
-        (workshop.bookingStatus === 'waitlist' && !product.allowWaitlistedWorkshops) ||
         (!isStaging &&
           (!workshop.mailerLiteGroupId || workshop.mailerLiteProvisioningStatus !== 'ready')),
     );
