@@ -4,9 +4,7 @@ import { UniqueFeaturedInput } from '../components/UniqueFeaturedInput';
 
 const bookingStatusOptions = [
   { title: 'Booking open', value: 'booking-open' },
-  { title: 'Few spots left', value: 'few-spots' },
-  { title: 'Waitlist', value: 'waitlist' },
-  { title: 'Closed', value: 'closed' },
+  { title: 'Registration closed', value: 'closed' },
 ];
 
 const iconOptions = [
@@ -43,7 +41,7 @@ export const workshop = defineType({
   type: 'document',
   fields: [
     defineField({ name: 'eventOverview', title: 'Registration overview', type: 'string', readOnly: true, components: { input: EventOverview } }),
-    defineField({ name: 'capacity', title: 'Maximum attendees', type: 'number', description: 'Leave empty for unlimited places. Includes confirmed attendees and active checkouts. Series bookings also consume a place in each workshop.', validation: rule => rule.integer().min(0) }),
+    defineField({ name: 'capacity', title: 'Maximum attendees', type: 'number', description: 'Leave empty for unlimited places. The website automatically shows places available, few places left, or waiting list. Confirmed attendees and active checkouts count toward this limit.', validation: rule => rule.integer().min(0) }),
     defineField({
       name: 'status',
       title: 'Website visibility',
@@ -142,17 +140,11 @@ export const workshop = defineType({
       validation: (rule) => rule.required(),
     }),
     defineField({
-      name: 'spotsLabel',
-      title: 'Availability note',
-      type: 'string',
-      description: 'Example: 18 spots, 4 spots left, Waitlist open',
-      validation: (rule) => rule.required(),
-    }),
-    defineField({
       name: 'bookingStatus',
-      title: 'Booking status',
+      title: 'Registration control',
       type: 'string',
       initialValue: 'booking-open',
+      description: 'Leave registration open to let capacity control availability automatically. Choose closed only when registrations must stop regardless of available places.',
       options: {
         list: bookingStatusOptions,
         layout: 'dropdown',

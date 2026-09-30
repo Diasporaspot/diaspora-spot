@@ -141,7 +141,7 @@ type SanityWorkshop = {
   duration?: string;
   format?: string;
   host?: string;
-  spotsLabel?: string;
+  capacity?: number | null;
   bookingStatus?: WorkshopStatus;
   paymentType?: WorkshopPaymentType;
   price?: number;
@@ -404,8 +404,9 @@ function normalizeWorkshop(workshop: SanityWorkshop): Workshop {
     duration: workshop.duration ?? '',
     format: workshop.format ?? '',
     host: workshop.host ?? '',
-    spotsLabel: workshop.spotsLabel ?? '',
-    bookingStatus: workshop.bookingStatus ?? 'booking-open',
+    capacity: workshop.capacity ?? null,
+    spotsLabel: 'Checking availability',
+    bookingStatus: workshop.bookingStatus === 'closed' ? 'closed' : 'booking-open',
     paymentType: workshop.paymentType ?? 'free',
     price: workshop.price ?? 0,
     currency: workshop.currency ?? 'usd',
@@ -416,6 +417,70 @@ function normalizeWorkshop(workshop: SanityWorkshop): Workshop {
     featured: workshop.featured ?? false,
     series: workshop.series,
   };
+}
+
+function automaticAvailabilityLabel(remaining: number | null, closed: boolean) {
+  if (closed) return 'Registration closed';
+  if (remaining === null) return 'Places available';
+  if (remaining === 0) return 'Waiting list open';
+  return remaining === 1 ? '1 place left' : `${remaining} places left`;
+}
+
+async function addAutomaticWorkshopAvailability(source: Workshop[]) {
+  if (!source.length) return source;
+
+  try {
+    const { capacityEnabled, canonicalId, eventDatabase } = await import('@/lib/event-capacity');
+    if (!capacityEnabled()) {
+      return source.map((workshop) => ({
+        ...workshop,
+        spotsLabel: automaticAvailabilityLabel(workshop.capacity, workshop.bookingStatus === 'closed'),
+      }));
+    }
+
+    const ids = source.map((workshop) => canonicalId(workshop._id));
+    const { data, error } = await eventDatabase().rpc('event_capacity_counts', {
+      p_environment: getSiteEnvironment(),
+      p_event_ids: ids,
+    });
+    if (error) throw error;
+
+    const counts = new Map(
+      ((data || []) as Array<{ event_id: string; confirmed: number; held: number }>).map((row) => [
+        row.event_id,
+        row.confirmed + row.held,
+      ]),
+    );
+
+    return source.map((workshop) => {
+      const closed = workshop.bookingStatus === 'closed';
+      const remaining = workshop.capacity === null
+        ? null
+        : Math.max(0, workshop.capacity - (counts.get(canonicalId(workshop._id)) || 0));
+      const fewPlacesThreshold = workshop.capacity === null
+        ? 0
+        : Math.max(3, Math.ceil(workshop.capacity * 0.2));
+      const bookingStatus: WorkshopStatus = closed
+        ? 'closed'
+        : remaining === 0
+          ? 'waitlist'
+          : remaining !== null && remaining <= fewPlacesThreshold
+            ? 'few-spots'
+            : 'booking-open';
+
+      return {
+        ...workshop,
+        bookingStatus,
+        spotsLabel: automaticAvailabilityLabel(remaining, closed),
+      };
+    });
+  } catch (error) {
+    console.warn('Live workshop availability could not be loaded.', error);
+    return source.map((workshop) => ({
+      ...workshop,
+      spotsLabel: workshop.bookingStatus === 'closed' ? 'Registration closed' : 'Check availability',
+    }));
+  }
 }
 
 function normalizeWorkshopSeries(series: SanityWorkshopSeries): WorkshopSeries {
@@ -598,12 +663,14 @@ export async function getUpcomingWorkshops() {
       getContentFetchOptions(),
     );
 
-    return sanityWorkshops.map(normalizeWorkshop);
+    return addAutomaticWorkshopAvailability(sanityWorkshops.map(normalizeWorkshop));
   } catch (error) {
     console.warn('Sanity workshop fetch failed, falling back to local dummy data.', error);
   }
 
-  return workshops.filter((workshop) => workshop.status === 'published').sort(byDateAsc);
+  return addAutomaticWorkshopAvailability(
+    workshops.filter((workshop) => workshop.status === 'published').sort(byDateAsc),
+  );
 }
 
 export async function getPublishedWorkshopSeries() {
@@ -614,7 +681,15 @@ export async function getPublishedWorkshopSeries() {
       getContentFetchOptions(),
     );
 
-    return series.map(normalizeWorkshopSeries);
+    const normalized = series.map(normalizeWorkshopSeries);
+    const enrichedWorkshops = await addAutomaticWorkshopAvailability(
+      normalized.flatMap((item) => item.workshops),
+    );
+    const byId = new Map(enrichedWorkshops.map((workshop) => [workshop._id, workshop]));
+    return normalized.map((item) => ({
+      ...item,
+      workshops: item.workshops.map((workshop) => byId.get(workshop._id) || workshop),
+    }));
   } catch (error) {
     console.warn('Sanity workshop series fetch failed.', error);
     return [];
@@ -629,7 +704,12 @@ export async function getWorkshopSeriesBySlug(slug: string) {
       getContentFetchOptions(),
     );
 
-    return series ? normalizeWorkshopSeries(series) : null;
+    if (!series) return null;
+    const normalized = normalizeWorkshopSeries(series);
+    return {
+      ...normalized,
+      workshops: await addAutomaticWorkshopAvailability(normalized.workshops),
+    };
   } catch (error) {
     console.warn('Sanity workshop series fetch failed.', error);
     return null;

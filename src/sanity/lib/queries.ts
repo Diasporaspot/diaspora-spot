@@ -55,7 +55,7 @@ const workshopFields = `
   duration,
   format,
   host,
-  spotsLabel,
+  capacity,
   bookingStatus,
   paymentType,
   price,
@@ -107,10 +107,6 @@ const workshopSeriesProjection = `{
       @->status in $workshopStatuses &&
       (!defined(@->mailerLiteGroupId) || @->mailerLiteProvisioningStatus != "ready")
     ]) == 0 &&
-    (
-      allowWaitlistedWorkshops == true ||
-      count(workshops[@->status in $workshopStatuses && @->bookingStatus == "waitlist"]) == 0
-    ) &&
     (
       paymentType == "paid" ||
       count(workshops[@->status in $workshopStatuses && @->paymentType == "paid"]) == 0

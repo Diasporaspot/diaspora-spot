@@ -114,6 +114,7 @@ export type Workshop = {
   duration: string;
   format: string;
   host: string;
+  capacity: number | null;
   spotsLabel: string;
   bookingStatus: WorkshopStatus;
   paymentType: WorkshopPaymentType;

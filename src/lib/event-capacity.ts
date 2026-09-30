@@ -25,7 +25,6 @@ export function eventRequirements(product: RegistrationProduct) {
   return [product, ...product.workshops].map((event) => ({
     id: canonicalId(event._id), capacity: event.capacity ?? null,
     closed: event.bookingStatus === 'closed' || ('salesStatus' in event && event.salesStatus === 'closed'),
-    waitlist: event.bookingStatus === 'waitlist' || ('salesStatus' in event && event.salesStatus === 'waitlist'),
   }));
 }
 export async function transitionBooking(id: string, state: Booking['state'], sessionId: string | null) {
@@ -69,10 +68,9 @@ export async function reconcileHolds() {
 export async function getAvailability(product: RegistrationProduct) {
   const events = eventRequirements(product);
   const manualClosed = events.some(e => e.closed);
-  const manualWaitlist = events.some(e => e.waitlist);
   if (!capacityEnabled()) {
     if (events.some(e => e.capacity !== null)) throw new Error('Capacity tracking is not enabled.');
-    return { closed: manualClosed, full: manualWaitlist, remaining: null, confirmed: 0, held: 0 };
+    return { closed: manualClosed, full: false, remaining: null, confirmed: 0, held: 0 };
   }
   await reconcileHolds();
   const { data, error } = await eventDatabase().rpc('event_capacity_counts', { p_environment: getSiteEnvironment(), p_event_ids: events.map(e => e.id) });
@@ -84,7 +82,7 @@ export async function getAvailability(product: RegistrationProduct) {
   });
   const own = counts.find(c => c.event_id === canonicalId(product._id))!;
   return {
-    closed: manualClosed, full: manualWaitlist || remaining.some(n => n === 0),
+    closed: manualClosed, full: remaining.some(n => n === 0),
     remaining: remaining.length ? Math.min(...remaining) : null,
     confirmed: own.confirmed, held: own.held, waitingCount: own.waiting,
   };
