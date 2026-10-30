@@ -56,6 +56,7 @@ const workshopFields = `
   format,
   host,
   capacity,
+  hasExistingRegistrations,
   existingRegistrations,
   requireGender,
   bookingStatus,

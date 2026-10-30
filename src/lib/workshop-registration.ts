@@ -27,6 +27,7 @@ export type {
 
 export type RegistrationWorkshop = {
   capacity?: number;
+  hasExistingRegistrations?: boolean;
   existingRegistrations?: number;
   requireGender?: boolean;
   date?: string;
@@ -55,6 +56,7 @@ export type RegistrationProduct = Omit<RegistrationWorkshop, '_type'> & {
 const registrationProductFields = `
   _id,
   capacity,
+  hasExistingRegistrations,
   existingRegistrations,
   requireGender,
   _type,

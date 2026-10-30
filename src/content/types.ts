@@ -115,6 +115,7 @@ export type Workshop = {
   format: string;
   host: string;
   capacity: number | null;
+  hasExistingRegistrations: boolean;
   existingRegistrations: number;
   requireGender: boolean;
   spotsLabel: string;

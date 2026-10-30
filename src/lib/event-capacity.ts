@@ -24,7 +24,7 @@ export type Booking = {
 export function eventRequirements(product: RegistrationProduct) {
   return [product, ...product.workshops].map((event) => ({
     id: canonicalId(event._id), capacity: event.capacity ?? null,
-    existingRegistrations: event.existingRegistrations ?? 0,
+    existingRegistrations: event.hasExistingRegistrations ? (event.existingRegistrations ?? 0) : 0,
     closed: event.bookingStatus === 'closed' || ('salesStatus' in event && event.salesStatus === 'closed'),
   }));
 }
@@ -85,7 +85,7 @@ export async function getAvailability(product: RegistrationProduct) {
   return {
     closed: manualClosed, full: remaining.some(n => n === 0),
     remaining: remaining.length ? Math.min(...remaining) : null,
-    confirmed: own.confirmed + (product.existingRegistrations ?? 0), held: own.held, waitingCount: own.waiting,
+    confirmed: own.confirmed + (product.hasExistingRegistrations ? (product.existingRegistrations ?? 0) : 0), held: own.held, waitingCount: own.waiting,
   };
 }
 export class CapacityError extends Error {

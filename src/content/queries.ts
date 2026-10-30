@@ -142,6 +142,7 @@ type SanityWorkshop = {
   format?: string;
   host?: string;
   capacity?: number | null;
+  hasExistingRegistrations?: boolean;
   existingRegistrations?: number;
   requireGender?: boolean;
   bookingStatus?: WorkshopStatus;
@@ -407,6 +408,7 @@ function normalizeWorkshop(workshop: SanityWorkshop): Workshop {
     format: workshop.format ?? '',
     host: workshop.host ?? '',
     capacity: workshop.capacity ?? null,
+    hasExistingRegistrations: workshop.hasExistingRegistrations ?? false,
     existingRegistrations: workshop.existingRegistrations ?? 0,
     requireGender: workshop.requireGender ?? false,
     spotsLabel: 'Checking availability',
@@ -460,7 +462,7 @@ async function addAutomaticWorkshopAvailability(source: Workshop[]) {
       const closed = workshop.bookingStatus === 'closed';
       const remaining = workshop.capacity === null
         ? null
-        : Math.max(0, workshop.capacity - workshop.existingRegistrations - (counts.get(canonicalId(workshop._id)) || 0));
+        : Math.max(0, workshop.capacity - (workshop.hasExistingRegistrations ? workshop.existingRegistrations : 0) - (counts.get(canonicalId(workshop._id)) || 0));
       const fewPlacesThreshold = workshop.capacity === null
         ? 0
         : Math.max(3, Math.ceil(workshop.capacity * 0.2));
