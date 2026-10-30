@@ -43,7 +43,8 @@ export const workshop = defineType({
     defineField({ name: 'eventOverview', title: 'Registration overview', type: 'string', readOnly: true, components: { input: EventOverview } }),
     defineField({ name: 'capacity', title: 'Maximum attendees', type: 'number', description: 'Leave empty for unlimited places. The website automatically shows places available, few places left, or waiting list. Confirmed attendees and active checkouts count toward this limit.', validation: rule => rule.integer().min(0) }),
     defineField({ name: 'existingRegistrations', title: 'People already registered', type: 'number', initialValue: 0, description: 'For an existing event, enter how many people registered before capacity tracking was switched on. They will count toward the maximum attendance.', validation: rule => rule.integer().min(0) }),
-    defineField({ name: 'requireGender', title: 'Ask for gender during registration', type: 'boolean', initialValue: false, description: 'Turn this on only for events where attendees must select male or female before registering.' }),
+    defineField({ name: 'requireGender', title: 'Require gender selection', type: 'boolean', initialValue: false, description: 'Turn this on to add a required Female or Male choice to this event’s registration and waiting-list forms.' }),
+    defineField({ name: 'spotsLabel', title: 'Old availability label', type: 'string', readOnly: true, hidden: true, description: 'Kept only so older workshop records remain compatible. Availability text is now calculated automatically.' }),
     defineField({
       name: 'status',
       title: 'Website visibility',
