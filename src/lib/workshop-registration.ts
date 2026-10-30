@@ -2,7 +2,7 @@ import 'server-only';
 
 import { subscribeToMailerLite } from '@/lib/mailerlite';
 import { sanityClient } from '@/sanity/lib/client';
-import { hasSeriesPricingConflict } from '@/lib/workshop-registration-core';
+import { hasSeriesPricingConflict, validateGenderRequirement } from '@/lib/workshop-registration-core';
 import { getSiteEnvironment, getVisibleWorkshopStatuses } from '@/lib/site-environment';
 import type {
   RegistrationProductType,
@@ -27,6 +27,8 @@ export type {
 
 export type RegistrationWorkshop = {
   capacity?: number;
+  existingRegistrations?: number;
+  requireGender?: boolean;
   date?: string;
   timezone?: string;
   discountCodes?: import('./workshop-discounts').DiscountCode[];
@@ -53,6 +55,8 @@ export type RegistrationProduct = Omit<RegistrationWorkshop, '_type'> & {
 const registrationProductFields = `
   _id,
   capacity,
+  existingRegistrations,
+  requireGender,
   _type,
   status,
   title,
@@ -185,6 +189,14 @@ export function getProductRegistrationError(product: RegistrationProduct | null)
   }
 
   return null;
+}
+
+export function getProductRegistrationInputError(
+  product: RegistrationProduct,
+  input: import('./workshop-registration-core').RegistrationInput,
+) {
+  const genderRequired = product.requireGender || product.workshops.some((workshop) => workshop.requireGender);
+  return validateGenderRequirement(genderRequired, input.gender);
 }
 
 async function registerAttendeeWithGroups({

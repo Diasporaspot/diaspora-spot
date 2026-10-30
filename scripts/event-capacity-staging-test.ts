@@ -24,7 +24,7 @@ async function main() {
   assert.equal(failedSeries.error,'full');
   const partial = await db.from('event_seats').select('*').eq('event_id',event('two').id);
   assert.equal(partial.data?.length,0,'Failed series purchase must reserve no partial seats');
-  const waiting = await Promise.all(Array.from({length:5},()=>db.rpc('join_event_waitlist',{p_environment:'staging',p_product_id:event('one').id,p_product_type:'workshop',p_email:'wait@example.invalid',p_name:'Waitlist QA',p_phone:'',p_events:[event('one')]})));
+  const waiting = await Promise.all(Array.from({length:5},()=>db.rpc('join_event_waitlist',{p_environment:'staging',p_product_id:event('one').id,p_product_type:'workshop',p_email:'wait@example.invalid',p_name:'Waitlist QA',p_phone:'',p_events:[event('one')],p_data:{gender:'female'}})));
   waiting.forEach(r=>assert.ifError(r.error)); assert.equal(new Set(waiting.map(r=>r.data.id)).size,1,'Waitlist joins are idempotent');
   const confirmation = await db.rpc('transition_event_booking',{p_environment:'staging',p_id:winner.id,p_state:'confirmed',p_session_id:'cs_test_'+prefix});
   assert.ifError(confirmation.error);

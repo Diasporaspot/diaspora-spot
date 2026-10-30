@@ -9,6 +9,7 @@ export type RegistrationProductType = 'series' | 'workshop';
 
 export type RegistrationInput = {
   email: string;
+  gender: 'female' | 'male' | '';
   name: string;
   phone: string;
   productType: RegistrationProductType;
@@ -47,6 +48,7 @@ const ZERO_DECIMAL_CURRENCIES = new Set([
 
 export function normalizeRegistrationInput(input: {
   email?: unknown;
+  gender?: unknown;
   name?: unknown;
   phone?: unknown;
   productType?: unknown;
@@ -55,6 +57,7 @@ export function normalizeRegistrationInput(input: {
 }): RegistrationInput {
   return {
     email: typeof input.email === 'string' ? input.email.trim().toLowerCase() : '',
+    gender: input.gender === 'female' || input.gender === 'male' ? input.gender : '',
     name: typeof input.name === 'string' ? input.name.trim() : '',
     phone: normalizeInternationalPhoneNumber(input.phone),
     productType: input.productType === 'series' ? 'series' : 'workshop',
@@ -91,6 +94,10 @@ export function validateRegistrationInput({
   }
 
   return '';
+}
+
+export function validateGenderRequirement(required: boolean, gender: RegistrationInput['gender']) {
+  return required && !gender ? 'Select your gender.' : '';
 }
 
 export function isPaidProduct(product: PricedProduct) {

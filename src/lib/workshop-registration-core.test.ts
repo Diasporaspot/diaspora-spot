@@ -6,6 +6,7 @@ import {
   hasSeriesPricingConflict,
   isPaidProduct,
   normalizeRegistrationInput,
+  validateGenderRequirement,
   validateRegistrationInput,
 } from './workshop-registration-core';
 import { getWorkshopSeriesPricingComparison } from './workshop-series-pricing';
@@ -15,6 +16,7 @@ describe('workshop registration input', () => {
     assert.deepEqual(
       normalizeRegistrationInput({
         email: ' Person@Example.com ',
+        gender: 'female',
         name: ' Ada Lovelace ',
         phone: ' +44 7911 123456 ',
         productType: 'series',
@@ -23,6 +25,7 @@ describe('workshop registration input', () => {
       }),
       {
         email: 'person@example.com',
+        gender: 'female',
         name: 'Ada Lovelace',
         phone: '+447911123456',
         productType: 'series',
@@ -36,10 +39,17 @@ describe('workshop registration input', () => {
     assert.equal(normalizeRegistrationInput({ productType: 'bundle' }).productType, 'workshop');
   });
 
+  it('requires gender only when the selected workshop needs it', () => {
+    assert.equal(validateGenderRequirement(true, ''), 'Select your gender.');
+    assert.equal(validateGenderRequirement(true, 'female'), '');
+    assert.equal(validateGenderRequirement(false, ''), '');
+  });
+
   it('validates the required registration fields', () => {
     assert.equal(
       validateRegistrationInput({
         email: 'person@example.com',
+        gender: '',
         name: 'Ada Lovelace',
         phone: '',
         productType: 'series',
@@ -51,6 +61,7 @@ describe('workshop registration input', () => {
     assert.equal(
       validateRegistrationInput({
         email: 'not-an-email',
+        gender: '',
         name: 'Ada Lovelace',
         phone: '',
         productType: 'workshop',
@@ -62,6 +73,7 @@ describe('workshop registration input', () => {
     assert.equal(
       validateRegistrationInput({
         email: 'person@example.com',
+        gender: '',
         name: 'Ada Lovelace',
         phone: '',
         productType: 'workshop',
@@ -73,6 +85,7 @@ describe('workshop registration input', () => {
     assert.equal(
       validateRegistrationInput({
         email: 'person@example.com',
+        gender: '',
         name: 'Ada Lovelace',
         phone: '07700 900123',
         productType: 'workshop',

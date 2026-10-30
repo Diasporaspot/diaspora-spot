@@ -115,6 +115,8 @@ export type Workshop = {
   format: string;
   host: string;
   capacity: number | null;
+  existingRegistrations: number;
+  requireGender: boolean;
   spotsLabel: string;
   bookingStatus: WorkshopStatus;
   paymentType: WorkshopPaymentType;

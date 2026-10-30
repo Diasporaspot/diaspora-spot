@@ -2,6 +2,7 @@ import { reserveSeats, CapacityError } from '@/lib/event-capacity';
 import { syncBooking } from '@/lib/event-mailing';
 import {
   getProductRegistrationError,
+  getProductRegistrationInputError,
   getRegistrationProduct,
   isPaidProduct,
   normalizeRegistrationInput,
@@ -18,6 +19,7 @@ import { sendMetaConversionSafely } from '@/lib/meta-conversions';
 
 type RegistrationBody = {
   email?: unknown;
+  gender?: unknown;
   metaEventId?: unknown;
   metaEventSourceUrl?: unknown;
   name?: unknown;
@@ -76,6 +78,9 @@ export async function POST(request: Request) {
         { status: registrationError?.status || 404 },
       );
     }
+
+    const productInputError = getProductRegistrationInputError(product, input);
+    if (productInputError) return Response.json({ error: productInputError }, { status: 400 });
 
     if (isPaidProduct(product)) {
       return Response.json(

@@ -168,6 +168,7 @@ export default async function WorkshopRegistrationPage({
                     initialNotice={paymentResult.notice}
                     isPaid={workshop.paymentType === 'paid'}
                     isStaging={getSiteEnvironment() === 'staging'}
+                    requireGender={workshop.requireGender}
                     priceLabel={priceLabel}
                     productLabel="workshop"
                     productType="workshop"

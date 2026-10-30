@@ -19,11 +19,12 @@ export type Booking = {
   email: string; name: string; phone: string; state: 'held' | 'confirmed' | 'released';
   session_id: string | null; expires_at: string; created_at: string;
   sync_status: string; sync_error?: string;
-  registration_data: { smsMarketingConsent?: boolean; smsConsentAt?: string };
+  registration_data: { gender?: 'female' | 'male'; smsMarketingConsent?: boolean; smsConsentAt?: string };
 };
 export function eventRequirements(product: RegistrationProduct) {
   return [product, ...product.workshops].map((event) => ({
     id: canonicalId(event._id), capacity: event.capacity ?? null,
+    existingRegistrations: event.existingRegistrations ?? 0,
     closed: event.bookingStatus === 'closed' || ('salesStatus' in event && event.salesStatus === 'closed'),
   }));
 }
@@ -78,13 +79,13 @@ export async function getAvailability(product: RegistrationProduct) {
   const counts = data as Array<{ event_id: string; confirmed: number; held: number; waiting: number }>;
   const remaining = events.filter(e => e.capacity !== null).map(e => {
     const count = counts.find(c => c.event_id === e.id)!;
-    return Math.max(0, e.capacity! - count.confirmed - count.held);
+    return Math.max(0, e.capacity! - e.existingRegistrations - count.confirmed - count.held);
   });
   const own = counts.find(c => c.event_id === canonicalId(product._id))!;
   return {
     closed: manualClosed, full: remaining.some(n => n === 0),
     remaining: remaining.length ? Math.min(...remaining) : null,
-    confirmed: own.confirmed, held: own.held, waitingCount: own.waiting,
+    confirmed: own.confirmed + (product.existingRegistrations ?? 0), held: own.held, waitingCount: own.waiting,
   };
 }
 export class CapacityError extends Error {
@@ -101,7 +102,7 @@ export async function reserveSeats(product: RegistrationProduct, input: Registra
     p_environment: getSiteEnvironment(), p_product_id: canonicalId(product._id), p_product_type: input.productType,
     p_email: input.email, p_name: input.name, p_phone: input.phone,
     p_events: eventRequirements(product), p_paid: paid,
-    p_data: { smsMarketingConsent: input.smsMarketingConsent, smsConsentAt: input.smsMarketingConsent ? new Date().toISOString() : undefined },
+    p_data: { gender: input.gender || undefined, smsMarketingConsent: input.smsMarketingConsent, smsConsentAt: input.smsMarketingConsent ? new Date().toISOString() : undefined },
   });
   if (error) throw error;
   if (data.error) throw new CapacityError(data.error);

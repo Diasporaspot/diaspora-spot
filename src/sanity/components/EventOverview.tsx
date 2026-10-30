@@ -11,6 +11,8 @@ type Overview = {
   waitingCount: number;
   emailUpdateIssues: number;
   full: boolean;
+  genderRequired: boolean;
+  genderBreakdown: { confirmedFemale: number; confirmedMale: number; waitingFemale: number; waitingMale: number };
   closed: boolean;
   group: { group_id: string; group_name: string } | null;
   updatedAt: string;
@@ -112,6 +114,17 @@ export function EventOverview() {
               text="Connect waitlist to MailerLite" tone="primary" />}
         </Flex>
       </Card>
+
+      {data.genderRequired ? <Card border padding={3} radius={2}><Stack space={3}>
+        <Text size={1} weight="semibold">Gender summary</Text>
+        <Grid columns={[2, 2, 4]} gap={3}>
+          <Metric label="Registered women" value={data.genderBreakdown.confirmedFemale} />
+          <Metric label="Registered men" value={data.genderBreakdown.confirmedMale} />
+          <Metric label="Waiting women" value={data.genderBreakdown.waitingFemale} />
+          <Metric label="Waiting men" value={data.genderBreakdown.waitingMale} />
+        </Grid>
+        <Text muted size={1}>This summary includes registrations received after the gender question was enabled.</Text>
+      </Stack></Card> : null}
 
       {data.emailUpdateIssues > 0 ? <Card padding={3} radius={2} tone="critical"><Flex align="center" gap={3}
         justify="space-between" wrap="wrap"><Stack space={2}>

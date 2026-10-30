@@ -18,6 +18,7 @@ type WorkshopRegistrationFormProps = {
   priceLabel: string;
   productLabel?: string;
   productType?: 'series' | 'workshop';
+  requireGender?: boolean;
   slug: string;
 };
 
@@ -30,6 +31,7 @@ export default function WorkshopRegistrationForm({
   priceLabel,
   productLabel = 'workshop',
   productType = 'workshop',
+  requireGender = false,
   slug,
 }: WorkshopRegistrationFormProps) {
   const [state, setState] = useState<'idle' | 'submitting' | 'success'>('idle');
@@ -150,6 +152,7 @@ export default function WorkshopRegistrationForm({
             discountCode: discount?.code,
             expectedAmount: discount?.amount,
             email: formData.get('email'),
+            gender: formData.get('gender'),
             name: formData.get('name'),
             productType,
             slug,
@@ -278,6 +281,16 @@ export default function WorkshopRegistrationForm({
           type="email"
         />
       </div>
+      {requireGender ? (
+        <div className={styles.registrationField}>
+          <label htmlFor="registration-gender">Gender</label>
+          <select defaultValue="" id="registration-gender" name="gender" required>
+            <option disabled value="">Select gender</option>
+            <option value="female">Female</option>
+            <option value="male">Male</option>
+          </select>
+        </div>
+      ) : null}
       {!waitlist && isPaid && productType === 'workshop' ? (
         <div className={styles.registrationField}>
           <label htmlFor="discount-code">Discount code (optional)</label>

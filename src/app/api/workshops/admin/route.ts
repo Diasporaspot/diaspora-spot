@@ -48,15 +48,30 @@ async function handle(request: Request) {
       } else return Response.json({ error: 'Unknown action' }, { status: 400, headers });
     }
     const availability = await getAvailability(product);
-    const [bookingIssues, waitlistIssues, group] = await Promise.all([
+    const genderRequired = Boolean(product.requireGender || product.workshops.some((workshop) => workshop.requireGender));
+    const [bookingIssues, waitlistIssues, group, femaleBookings, maleBookings, femaleWaiting, maleWaiting] = await Promise.all([
       db.from('event_bookings').select('*', { count: 'exact', head: true }).eq('environment', environment)
         .eq('product_id', id).eq('state', 'confirmed').eq('sync_status', 'failed'),
       db.from('event_waitlist').select('*', { count: 'exact', head: true }).eq('environment', environment)
         .eq('product_id', id).eq('sync_status', 'failed'),
       db.from('event_mailer_groups').select('group_id,group_name').eq('environment',environment).eq('product_id',id).maybeSingle(),
+      db.from('event_bookings').select('*', { count: 'exact', head: true }).eq('environment', environment)
+        .eq('product_id', id).eq('state', 'confirmed').contains('registration_data', { gender: 'female' }),
+      db.from('event_bookings').select('*', { count: 'exact', head: true }).eq('environment', environment)
+        .eq('product_id', id).eq('state', 'confirmed').contains('registration_data', { gender: 'male' }),
+      db.from('event_waitlist').select('*', { count: 'exact', head: true }).eq('environment', environment)
+        .eq('product_id', id).eq('state', 'waiting').contains('registration_data', { gender: 'female' }),
+      db.from('event_waitlist').select('*', { count: 'exact', head: true }).eq('environment', environment)
+        .eq('product_id', id).eq('state', 'waiting').contains('registration_data', { gender: 'male' }),
     ]);
-    if (bookingIssues.error || waitlistIssues.error || group.error) throw bookingIssues.error || waitlistIssues.error || group.error;
+    const queryError = [bookingIssues, waitlistIssues, group, femaleBookings, maleBookings, femaleWaiting, maleWaiting].find((result) => result.error)?.error;
+    if (queryError) throw queryError;
     return Response.json({ environment, capacity: product.capacity ?? null, ...availability,
+      genderRequired,
+      genderBreakdown: {
+        confirmedFemale: femaleBookings.count || 0, confirmedMale: maleBookings.count || 0,
+        waitingFemale: femaleWaiting.count || 0, waitingMale: maleWaiting.count || 0,
+      },
       emailUpdateIssues: (bookingIssues.count || 0) + (waitlistIssues.count || 0),
       group: group.data, updatedAt: new Date().toISOString() }, { headers });
   } catch (error) {

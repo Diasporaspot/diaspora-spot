@@ -154,6 +154,7 @@ export default async function WorkshopSeriesRegistrationPage({
                     priceLabel={priceLabel}
                     productLabel="series"
                     productType="series"
+                    requireGender={series.workshops.some((workshop) => workshop.requireGender)}
                     slug={series.slug}
                   />
                 ) : (

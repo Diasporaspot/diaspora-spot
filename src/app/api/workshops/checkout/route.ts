@@ -3,6 +3,7 @@ import { quoteDiscount } from '@/lib/workshop-discounts';
 import {
   getProductCurrency,
   getProductRegistrationError,
+  getProductRegistrationInputError,
   getRegistrationProduct,
   getStripeUnitAmount,
   isPaidProduct,
@@ -22,6 +23,7 @@ type CheckoutBody = {
   expectedAmount?: unknown;
   discountCode?: unknown;
   email?: unknown;
+  gender?: unknown;
   fromSeries?: unknown;
   metaEventId?: unknown;
   metaEventSourceUrl?: unknown;
@@ -93,6 +95,9 @@ export async function POST(request: Request) {
       );
     }
 
+    const productInputError = getProductRegistrationInputError(product, input);
+    if (productInputError) return Response.json({ error: productInputError }, { status: 400 });
+
     if (!isPaidProduct(product)) {
       return Response.json(
         { error: 'This workshop or series does not require payment.' },
@@ -145,6 +150,7 @@ export async function POST(request: Request) {
       originalAmount: String(quote.originalAmount),
       discountAmount: String(quote.discountAmount),
       email: input.email,
+      ...(input.gender ? { gender: input.gender } : {}),
       name: input.name,
       productId: product._id,
       productType: input.productType,

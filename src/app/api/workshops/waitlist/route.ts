@@ -1,4 +1,4 @@
-import { getRegistrationProduct, getProductRegistrationError, normalizeRegistrationInput, validateRegistrationInput } from '@/lib/workshop-registration';
+import { getRegistrationProduct, getProductRegistrationError, getProductRegistrationInputError, normalizeRegistrationInput, validateRegistrationInput } from '@/lib/workshop-registration';
 import { capacityEnabled, canonicalId, eventDatabase, eventRequirements, getAvailability, CapacityError } from '@/lib/event-capacity';
 import { getSiteEnvironment } from '@/lib/site-environment';
 import { syncWaitlist, type WaitlistEntry } from '@/lib/event-mailing';
@@ -19,10 +19,13 @@ export async function POST(request: Request) {
     const product = await getRegistrationProduct(input.productType, input.slug);
     const error = getProductRegistrationError(product);
     if (!product || error) return Response.json({ error: error?.message || 'Event not found' }, { status: error?.status || 404 });
+    const productInputError = getProductRegistrationInputError(product, input);
+    if (productInputError) return Response.json({ error: productInputError }, { status: 400 });
     await getAvailability(product);
     const result = await eventDatabase().rpc('join_event_waitlist', {
       p_environment: getSiteEnvironment(), p_product_id: canonicalId(product._id), p_product_type: input.productType,
       p_email: input.email, p_name: input.name, p_phone: input.phone, p_events: eventRequirements(product),
+      p_data: { gender: input.gender || undefined },
     });
     if (result.error) throw result.error;
     if (result.data.error) return Response.json({ error: result.data.error === 'available' ? 'Seats are available again. Please continue with registration.' : new CapacityError(result.data.error).message, code: result.data.error }, { status: 409 });

@@ -56,6 +56,8 @@ const workshopFields = `
   format,
   host,
   capacity,
+  existingRegistrations,
+  requireGender,
   bookingStatus,
   paymentType,
   price,
