@@ -288,6 +288,7 @@ export default function WorkshopRegistrationForm({
             <option disabled value="">Select gender</option>
             <option value="female">Female</option>
             <option value="male">Male</option>
+            <option value="non-binary">Non-binary</option>
           </select>
         </div>
       ) : null}

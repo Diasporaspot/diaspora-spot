@@ -42,6 +42,7 @@ describe('workshop registration input', () => {
   it('requires gender only when the selected workshop needs it', () => {
     assert.equal(validateGenderRequirement(true, ''), 'Select your gender.');
     assert.equal(validateGenderRequirement(true, 'female'), '');
+    assert.equal(normalizeRegistrationInput({ gender: 'non-binary' }).gender, 'non-binary');
     assert.equal(validateGenderRequirement(false, ''), '');
   });
 

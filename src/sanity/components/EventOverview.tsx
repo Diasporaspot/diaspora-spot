@@ -12,7 +12,7 @@ type Overview = {
   emailUpdateIssues: number;
   full: boolean;
   genderRequired: boolean;
-  genderBreakdown: { confirmedFemale: number; confirmedMale: number; waitingFemale: number; waitingMale: number };
+  genderBreakdown: { confirmedFemale: number; confirmedMale: number; confirmedNonBinary: number; waitingFemale: number; waitingMale: number; waitingNonBinary: number };
   closed: boolean;
   group: { group_id: string; group_name: string } | null;
   updatedAt: string;
@@ -36,9 +36,13 @@ export function EventOverview() {
   const [busy, setBusy] = useState(false);
   const embeddedOrigin = typeof window !== 'undefined' && window.location.pathname.startsWith('/studio')
     ? window.location.origin : undefined;
+  const configuredProductionBase = process.env.SANITY_STUDIO_PRODUCTION_URL || 'https://www.diasporaspot.com';
+  const productionBase = configuredProductionBase === 'https://diasporaspot.com'
+    ? 'https://www.diasporaspot.com'
+    : configuredProductionBase;
   const base = environment === 'staging'
     ? embeddedOrigin || process.env.SANITY_STUDIO_STAGING_URL || 'https://diasporaspotstaging.vercel.app'
-    : process.env.SANITY_STUDIO_PRODUCTION_URL || 'https://diasporaspot.com';
+    : productionBase;
 
   const load = useCallback(async (action?: Record<string, string>) => {
     const token = client.config().token;
@@ -117,11 +121,13 @@ export function EventOverview() {
 
       {data.genderRequired ? <Card border padding={3} radius={2}><Stack space={3}>
         <Text size={1} weight="semibold">Gender summary</Text>
-        <Grid columns={[2, 2, 4]} gap={3}>
+        <Grid columns={[2, 3, 3]} gap={3}>
           <Metric label="Registered women" value={data.genderBreakdown.confirmedFemale} />
           <Metric label="Registered men" value={data.genderBreakdown.confirmedMale} />
+          <Metric label="Registered non-binary" value={data.genderBreakdown.confirmedNonBinary} />
           <Metric label="Waiting women" value={data.genderBreakdown.waitingFemale} />
           <Metric label="Waiting men" value={data.genderBreakdown.waitingMale} />
+          <Metric label="Waiting non-binary" value={data.genderBreakdown.waitingNonBinary} />
         </Grid>
         <Text muted size={1}>This summary includes registrations received after the gender question was enabled.</Text>
       </Stack></Card> : null}

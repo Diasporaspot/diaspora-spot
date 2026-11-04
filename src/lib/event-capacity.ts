@@ -19,7 +19,7 @@ export type Booking = {
   email: string; name: string; phone: string; state: 'held' | 'confirmed' | 'released';
   session_id: string | null; expires_at: string; created_at: string;
   sync_status: string; sync_error?: string;
-  registration_data: { gender?: 'female' | 'male'; smsMarketingConsent?: boolean; smsConsentAt?: string };
+  registration_data: { gender?: 'female' | 'male' | 'non-binary'; smsMarketingConsent?: boolean; smsConsentAt?: string };
 };
 export function eventRequirements(product: RegistrationProduct) {
   return [product, ...product.workshops].map((event) => ({

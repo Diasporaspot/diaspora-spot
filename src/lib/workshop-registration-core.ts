@@ -9,7 +9,7 @@ export type RegistrationProductType = 'series' | 'workshop';
 
 export type RegistrationInput = {
   email: string;
-  gender: 'female' | 'male' | '';
+  gender: 'female' | 'male' | 'non-binary' | '';
   name: string;
   phone: string;
   productType: RegistrationProductType;
@@ -57,7 +57,7 @@ export function normalizeRegistrationInput(input: {
 }): RegistrationInput {
   return {
     email: typeof input.email === 'string' ? input.email.trim().toLowerCase() : '',
-    gender: input.gender === 'female' || input.gender === 'male' ? input.gender : '',
+    gender: input.gender === 'female' || input.gender === 'male' || input.gender === 'non-binary' ? input.gender : '',
     name: typeof input.name === 'string' ? input.name.trim() : '',
     phone: normalizeInternationalPhoneNumber(input.phone),
     productType: input.productType === 'series' ? 'series' : 'workshop',
